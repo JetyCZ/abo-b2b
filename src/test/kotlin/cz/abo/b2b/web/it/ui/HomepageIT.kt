@@ -47,6 +47,6 @@ class HomepageIT {
     fun testHomepage2() {
         driver.get("http://localhost:8080")
 
-        assertNotNull(driver.findElement(By.xpath("//vaadin-grid-sorter[text()='Product Name']")))
+        assertNotNull(driver.findElement(By.xpath("//vaadin-grid-sorter[text()='Product2 Name']")))
     }
 }
