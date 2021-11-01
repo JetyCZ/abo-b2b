@@ -67,6 +67,36 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+
+		<!-- Selenium kotlin -->
+		<!-- Use the Kotlin test library. -->
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-test</artifactId>
+			<version>${kotlin.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- Use the Kotlin JUnit integration. -->
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-test-junit</artifactId>
+			<version>${kotlin.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>3.14.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.bonigarcia</groupId>
+			<artifactId>webdrivermanager</artifactId>
+			<version>5.0.2</version>
+			<scope>test</scope>
+		</dependency>
+
+
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
@@ -196,6 +226,55 @@
 								</configuration>
 							</execution>
 						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>it</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-maven-plugin</artifactId>
+						<configuration>
+							<wait>1000</wait>
+							<maxAttempts>600</maxAttempts>
+						</configuration>
+						<executions>
+							<execution>
+								<id>start-spring-boot</id>
+								<phase>pre-integration-test</phase>
+								<configuration>
+									<wait>1000</wait>
+									<maxAttempts>600</maxAttempts>
+								</configuration>
+								<goals>
+									<goal>start</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>stop-spring-boot</id>
+								<phase>post-integration-test</phase>
+								<goals>
+									<goal>stop</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>integration-test</id>
+								<phase>verify</phase>
+							</execution>
+						</executions>
+						<configuration>
+							<trimStackTrace>false</trimStackTrace>
+							<enableAssertions>true</enableAssertions>
+						</configuration>
 					</plugin>
 				</plugins>
 			</build>

@@ -1,0 +1,74 @@
+buildscript {
+    repositories {
+        maven { setUrl("https://maven.vaadin.com/vaadin-prereleases") }
+        mavenLocal()
+        mavenCentral()
+    }
+}
+
+plugins {
+    id 'org.springframework.boot' version '2.5.6'
+    id 'io.spring.dependency-management'  version '1.0.9.RELEASE'
+    id 'java'
+    id "com.vaadin" version "$vaadinVersion"
+    id 'org.jetbrains.kotlin.jvm' version '1.5.31'
+    id "org.jetbrains.kotlin.plugin.jpa" version "1.3.41"
+    id "org.jetbrains.kotlin.plugin.allopen" version "1.5.31"
+}
+
+defaultTasks("clean", "build")
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+    maven { setUrl("https://maven.vaadin.com/vaadin-addons") }
+}
+
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+}
+
+dependencies {
+    implementation('com.vaadin:vaadin-spring-boot-starter')
+
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("com.h2database:h2")
+
+    implementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+
+    // UI testing
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
+
+    testImplementation "org.seleniumhq.selenium:selenium-java:3.14.0"
+    testImplementation "io.github.bonigarcia:webdrivermanager:5.0.2"
+
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "com.vaadin:vaadin-bom:$vaadinVersion"
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+// The following pnpmEnable = true is not needed as pnpm is used by default,
+// this is just an example of how to configure the Gradle Vaadin Plugin:
+// for more configuration options please see: https://vaadin.com/docs/latest/guide/start/gradle/#all-options
+vaadin {
+    pnpmEnable = true
+}

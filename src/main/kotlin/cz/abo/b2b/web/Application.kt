@@ -9,9 +9,9 @@ import org.springframework.context.annotation.Bean
 import java.math.BigDecimal
 
 @SpringBootApplication
-class Application {
+open class Application {
     @Bean
-    fun loadData(repository: ProductRepository): CommandLineRunner {
+    open fun loadData(repository: ProductRepository): CommandLineRunner {
         return CommandLineRunner {
             // save a couple of customers
             repository.save(Product("Kešu", BigDecimal.valueOf(25.5), null))

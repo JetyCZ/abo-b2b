@@ -25,7 +25,7 @@ class MainView(val productRepository: ProductRepository) : VerticalLayout() {
 
         add(Button(
             "Click me"
-        ) { e: ClickEvent<Button?>? ->
+        ) {
             Notification.show(
                 "Hello, Spring+Vaadin user!"
             )
