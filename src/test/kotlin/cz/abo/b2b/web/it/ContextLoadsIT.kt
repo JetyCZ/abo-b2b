@@ -6,7 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 
 @SpringBootTest
-class WebApplicationTests(val applicationContext: ApplicationContext) {
+class ContextLoadsIT(val applicationContext: ApplicationContext) {
 
 	@Test
 	fun contextLoads() {
