@@ -5,43 +5,48 @@
 package cz.abo.b2b.web.it.ui
 
 import org.junit.jupiter.api.*
+import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
-import org.springframework.test.context.event.annotation.AfterTestClass
+import java.util.concurrent.TimeUnit
 import kotlin.test.assertNotNull
 
+@TestInstance(PER_CLASS)
 class HomepageIT {
 
-    companion object {
-        var driver: WebDriver
-        init {
-            System.setProperty("webdriver.chrome.driver", this.javaClass.getResource("/chromedriver").file)
-            driver = ChromeDriver(ChromeOptions())
-        }
+    lateinit var driver: WebDriver
 
+    @BeforeAll
+    fun setup() {
+        System.setProperty("webdriver.chrome.driver", this.javaClass.getResource("/chromedriver").file)
 
-        /*@BeforeAll
-        fun beforeAll() {
-            System.setProperty("webdriver.chrome.driver", this.javaClass.getResource("/chromedriver").file)
-            driver = ChromeDriver(ChromeOptions())
-        }*/
-
-        @AfterAll
-        fun afterAll() {
-            // Quit the driver to release resources
-            driver.quit()
-        }
+        driver = ChromeDriver(ChromeOptions())
+        driver.manage().timeouts().implicitlyWait(100, TimeUnit.SECONDS);
     }
+
+    @AfterAll
+    fun stop(){
+        driver.quit()
+    }
+
+
 
 
     @Test
     fun testHomepage() {
         driver.get("http://localhost:8080")
+
         assertNotNull(driver.findElement(By.xpath("//vaadin-grid-sorter[text()='Product Name']")))
     }
 
 
+    @Test
+    fun testHomepage2() {
+        driver.get("http://localhost:8080")
+
+        assertNotNull(driver.findElement(By.xpath("//vaadin-grid-sorter[text()='Product Name']")))
+    }
 }
