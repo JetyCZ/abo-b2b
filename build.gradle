@@ -3,6 +3,7 @@ buildscript {
         maven { setUrl("https://maven.vaadin.com/vaadin-prereleases") }
         mavenLocal()
         mavenCentral()
+        maven { url = "https://maven.vaadin.com/vaadin-addons" }
     }
 }
 
@@ -36,6 +37,7 @@ configurations {
 
 dependencies {
     implementation('com.vaadin:vaadin-spring-boot-starter')
+    implementation 'org.vaadin.klaudeta:grid-pagination:2.0.10'
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")

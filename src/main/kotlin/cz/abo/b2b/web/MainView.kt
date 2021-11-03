@@ -4,7 +4,6 @@ import com.vaadin.flow.component.ClickEvent
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.GridVariant
-import com.vaadin.flow.component.html.Label
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.icon.VaadinIcon
@@ -24,13 +23,14 @@ import cz.abo.b2b.web.dao.ProductRepository
 import cz.abo.b2b.web.shoppingcart.ShoppingCart
 import cz.abo.b2b.web.shoppingcart.ShoppingCartItem
 import org.apache.commons.lang3.StringUtils
+import org.vaadin.klaudeta.PaginatedGrid
 
 
 @Route
 class MainView(val productRepository: ProductRepository,
                 val shoppingCart: ShoppingCart) : VerticalLayout() {
 
-    private val productGrid: Grid<Product> = Grid(Product::class.java)
+    private val productGrid: PaginatedGrid<Product> = PaginatedGrid(Product::class.java)
     private val shoppingCartGrid: Grid<ShoppingCartItem> = Grid(ShoppingCartItem::class.java)
     private val leftColumn : VerticalLayout = VerticalLayout()
     init {
@@ -46,7 +46,6 @@ class MainView(val productRepository: ProductRepository,
         leftColumn.width = "33%"
 
         workspace.add(leftColumn)
-        workspace.height = "100%"
         val rightColumn = VerticalLayout()
 
         val filter = TextField()
@@ -63,30 +62,21 @@ class MainView(val productRepository: ProductRepository,
         displayShoppingCartContent()
 
         rightColumn.add(productGrid)
+
         workspace.add(rightColumn)
         workspace.element.style.set("background-color","#FFFFA0")
         add(workspace)
-        // FOOTER
-
-        // FOOTER
-        val actionButton1 = Tab(VaadinIcon.HOME.create(), Span("Home"))
-        val actionButton2 = Tab(VaadinIcon.USERS.create(), Span("Customers"))
-        val actionButton3 = Tab(VaadinIcon.PACKAGE.create(), Span("Products"))
-        val buttonBar = Tabs(actionButton1, actionButton2, actionButton3)
-        val footer = HorizontalLayout(buttonBar)
-        footer.justifyContentMode = JustifyContentMode.CENTER
-        footer.width = "100%"
-        footer.element.style.set("background-color","#FFA0FF")
 
 
-        add(footer)
 }
 
     private fun buildProductGrid() {
+
         val productList = productRepository.findAll()
         productGrid.setItems(productList)
         productGrid.removeAllColumns()
-        productGrid.addColumn(Product::productName).setHeader("Název zboží")
+        productGrid.addColumn(Product::productName).setHeader("Název zboží").setFlexGrow(1)
+
         productGrid.addColumn(Product::priceVAT).setHeader("Cena vč. DPH")
         productGrid.addComponentColumn(this::buildBuyButton).setHeader("Akce")
         productGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
@@ -106,6 +96,7 @@ class MainView(val productRepository: ProductRepository,
                 )
                 layout
             })
+        productGrid.height = "70vh"
     }
 
     /*private fun onItemClick(event: ItemClickEvent<Product>) {
@@ -139,7 +130,16 @@ class MainView(val productRepository: ProductRepository,
         val drawer: Icon = VaadinIcon.MENU.create()
         val title = Span("Asociace Bezobalu - B2B platforma")
         val help: Icon = VaadinIcon.QUESTION_CIRCLE.create()
-        val header = HorizontalLayout(drawer, title, help)
+
+        val actionButton1 = Tab(VaadinIcon.HOME.create(), Span("Domů"))
+        val actionButton2 = Tab(VaadinIcon.USERS.create(), Span("Nastavení"))
+        val actionButton3 = Tab(VaadinIcon.PACKAGE.create(), Span("Odhlásit"))
+        val buttonBar = Tabs(actionButton1, actionButton2, actionButton3)
+        val topMenu = HorizontalLayout(buttonBar)
+        topMenu.justifyContentMode = JustifyContentMode.CENTER
+        topMenu.width = "100%"
+
+        val header = HorizontalLayout(drawer, title, topMenu, help)
         header.expand(title)
         header.isPadding = true
         header.width = "100%"
