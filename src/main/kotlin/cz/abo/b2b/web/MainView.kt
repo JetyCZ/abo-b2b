@@ -4,10 +4,7 @@ import com.vaadin.flow.component.ClickEvent
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.GridVariant
-import com.vaadin.flow.component.grid.ItemClickEvent
-import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.html.Label
-import com.vaadin.flow.component.html.Section
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.icon.VaadinIcon
@@ -25,6 +22,7 @@ import cz.abo.b2b.web.component.StyledText
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.ProductRepository
 import cz.abo.b2b.web.shoppingcart.ShoppingCart
+import cz.abo.b2b.web.shoppingcart.ShoppingCartItem
 import org.apache.commons.lang3.StringUtils
 
 
@@ -32,12 +30,14 @@ import org.apache.commons.lang3.StringUtils
 class MainView(val productRepository: ProductRepository,
                 val shoppingCart: ShoppingCart) : VerticalLayout() {
 
-    private val grid: Grid<Product> = Grid(Product::class.java)
+    private val productGrid: Grid<Product> = Grid(Product::class.java)
+    private val shoppingCartGrid: Grid<ShoppingCartItem> = Grid(ShoppingCartItem::class.java)
     private val leftColumn : VerticalLayout = VerticalLayout()
     init {
-        addHeader()
+        height = "100%"
+        element.style.set("background-color","#FCFFFC")
 
-        // WORKSPACE
+        addHeader()
 
         // WORKSPACE
         val workspace = HorizontalLayout()
@@ -55,34 +55,16 @@ class MainView(val productRepository: ProductRepository,
         filter.addValueChangeListener { e -> listProducts(e.value) }
         rightColumn.add(filter)
 
-        val productList = productRepository.findAll()
-        grid.setItems(productList)
-        grid.removeAllColumns()
-        grid.addColumn(Product::productName).setHeader("Název zboží")
-        grid.addColumn(Product::priceVAT).setHeader("Cena vč. DPH")
-        grid.addComponentColumn(this::buildDeleteButton).setHeader("Akce")
-        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
-
-        grid.setItemDetailsRenderer(
-            ComponentRenderer { product: Product ->
-                val layout = VerticalLayout()
-                layout.width = "100%"
-                val description : String
-                if (product.description==null) {
-                    description = "Žádný popis"
-                } else {
-                    description = "Popis: " + product.description
-                }
-                layout.add(
-                    StyledText(description)
-                )
-                layout
-            })
-        // grid.addItemClickListener(this::onItemClick)
-
+        buildProductGrid()
+        shoppingCartGrid.removeAllColumns()
+        shoppingCartGrid.addColumn("product.productName").setHeader("V košíku")
+        shoppingCartGrid.addColumn("count").setHeader("Počet")
+        leftColumn.add(shoppingCartGrid)
         displayShoppingCartContent()
-        rightColumn.add(grid)
+
+        rightColumn.add(productGrid)
         workspace.add(rightColumn)
+        workspace.element.style.set("background-color","#FFFFA0")
         add(workspace)
         // FOOTER
 
@@ -94,15 +76,43 @@ class MainView(val productRepository: ProductRepository,
         val footer = HorizontalLayout(buttonBar)
         footer.justifyContentMode = JustifyContentMode.CENTER
         footer.width = "100%"
+        footer.element.style.set("background-color","#FFA0FF")
+
 
         add(footer)
 }
+
+    private fun buildProductGrid() {
+        val productList = productRepository.findAll()
+        productGrid.setItems(productList)
+        productGrid.removeAllColumns()
+        productGrid.addColumn(Product::productName).setHeader("Název zboží")
+        productGrid.addColumn(Product::priceVAT).setHeader("Cena vč. DPH")
+        productGrid.addComponentColumn(this::buildBuyButton).setHeader("Akce")
+        productGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+
+        productGrid.setItemDetailsRenderer(
+            ComponentRenderer { product: Product ->
+                val layout = VerticalLayout()
+                layout.width = "100%"
+                val description: String
+                if (product.description == null) {
+                    description = "Žádný popis"
+                } else {
+                    description = "Popis: " + product.description
+                }
+                layout.add(
+                    StyledText(description)
+                )
+                layout
+            })
+    }
 
     /*private fun onItemClick(event: ItemClickEvent<Product>) {
 
     }*/
 
-    private fun buildDeleteButton(p: Product): Button? {
+    private fun buildBuyButton(p: Product): Button? {
         val button: Button = Button("Koupit")
         button.addClickListener { e: ClickEvent<Button?>? ->
             addToCart(p)
@@ -111,17 +121,18 @@ class MainView(val productRepository: ProductRepository,
     }
 
     private fun addToCart(p: Product) {
-        Notification.show("Product " + p.productName + " added to cart")
+        Notification.show("Produkt '" + p.productName + "' byl přidán do košíku", 2000, Notification.Position.TOP_CENTER)
         shoppingCart.add(p, 1)
-        leftColumn.removeAll()
         displayShoppingCartContent()
     }
 
     private fun displayShoppingCartContent() {
+        var items = ArrayList<ShoppingCartItem>()
         for (shoppingCartEntry in shoppingCart.entries) {
-            val shoppingCartEntry = shoppingCartEntry.value
-            leftColumn.add(Label(shoppingCartEntry.product.productName + ": " + shoppingCartEntry.count))
+            items.add(shoppingCartEntry.value)
         }
+        shoppingCartGrid.setItems(items)
+
     }
 
     private fun addHeader() {
@@ -137,9 +148,9 @@ class MainView(val productRepository: ProductRepository,
 
     private fun listProducts(productName: String?) {
         if (StringUtils.isEmpty(productName)) {
-            grid.setItems(productRepository.findAll())
+            productGrid.setItems(productRepository.findAll())
         } else {
-            grid.setItems(productRepository.findByProductNameContaining(productName))
+            productGrid.setItems(productRepository.findByProductNameContaining(productName))
         }
     }
 }
