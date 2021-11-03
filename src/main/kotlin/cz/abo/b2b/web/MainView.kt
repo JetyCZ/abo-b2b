@@ -3,6 +3,11 @@ package cz.abo.b2b.web
 import com.vaadin.flow.component.ClickEvent
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.grid.GridVariant
+import com.vaadin.flow.component.grid.ItemClickEvent
+import com.vaadin.flow.component.html.Div
+import com.vaadin.flow.component.html.Label
+import com.vaadin.flow.component.html.Section
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.icon.VaadinIcon
@@ -13,17 +18,22 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.tabs.Tab
 import com.vaadin.flow.component.tabs.Tabs
 import com.vaadin.flow.component.textfield.TextField
+import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.value.ValueChangeMode
 import com.vaadin.flow.router.Route
+import cz.abo.b2b.web.component.StyledText
+import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.ProductRepository
+import cz.abo.b2b.web.shoppingcart.ShoppingCart
 import org.apache.commons.lang3.StringUtils
 
 
 @Route
-class MainView(val productRepository: ProductRepository) : VerticalLayout() {
+class MainView(val productRepository: ProductRepository,
+                val shoppingCart: ShoppingCart) : VerticalLayout() {
 
     private val grid: Grid<Product> = Grid(Product::class.java)
-
+    private val leftColumn : VerticalLayout = VerticalLayout()
     init {
         addHeader()
 
@@ -33,12 +43,10 @@ class MainView(val productRepository: ProductRepository) : VerticalLayout() {
         val workspace = HorizontalLayout()
         workspace.setSizeFull()
 
-        val leftColumn = VerticalLayout()
-        leftColumn.setWidth("33%")
-        leftColumn.add(Span("Košík - Benkor"))
-        leftColumn.add(Span("Košík - Probio"))
-        workspace.add(leftColumn)
+        leftColumn.width = "33%"
 
+        workspace.add(leftColumn)
+        workspace.height = "100%"
         val rightColumn = VerticalLayout()
 
         val filter = TextField()
@@ -49,9 +57,30 @@ class MainView(val productRepository: ProductRepository) : VerticalLayout() {
 
         val productList = productRepository.findAll()
         grid.setItems(productList)
-        grid.setColumns("productName", "priceVAT")
-        grid.addComponentColumn(this::buildDeleteButton)
+        grid.removeAllColumns()
+        grid.addColumn(Product::productName).setHeader("Název zboží")
+        grid.addColumn(Product::priceVAT).setHeader("Cena vč. DPH")
+        grid.addComponentColumn(this::buildDeleteButton).setHeader("Akce")
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
 
+        grid.setItemDetailsRenderer(
+            ComponentRenderer { product: Product ->
+                val layout = VerticalLayout()
+                layout.width = "100%"
+                val description : String
+                if (product.description==null) {
+                    description = "Žádný popis"
+                } else {
+                    description = "Popis: " + product.description
+                }
+                layout.add(
+                    StyledText(description)
+                )
+                layout
+            })
+        // grid.addItemClickListener(this::onItemClick)
+
+        displayShoppingCartContent()
         rightColumn.add(grid)
         workspace.add(rightColumn)
         add(workspace)
@@ -69,6 +98,10 @@ class MainView(val productRepository: ProductRepository) : VerticalLayout() {
         add(footer)
 }
 
+    /*private fun onItemClick(event: ItemClickEvent<Product>) {
+
+    }*/
+
     private fun buildDeleteButton(p: Product): Button? {
         val button: Button = Button("Koupit")
         button.addClickListener { e: ClickEvent<Button?>? ->
@@ -79,6 +112,16 @@ class MainView(val productRepository: ProductRepository) : VerticalLayout() {
 
     private fun addToCart(p: Product) {
         Notification.show("Product " + p.productName + " added to cart")
+        shoppingCart.add(p, 1)
+        leftColumn.removeAll()
+        displayShoppingCartContent()
+    }
+
+    private fun displayShoppingCartContent() {
+        for (shoppingCartEntry in shoppingCart.entries) {
+            val shoppingCartEntry = shoppingCartEntry.value
+            leftColumn.add(Label(shoppingCartEntry.product.productName + ": " + shoppingCartEntry.count))
+        }
     }
 
     private fun addHeader() {
@@ -100,3 +143,5 @@ class MainView(val productRepository: ProductRepository) : VerticalLayout() {
         }
     }
 }
+
+
