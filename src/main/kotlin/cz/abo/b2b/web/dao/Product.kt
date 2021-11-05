@@ -2,10 +2,7 @@ package cz.abo.b2b.web.dao
 
 import java.math.BigDecimal
 import java.util.*
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity
 class Product(
@@ -15,9 +12,13 @@ class Product(
     var priceVAT: BigDecimal,
 
     @Column(columnDefinition="LONGTEXT")
-    var description: String?
+    var description: String?,
+
+    @ManyToOne
+    var supplier: Supplier
 
     ) {
+
     @Id
     @GeneratedValue
     val id: UUID = UUID.randomUUID()

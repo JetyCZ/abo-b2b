@@ -3,6 +3,7 @@ package cz.abo.b2b.web
 import com.vaadin.flow.component.ClickEvent
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.grid.GridSortOrder
 import com.vaadin.flow.component.grid.GridVariant
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.Icon
@@ -14,7 +15,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.tabs.Tab
 import com.vaadin.flow.component.tabs.Tabs
 import com.vaadin.flow.component.textfield.TextField
+import com.vaadin.flow.data.provider.SortDirection
 import com.vaadin.flow.data.renderer.ComponentRenderer
+import com.vaadin.flow.data.renderer.Renderer
 import com.vaadin.flow.data.value.ValueChangeMode
 import com.vaadin.flow.router.Route
 import cz.abo.b2b.web.component.StyledText
@@ -24,6 +27,8 @@ import cz.abo.b2b.web.shoppingcart.ShoppingCart
 import cz.abo.b2b.web.shoppingcart.ShoppingCartItem
 import org.apache.commons.lang3.StringUtils
 import org.vaadin.klaudeta.PaginatedGrid
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 @Route
@@ -49,7 +54,7 @@ class MainView(val productRepository: ProductRepository,
         val rightColumn = VerticalLayout()
 
         val filter = TextField()
-        filter.placeholder = "Filter by last name";
+        filter.placeholder = "Filtrovat podle názvu zboží";
         filter.valueChangeMode = ValueChangeMode.EAGER
         filter.addValueChangeListener { e -> listProducts(e.value) }
         rightColumn.add(filter)
@@ -75,12 +80,13 @@ class MainView(val productRepository: ProductRepository,
         val productList = productRepository.findAll()
         productGrid.setItems(productList)
         productGrid.removeAllColumns()
-        productGrid.addColumn(Product::productName).setHeader("Název zboží").setFlexGrow(1)
-
+        productGrid.addColumn("supplier.name").setHeader("Dodavatel")
+        val productColumn = productGrid.addColumn(Product::productName).setHeader("Název zboží").setWidth("70%")
         productGrid.addColumn(Product::priceVAT).setHeader("Cena vč. DPH")
         productGrid.addComponentColumn(this::buildBuyButton).setHeader("Akce")
         productGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
-
+        productGrid.setPaginatorTexts("Strana", "z")
+        productGrid.sort(Collections.singletonList(GridSortOrder(productColumn, SortDirection.ASCENDING)))
         productGrid.setItemDetailsRenderer(
             ComponentRenderer { product: Product ->
                 val layout = VerticalLayout()

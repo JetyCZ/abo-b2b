@@ -2,6 +2,7 @@ package cz.abo.b2b.web
 
 import cz.abo.b2b.web.dao.ProductRepository
 import cz.abo.b2b.web.importer.HeurekaXMLParser
+import cz.abo.b2b.web.importer.SuppliersImport
 import cz.abo.b2b.web.shoppingcart.ShoppingCart
 import org.slf4j.LoggerFactory
 import org.springframework.boot.CommandLineRunner
@@ -15,11 +16,9 @@ open class Application {
 
 
     @Bean
-    open fun loadData(heurekaXMLParser: HeurekaXMLParser, repository: ProductRepository): CommandLineRunner {
+    open fun loadData(suppliersImport: SuppliersImport): CommandLineRunner {
         return CommandLineRunner {
-            var products = heurekaXMLParser.products()
-            // save a couple of customers
-            repository.saveAll(products)
+            suppliersImport.importAll()
         }
     }
 
