@@ -10,14 +10,15 @@ class Product(
     var productName: String,
 
     var priceVAT: BigDecimal,
+    var VAT: Double,
 
-    @Column(columnDefinition="LONGTEXT")
+    @Column(columnDefinition = "LONGTEXT")
     var description: String?,
 
     @ManyToOne
     var supplier: Supplier
 
-    ) {
+) {
 
     @Id
     @GeneratedValue

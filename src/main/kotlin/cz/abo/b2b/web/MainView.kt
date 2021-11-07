@@ -5,6 +5,7 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.GridSortOrder
 import com.vaadin.flow.component.grid.GridVariant
+import com.vaadin.flow.component.html.Label
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.icon.VaadinIcon
@@ -36,7 +37,7 @@ class MainView(val productRepository: ProductRepository,
                 val shoppingCart: ShoppingCart) : VerticalLayout() {
 
     private val productGrid: PaginatedGrid<Product> = PaginatedGrid(Product::class.java)
-    private val shoppingCartGrid: Grid<ShoppingCartItem> = Grid(ShoppingCartItem::class.java)
+
     private val leftColumn : VerticalLayout = VerticalLayout()
     init {
         height = "100%"
@@ -60,10 +61,6 @@ class MainView(val productRepository: ProductRepository,
         rightColumn.add(filter)
 
         buildProductGrid()
-        shoppingCartGrid.removeAllColumns()
-        shoppingCartGrid.addColumn("product.productName").setHeader("V košíku")
-        shoppingCartGrid.addColumn("count").setHeader("Počet")
-        leftColumn.add(shoppingCartGrid)
         displayShoppingCartContent()
 
         rightColumn.add(productGrid)
@@ -93,9 +90,9 @@ class MainView(val productRepository: ProductRepository,
                 layout.width = "100%"
                 val description: String
                 if (product.description == null) {
-                    description = "Žádný popis"
+                    description = "<i>Žádný popis</i>"
                 } else {
-                    description = "Popis: " + product.description
+                    description = "<b>Popis:</b> " + product.description
                 }
                 layout.add(
                     StyledText(description)
@@ -124,11 +121,31 @@ class MainView(val productRepository: ProductRepository,
     }
 
     private fun displayShoppingCartContent() {
-        var items = ArrayList<ShoppingCartItem>()
+
+        leftColumn.removeAll()
         for (shoppingCartEntry in shoppingCart.entries) {
-            items.add(shoppingCartEntry.value)
+            val shoppingCartGrid: Grid<ShoppingCartItem> = Grid(ShoppingCartItem::class.java)
+
+            shoppingCartGrid.removeAllColumns()
+            shoppingCartGrid.addColumn("product.productName").setHeader("V košíku")
+            shoppingCartGrid.addColumn("count").setHeader("Počet")
+            var items = ArrayList<ShoppingCartItem>()
+            val shoppingCartItem = shoppingCartEntry.value
+            items.addAll(shoppingCartItem.values)
+            shoppingCartGrid.setItems(items)
+
+            val oneSupplierDiv = VerticalLayout()
+            oneSupplierDiv.element.style.set("background-color","#F0EEF0")
+            oneSupplierDiv.add(Label("Košík - " + shoppingCartItem.supplier.name))
+            oneSupplierDiv.add(shoppingCartGrid)
+            oneSupplierDiv.add(Label("Bez DPH:" + shoppingCartItem.totalPriceNoVAT()))
+            oneSupplierDiv.add(Label("S DPH:" + shoppingCartItem.totalPriceVAT()))
+            oneSupplierDiv.add(Label("Doprava zdarma (bez DPH):" + shoppingCartItem.supplier.freeTransportFrom))
+            oneSupplierDiv.add(Label("K dopravě zdarma ještě:" + shoppingCartItem.remainingToFreeTransportNoVAT()))
+            leftColumn.add(oneSupplierDiv)
+
         }
-        shoppingCartGrid.setItems(items)
+
 
     }
 

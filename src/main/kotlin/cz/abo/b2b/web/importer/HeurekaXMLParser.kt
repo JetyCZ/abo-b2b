@@ -4,24 +4,11 @@ import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.Supplier
 import org.springframework.stereotype.Component
 import java.io.File
-import java.io.FileInputStream
-import java.io.InputStream
-import java.lang.Double
 import java.math.BigDecimal
 import javax.xml.parsers.DocumentBuilderFactory
 
 @Component
-class HeurekaXMLParser {
-
-    @Throws(Exception::class)
-    fun products(): List<Product>? {
-
-        val file = HeurekaXMLParser::class.java.getResource("/xml/example.xml").file
-        val input = File(file)
-
-        val supplier = Supplier("Test", BigDecimal(1000), "", null)
-        return parseStream(input, supplier)
-    }
+class HeurekaXMLParser() {
 
     fun parseStream(file: File, supplier: Supplier): MutableList<Product> {
         val factory = DocumentBuilderFactory.newInstance()
@@ -39,6 +26,7 @@ class HeurekaXMLParser {
             var productName: String? = null
             var description: String? = null
             var priceVAT: BigDecimal? = null
+            var vat = 0.15
             for (j in 1 until shopItemChildrenCount) {
                 val shopItemChild = shopItemChildren.item(j)
                 val nodeName = shopItemChild.nodeName
@@ -49,11 +37,14 @@ class HeurekaXMLParser {
                 } else if ("PRICE_VAT" == nodeName) {
                     var priceVatStr = shopItemChild.firstChild.nodeValue
                     priceVatStr = priceVatStr.replace(',', '.')
-                    priceVAT = BigDecimal(Double.valueOf(priceVatStr))
+                    priceVAT = BigDecimal(priceVatStr.toDouble())
+                } else if ("VAT" == nodeName) {
+                    var vatStr = shopItemChild.firstChild.nodeValue
+                    vat = vatStr.replace("%","").toDouble() * 0.01
                 }
             }
             try {
-                val product = Product(productName!!, priceVAT!!, description, supplier)
+                val product = Product(productName!!, priceVAT!!, vat, description, supplier)
                 result.add(product)
             } catch (e: Exception) {
                 //TODO email problem with importing product

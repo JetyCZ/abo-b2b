@@ -4,10 +4,10 @@ import cz.abo.b2b.web.dao.Product
 import java.util.*
 import kotlin.collections.HashMap
 
-open class ShoppingCart : HashMap<UUID, ShoppingCartItem>() {
+open class ShoppingCart : HashMap<UUID, ShoppingCartSupplier>() {
     fun add(product: Product, count: Long) {
-        val item = getOrDefault(product.id, ShoppingCartItem(product, 0L))
-        item.count += count
-        put(product.id, item)
+        val shoppingCartSupplier = getOrDefault(product.supplier.id, ShoppingCartSupplier(product.supplier))
+        put(product.supplier.id, shoppingCartSupplier)
+        shoppingCartSupplier.addToCart(product, count)
     }
 }
