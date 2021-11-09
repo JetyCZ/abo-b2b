@@ -19,7 +19,8 @@ class Supplier(
 
     @Column(columnDefinition = "LONGTEXT")
     var description: String?,
-    var importUrl: String?
+    var importUrl: String,
+    var importerClassName: String
 
 ) {
     @Id

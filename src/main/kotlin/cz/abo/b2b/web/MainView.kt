@@ -1,6 +1,7 @@
 package cz.abo.b2b.web
 
 import com.vaadin.flow.component.ClickEvent
+import com.vaadin.flow.component.Html
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.GridSortOrder
@@ -18,7 +19,6 @@ import com.vaadin.flow.component.tabs.Tabs
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.provider.SortDirection
 import com.vaadin.flow.data.renderer.ComponentRenderer
-import com.vaadin.flow.data.renderer.Renderer
 import com.vaadin.flow.data.value.ValueChangeMode
 import com.vaadin.flow.router.Route
 import cz.abo.b2b.web.component.StyledText
@@ -79,7 +79,8 @@ class MainView(val productRepository: ProductRepository,
         productGrid.removeAllColumns()
         productGrid.addColumn("supplier.name").setHeader("Dodavatel")
         val productColumn = productGrid.addColumn(Product::productName).setHeader("Název zboží").setWidth("70%")
-        productGrid.addColumn(Product::priceVAT).setHeader("Cena vč. DPH")
+        productGrid.addColumn(Product::priceNoVAT).setHeader(
+            Html("<span>Cena<br>bez DPH</br>"))
         productGrid.addComponentColumn(this::buildBuyButton).setHeader("Akce")
         productGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         productGrid.setPaginatorTexts("Strana", "z")

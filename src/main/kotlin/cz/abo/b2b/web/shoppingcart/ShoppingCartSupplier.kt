@@ -2,7 +2,6 @@ package cz.abo.b2b.web.shoppingcart
 
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.Supplier
-import org.apache.http.entity.ContentType.getOrDefault
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*

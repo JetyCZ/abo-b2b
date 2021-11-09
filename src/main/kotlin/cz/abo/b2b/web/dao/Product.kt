@@ -15,6 +15,7 @@ class Product(
     @Column(columnDefinition = "LONGTEXT")
     var description: String?,
 
+    quantity: BigDecimal,
     @ManyToOne
     var supplier: Supplier
 
@@ -24,4 +25,8 @@ class Product(
     @GeneratedValue
     val id: UUID = UUID.randomUUID()
 
+
+    fun priceNoVAT() : BigDecimal {
+        return priceVAT.divide(BigDecimal(1 + VAT))
+    }
 }

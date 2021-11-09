@@ -44,7 +44,7 @@ class HeurekaXMLParser() {
                 }
             }
             try {
-                val product = Product(productName!!, priceVAT!!, vat, description, supplier)
+                val product = Product(productName!!, priceVAT!!, vat, description, BigDecimal.ONE, supplier)
                 result.add(product)
             } catch (e: Exception) {
                 //TODO email problem with importing product
