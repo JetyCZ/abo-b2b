@@ -1,5 +1,6 @@
 package cz.abo.b2b.web.importer.xls.processor;
 
+import cz.abo.b2b.web.dao.Product;
 import cz.abo.b2b.web.importer.xls.dto.Item;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -67,7 +68,7 @@ public interface ISheetProcessor
         }
         return map;
     }
-    default Workbook fillOrder(File fileToParse, Map<Item, Integer> orderedItems){
+    default Workbook fillOrder(File fileToParse, Map<Product, Integer> orderedItems){
         ExcelFile parsedExcel = getWorkbookFromFile(fileToParse);
         Workbook workbook = parsedExcel.getWorkbook();
         int orderColumnIdx = getOrderColumnIdx();
@@ -75,10 +76,10 @@ public interface ISheetProcessor
         // Fill order not implemented yet
         if (orderColumnIdx==-1) return workbook;
         Sheet orderSheet = getOrderSheetFromWorkbook(workbook);
-        for (Map.Entry<Item, Integer> itemIntegerEntry : orderedItems.entrySet()) {
-            Item item = itemIntegerEntry.getKey();
+        for (Map.Entry<Product, Integer> itemIntegerEntry : orderedItems.entrySet()) {
+            Product product = itemIntegerEntry.getKey();
             Integer orderQuantity = itemIntegerEntry.getValue();
-            setOrderQuantityForItem(orderSheet, item, orderQuantity);
+            setOrderQuantityForItem(orderSheet, product, orderQuantity);
         }
         try {
             parsedExcel.getExcelFile().close();
@@ -88,8 +89,8 @@ public interface ISheetProcessor
         return parsedExcel.getWorkbook();
     }
 
-    default void setOrderQuantityForItem(Sheet orderSheet, Item item, Integer orderQuantity) {
-        Row row = orderSheet.getRow(item.getRowNum());
+    default void setOrderQuantityForItem(Sheet orderSheet, Product product, Integer orderQuantity) {
+        Row row = orderSheet.getRow(product.getRowNum());
         row.createCell(getOrderColumnIdx()).setCellValue(orderQuantity);
     }
     default double getOrderedQuantity(Workbook workbook, int rowNum) {

@@ -23,8 +23,6 @@ class SuppliersImport(
     val heurekaXMLParser: HeurekaXMLParser,
     val applicationContext: ApplicationContext) {
 
-
-
     fun importAll() {
         supplierRepository.deleteAll()
         productRepository.deleteAll()
@@ -46,16 +44,21 @@ class SuppliersImport(
                 } else {
                     val importerClass = Class.forName(supplier.importerClassName)
                     val importer = applicationContext.getBean(importerClass)
-                    val fileToParse = resourceFilePath(supplier.importUrl)
+                    val fileToParse = supplier.resourceFilePath()
                     val items = (importer as AbstractSheetProcessor).parseItems(File(fileToParse))
                     products = ArrayList()
                     for (item in items) {
                         val VAT = 0.01 * item.itemTax
-                        val priceVAT = BigDecimal((1 + VAT) * item.itemPrice)
-                        val quantity = BigDecimal(item.itemQuantity)
+                        val priceVAT = BigDecimal((1 + VAT) * item.itemPrice * 1000)
+                        var quantity = BigDecimal(item.itemQuantity)
+                        if (quantity.intValueExact()!=1) {
+                            quantity = quantity.divide(BigDecimal(1000))
+                        }
+                        val product = Product(item.itemName, priceVAT, VAT, "", quantity, saved)
+                        product.rowNum = item.rowNum
                         products.add(
                             // TODO item.description
-                            Product(item.itemName, priceVAT, VAT, "", quantity, saved)
+                            product
                         )
                     }
                 }
@@ -65,7 +68,4 @@ class SuppliersImport(
         }
     }
 
-    fun resourceFilePath(relativeResourcesPath: String) : String{
-        return SuppliersImport::class.java.getResource(relativeResourcesPath).getFile().replace("%20", " ")
-    }
 }

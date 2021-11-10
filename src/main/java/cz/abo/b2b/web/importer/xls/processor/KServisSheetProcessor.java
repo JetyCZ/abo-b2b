@@ -1,5 +1,6 @@
 package cz.abo.b2b.web.importer.xls.processor;
 
+import cz.abo.b2b.web.dao.Product;
 import cz.abo.b2b.web.importer.xls.dto.Item;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -56,7 +57,7 @@ public class KServisSheetProcessor extends AbstractSheetProcessor
     }
 
     @Override
-    public Workbook fillOrder(File fileToParse, Map<Item, Integer> orderedItems) {
+    public Workbook fillOrder(File fileToParse, Map<Product, Integer> orderedItems) {
         Workbook workbook = super.fillOrder(fileToParse, orderedItems);
         getProductsSheetFromWorkbook(workbook).getRow(0).getCell(5).setCellValue("Objednávám tolik balení");
         return workbook;

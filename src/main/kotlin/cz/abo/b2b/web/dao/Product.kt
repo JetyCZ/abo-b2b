@@ -1,6 +1,7 @@
 package cz.abo.b2b.web.dao
 
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.util.*
 import javax.persistence.*
 
@@ -15,11 +16,13 @@ class Product(
     @Column(columnDefinition = "LONGTEXT")
     var description: String?,
 
-    quantity: BigDecimal,
+    var quantity: BigDecimal,
     @ManyToOne
     var supplier: Supplier
 
 ) {
+
+    var rowNum: Int = 0
 
     @Id
     @GeneratedValue
@@ -27,6 +30,6 @@ class Product(
 
 
     fun priceNoVAT() : BigDecimal {
-        return priceVAT.divide(BigDecimal(1 + VAT))
+        return priceVAT.divide(BigDecimal(1 + VAT), 2, RoundingMode.HALF_UP)
     }
 }

@@ -1,5 +1,6 @@
 package cz.abo.b2b.web.importer.xls.processor;
 
+import cz.abo.b2b.web.dao.Product;
 import cz.abo.b2b.web.importer.xls.dto.Item;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
@@ -67,7 +68,7 @@ public class NutSheetProcessor extends AbstractSheetProcessor
     }
 
     @Override
-    public void setOrderQuantityForItem(Sheet orderSheet, Item item, Integer orderQuantity) {
+    public void setOrderQuantityForItem(Sheet orderSheet, Product product, Integer orderQuantity) {
         int rowIdx = 3;
         boolean finish = false;
         // We find item based on its name
@@ -76,7 +77,7 @@ public class NutSheetProcessor extends AbstractSheetProcessor
             finish = (row == null);
             if (!finish) {
                 String name = row.getCell(1).getStringCellValue();
-                if (name!=null && name.equals(item.getItemName())) {
+                if (name!=null && name.equals(product.getProductName())) {
                     row.createCell(getOrderColumnIdx()).setCellValue(orderQuantity);
                     finish=true;
                 }

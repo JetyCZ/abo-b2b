@@ -6,6 +6,8 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.GridSortOrder
 import com.vaadin.flow.component.grid.GridVariant
+import com.vaadin.flow.component.html.Anchor
+import com.vaadin.flow.component.html.AnchorTarget
 import com.vaadin.flow.component.html.Label
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.Icon
@@ -26,8 +28,11 @@ import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.ProductRepository
 import cz.abo.b2b.web.shoppingcart.ShoppingCart
 import cz.abo.b2b.web.shoppingcart.ShoppingCartItem
+import cz.abo.b2b.web.shoppingcart.ShoppingCartSupplier
 import org.apache.commons.lang3.StringUtils
 import org.vaadin.klaudeta.PaginatedGrid
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -61,7 +66,7 @@ class MainView(val productRepository: ProductRepository,
         rightColumn.add(filter)
 
         buildProductGrid()
-        displayShoppingCartContent()
+        displayShoppingCart()
 
         rightColumn.add(productGrid)
 
@@ -80,7 +85,9 @@ class MainView(val productRepository: ProductRepository,
         productGrid.addColumn("supplier.name").setHeader("Dodavatel")
         val productColumn = productGrid.addColumn(Product::productName).setHeader("Název zboží").setWidth("70%")
         productGrid.addColumn(Product::priceNoVAT).setHeader(
-            Html("<span>Cena<br>bez DPH</br>"))
+            Html("<span>Cena<br>bez DPH<br>za m.j.</span>"))
+        productGrid.addColumn(Product::quantity).setHeader(
+            Html("<span>Množství<br>(ks/kg/l)</span>"))
         productGrid.addComponentColumn(this::buildBuyButton).setHeader("Akce")
         productGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         productGrid.setPaginatorTexts("Strana", "z")
@@ -118,36 +125,63 @@ class MainView(val productRepository: ProductRepository,
     private fun addToCart(p: Product) {
         Notification.show("Produkt '" + p.productName + "' byl přidán do košíku", 2000, Notification.Position.TOP_CENTER)
         shoppingCart.add(p, 1)
-        displayShoppingCartContent()
+        displayShoppingCart()
     }
 
-    private fun displayShoppingCartContent() {
+    private fun displayShoppingCart() {
 
         leftColumn.removeAll()
         for (shoppingCartEntry in shoppingCart.entries) {
-            val shoppingCartGrid: Grid<ShoppingCartItem> = Grid(ShoppingCartItem::class.java)
-
-            shoppingCartGrid.removeAllColumns()
-            shoppingCartGrid.addColumn("product.productName").setHeader("V košíku")
-            shoppingCartGrid.addColumn("count").setHeader("Počet")
-            var items = ArrayList<ShoppingCartItem>()
-            val shoppingCartItem = shoppingCartEntry.value
-            items.addAll(shoppingCartItem.values)
-            shoppingCartGrid.setItems(items)
-
-            val oneSupplierDiv = VerticalLayout()
-            oneSupplierDiv.element.style.set("background-color","#F0EEF0")
-            oneSupplierDiv.add(Label("Košík - " + shoppingCartItem.supplier.name))
-            oneSupplierDiv.add(shoppingCartGrid)
-            oneSupplierDiv.add(Label("Bez DPH:" + shoppingCartItem.totalPriceNoVAT()))
-            oneSupplierDiv.add(Label("S DPH:" + shoppingCartItem.totalPriceVAT()))
-            oneSupplierDiv.add(Label("Doprava zdarma (bez DPH):" + shoppingCartItem.supplier.freeTransportFrom))
-            oneSupplierDiv.add(Label("K dopravě zdarma ještě:" + shoppingCartItem.remainingToFreeTransportNoVAT()))
-            leftColumn.add(oneSupplierDiv)
-
+            oneSupplierShoppingCart(shoppingCartEntry)
         }
 
 
+    }
+
+    private fun oneSupplierShoppingCart(shoppingCartEntry: MutableMap.MutableEntry<UUID, ShoppingCartSupplier>) {
+        val shoppingCartGrid: Grid<ShoppingCartItem> = Grid(ShoppingCartItem::class.java)
+
+        shoppingCartGrid.removeAllColumns()
+        shoppingCartGrid.addColumn("product.productName").setHeader("V košíku")
+        shoppingCartGrid.addColumn("count").setHeader("Počet")
+        var items = ArrayList<ShoppingCartItem>()
+        val shoppingCartItem = shoppingCartEntry.value
+        items.addAll(shoppingCartItem.values)
+        shoppingCartGrid.setItems(items)
+
+        val oneSupplierDiv = VerticalLayout()
+        oneSupplierDiv.element.style.set("background-color", "#F0EEF0")
+        oneSupplierDiv.add(Label("Košík - " + shoppingCartItem.supplier.name))
+        oneSupplierDiv.add(shoppingCartGrid)
+        oneSupplierDiv.add(
+            Html(
+                "<span>" +
+                        "<b>Bez DPH</b>: " + shoppingCartItem.totalPriceNoVAT() +
+                        "&nbsp;<b>s DPH</b>: " + shoppingCartItem.totalPriceVAT() +
+                        "</span>"
+            )
+        )
+        val remainingToFreeTransportNoVAT = shoppingCartItem.remainingToFreeTransportNoVAT()
+
+        val transportFreeLabel =
+            StringBuffer("<div>Doprava zdarma (bez DPH):" + shoppingCartItem.supplier.freeTransportFrom + " ")
+        if (remainingToFreeTransportNoVAT.toDouble() > 0) {
+            transportFreeLabel.append(
+                "<span style='color:red'>NE</span><br><i>(chybí " +
+                        remainingToFreeTransportNoVAT.setScale(0, RoundingMode.HALF_UP) + " Kč)</i>"
+            )
+        } else {
+            transportFreeLabel.append(
+                "<span style='color:green'>ANO</span><br><i>(víc o " +
+                        remainingToFreeTransportNoVAT.multiply(BigDecimal(-1))
+                            .setScale(0, RoundingMode.HALF_UP) + " Kč)</i>"
+            )
+        }
+        transportFreeLabel.append("</div>")
+        oneSupplierDiv.add(Html(transportFreeLabel.toString()))
+        val downloadAnchor = "<a href='/download-filled/" +shoppingCartEntry.key + "' target='_new'>Stáhnout vyplněný ceník</a>"
+        oneSupplierDiv.add(Html(downloadAnchor))
+        leftColumn.add(oneSupplierDiv)
     }
 
     private fun addHeader() {

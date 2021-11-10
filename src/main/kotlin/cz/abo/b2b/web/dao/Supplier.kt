@@ -1,5 +1,6 @@
 package cz.abo.b2b.web.dao
 
+import cz.abo.b2b.web.importer.SuppliersImport
 import java.math.BigDecimal
 import java.util.*
 import javax.persistence.Column
@@ -27,4 +28,7 @@ class Supplier(
     @GeneratedValue
     val id: UUID = UUID.randomUUID()
 
+    fun resourceFilePath() : String{
+        return Supplier::class.java.getResource(importUrl).getFile().replace("%20", " ")
+    }
 }
