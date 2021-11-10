@@ -54,7 +54,7 @@ class SuppliersImport(
                         if (quantity.intValueExact()!=1) {
                             quantity = quantity.divide(BigDecimal(1000))
                         }
-                        val product = Product(item.itemName, priceVAT, VAT, "", quantity, saved)
+                        val product = Product(item.itemName, priceVAT, VAT, item.description, quantity, saved)
                         product.rowNum = item.rowNum
                         products.add(
                             // TODO item.description

@@ -63,10 +63,26 @@ public class BionebioSheetProcessor extends AbstractSheetProcessor
                             log.warn("No price for: " + itemNameToUse);
                         }
                     }
+
+                    String note = values[7];
+                    String description = "";
+                    if (!StringUtils.isEmpty(note)) {
+                        if (note.contains("Cena za celé balení")) {
+                            itemPrice = itemPrice/itemQuantity;
+                        } else {
+                            description = note;
+                        }
+                    }
+                    if (values.length>8) {
+                        description += "<br><b>Výrobce/dodavatel</b>: " + values[8];
+                    }
+
                     int itemTax = 15;
 
                     if (itemPrice!=null) {
-                        itemsList.add(new Item(itemNameToUse, itemQuantity, itemPrice, itemTax));
+                        Item item = new Item(itemNameToUse, itemQuantity, itemPrice, itemTax);
+                        item.description = description;
+                        itemsList.add(item);
                     }
                 }
 

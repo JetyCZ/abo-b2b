@@ -27,23 +27,29 @@ public class KServisSheetProcessor extends AbstractSheetProcessor
         //split values from list to array
         String[] values = sheetData.toArray(new String[0]);
 
-        if (values.length>4) {
-            String priceStr = values[4].replaceFirst("\\s*Kč","");
+        if (values.length>5) {
+            String priceStr = values[5].replaceFirst("\\s*Kč","");
 
             if (StringUtils.isNumeric(priceStr)) {
-                String itemName = values[0].trim();
-                String itemQuantityStr = values[3];
+                String itemName = values[1].trim();
+                String itemQuantityStr = values[4];
                 Pattern weightPattern = Pattern.compile("^(?<weight>.+?)(\\(.*\\)|\\/.*)?$");
                 Matcher matcher = weightPattern.matcher(itemQuantityStr);
                 if (matcher.matches()) {
                     String itemQuantityParsed = matcher.group("weight")
                             .replaceFirst("\\,", "\\.")
-                            .replaceFirst("x1kg", "");
+                            .replaceFirst("x1kg", "")
+                            .replaceFirst("kg","");
 
                     double itemQuantity = Double.parseDouble(itemQuantityParsed)*1000;
                     double itemPrice = Double.parseDouble(priceStr)/1000;
                     int itemTax = 15;
-                    itemsList.add(new Item(itemName, itemQuantity, itemPrice, itemTax));
+                    Item item = new Item(itemName, itemQuantity, itemPrice, itemTax);
+                    itemsList.add(item);
+                    item.description = "<br><b>Balení:</b> " + itemQuantityStr + "<br>";
+                    item.description += "<b>Bez přid. cukru:</b> " + (("X".equals(values[2]))?"Ano":"Ne") + "<br>";
+                    item.description += "<b>Bez SO2:</b> " + (("X".equals(values[3]))?"Ano":"Ne") + "<br>";
+
                 }
 
 
@@ -53,13 +59,13 @@ public class KServisSheetProcessor extends AbstractSheetProcessor
     }
 
     public int getOrderColumnIdx() {
-        return 5;
+        return 6;
     }
 
     @Override
     public Workbook fillOrder(File fileToParse, Map<Product, Integer> orderedItems) {
         Workbook workbook = super.fillOrder(fileToParse, orderedItems);
-        getProductsSheetFromWorkbook(workbook).getRow(0).getCell(5).setCellValue("Objednávám tolik balení");
+        getProductsSheetFromWorkbook(workbook).getRow(0).getCell(6).setCellValue("Objednávám tolik balení");
         return workbook;
     }
 }

@@ -60,7 +60,7 @@ dependencies {
     testImplementation("org.codehaus.groovy:groovy-all:3.0.9")
     testImplementation("org.spockframework:spock-core:2.0-groovy-3.0")
 
-    // developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }

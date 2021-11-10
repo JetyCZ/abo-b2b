@@ -11,37 +11,17 @@ import java.util.Objects;
  * @author Tomas Kodym
  */
 
-@Entity(name = "Item")
-@Table(name = "item")
-@Transactional
 public class Item implements Serializable, Comparable<Item>
 {
-    @Column
     public Integer parsedIdx;
-
-    @Column
     private boolean bio;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true, updatable = false)
-
     private Integer itemId;
-
-    @Column(name = "item_name", nullable = false, length = 100)
     private String itemName;
-
-    @Column(name = "item_quantity", nullable = false, length = 50)
     private Double itemQuantity;
-
-    @Column(name = "item_price", nullable = false)
     private Double itemPrice;
-
-    @Column(name = "item_tax", nullable = false)
     private Integer itemTax;
-
-    @Column
     private Integer rowNum;
+    public String description;
 
     public Item() {
     }
