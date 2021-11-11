@@ -6,8 +6,6 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.GridSortOrder
 import com.vaadin.flow.component.grid.GridVariant
-import com.vaadin.flow.component.html.Anchor
-import com.vaadin.flow.component.html.AnchorTarget
 import com.vaadin.flow.component.html.Label
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.Icon
@@ -208,7 +206,7 @@ class MainView(val productRepository: ProductRepository,
         if (StringUtils.isEmpty(productName)) {
             productGrid.setItems(productRepository.findAll())
         } else {
-            productGrid.setItems(productRepository.findByProductNameContaining(productName))
+            productGrid.setItems(productRepository.findByProductNameContainingIgnoreCase(productName))
         }
     }
 }

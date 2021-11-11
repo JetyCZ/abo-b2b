@@ -20,18 +20,25 @@ import java.util.regex.Pattern;
 @Component
 public class KServisSheetProcessor extends AbstractSheetProcessor
 {
+    String lastCategory = null;
 
     @Override
     public List<Item> disintegrateIntoItem(int rowNum, List<String> sheetData) {
         List<Item> itemsList = new ArrayList<>();
         //split values from list to array
         String[] values = sheetData.toArray(new String[0]);
-
         if (values.length>5) {
-            String priceStr = values[5].replaceFirst("\\s*Kč","");
+            String priceStr = values[5].replaceFirst("\\s*Kč","").trim();
+            String valueInNameColumn = values[1].trim();
+            if (priceStr.contains("Cena za kg")) {
+                lastCategory = valueInNameColumn;
+            }
 
             if (StringUtils.isNumeric(priceStr)) {
-                String itemName = values[1].trim();
+                String itemName = valueInNameColumn;
+                if (!StringUtils.isEmpty(lastCategory)) {
+                    itemName += " (" + lastCategory + ")";
+                }
                 String itemQuantityStr = values[4];
                 Pattern weightPattern = Pattern.compile("^(?<weight>.+?)(\\(.*\\)|\\/.*)?$");
                 Matcher matcher = weightPattern.matcher(itemQuantityStr);
