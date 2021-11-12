@@ -1,5 +1,8 @@
 package cz.abo.b2b.web.importer.xls.dto;
 
+import cz.abo.b2b.web.dao.Product;
+import cz.abo.b2b.web.dao.Supplier;
+
 import javax.persistence.*;
 import javax.transaction.Transactional;
 import java.io.Serializable;
@@ -145,5 +148,17 @@ public class Item implements Serializable, Comparable<Item>
 
     public void setBio(boolean bio) {
         this.bio = bio;
+    }
+
+    public Product toProduct(Supplier saved)  {
+        double VAT = 0.01 * itemTax;
+        BigDecimal priceVAT = new BigDecimal((1 + VAT) * itemPrice * 1000);
+        BigDecimal quantity = new BigDecimal(itemQuantity);
+        if (quantity.intValueExact() != 1) {
+            quantity = quantity.divide(new BigDecimal(1000));
+        }
+        Product product = new Product(itemName, priceVAT, VAT, description, quantity, saved);
+        product.setRowNum(rowNum);
+        return product;
     }
 }

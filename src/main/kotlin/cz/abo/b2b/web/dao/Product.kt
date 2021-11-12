@@ -32,4 +32,6 @@ class Product(
     fun priceNoVAT() : BigDecimal {
         return priceVAT.divide(BigDecimal(1 + VAT), 2, RoundingMode.HALF_UP)
     }
+
+
 }

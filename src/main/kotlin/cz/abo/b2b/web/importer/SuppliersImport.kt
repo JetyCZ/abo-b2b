@@ -2,7 +2,9 @@ package cz.abo.b2b.web.importer
 
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.ProductRepository
+import cz.abo.b2b.web.dao.Supplier
 import cz.abo.b2b.web.dao.SupplierRepository
+import cz.abo.b2b.web.importer.xls.dto.Item
 import cz.abo.b2b.web.importer.xls.processor.AbstractSheetProcessor
 import org.apache.commons.lang3.StringUtils
 import org.springframework.context.ApplicationContext
@@ -17,11 +19,13 @@ import kotlin.collections.ArrayList
 
 @Component
 class SuppliersImport(
+
     val productRepository: ProductRepository,
     val supplierRepository: SupplierRepository,
     val suppliers: Suppliers,
     val heurekaXMLParser: HeurekaXMLParser,
     val applicationContext: ApplicationContext) {
+
 
     fun importAll() {
         supplierRepository.deleteAll()
@@ -48,18 +52,8 @@ class SuppliersImport(
                     val items = (importer as AbstractSheetProcessor).parseItems(File(fileToParse))
                     products = ArrayList()
                     for (item in items) {
-                        val VAT = 0.01 * item.itemTax
-                        val priceVAT = BigDecimal((1 + VAT) * item.itemPrice * 1000)
-                        var quantity = BigDecimal(item.itemQuantity)
-                        if (quantity.intValueExact()!=1) {
-                            quantity = quantity.divide(BigDecimal(1000))
-                        }
-                        val product = Product(item.itemName, priceVAT, VAT, item.description, quantity, saved)
-                        product.rowNum = item.rowNum
-                        products.add(
-                            // TODO item.description
-                            product
-                        )
+                        val product = item.toProduct(saved)
+                        products.add(product)
                     }
                 }
                 productRepository.saveAll(products)
@@ -67,5 +61,6 @@ class SuppliersImport(
             }
         }
     }
+
 
 }

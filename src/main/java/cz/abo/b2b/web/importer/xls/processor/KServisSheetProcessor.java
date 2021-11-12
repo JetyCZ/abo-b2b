@@ -69,10 +69,4 @@ public class KServisSheetProcessor extends AbstractSheetProcessor
         return 6;
     }
 
-    @Override
-    public Workbook fillOrder(File fileToParse, Map<Product, Integer> orderedItems) {
-        Workbook workbook = super.fillOrder(fileToParse, orderedItems);
-        getProductsSheetFromWorkbook(workbook).getRow(0).getCell(6).setCellValue("Objednávám tolik balení");
-        return workbook;
-    }
 }

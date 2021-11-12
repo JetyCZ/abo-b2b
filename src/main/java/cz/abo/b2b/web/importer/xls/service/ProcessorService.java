@@ -53,19 +53,19 @@ public class ProcessorService {
         // Load file from database
         String contentType = "application/vnd.ms-excel";
 
-        String pricelistFileName = "OL_bio nebio_11_2021.xls";
+        String pricelistFileName = new File(fileToParse).getName();
         String outputFilename = UPLOADING_DIR  + pricelistFileName;
         FileUtils.copyFile(new File(fileToParse), new File(outputFilename));
 
-        Map<Product, Integer> orderedItems = new HashMap<>();
+        Map<Product, Integer> orderedProducts = new HashMap<>();
         ShoppingCartSupplier shoppingCartSupplier = shoppingCart.get(supplierId);
         for (ShoppingCartItem shoppingCartItem : shoppingCartSupplier.values()) {
             Integer count = new Integer((int) shoppingCartItem.getCount());
-            orderedItems.put(shoppingCartItem.getProduct(), count);
+            orderedProducts.put(shoppingCartItem.getProduct(), count);
         }
 
         ISheetProcessor sheetProcessor = selectProcessor(supplier);
-        Workbook workbook = sheetProcessor.fillOrder(new File(outputFilename), orderedItems);
+        Workbook workbook = sheetProcessor.fillOrder(new File(outputFilename), orderedProducts);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
             workbook.write(bos);

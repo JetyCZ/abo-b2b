@@ -118,18 +118,17 @@ public interface ISheetProcessor
     default Sheet getProductsSheetFromWorkbook(File fileToParse) {
         Workbook workbook = getWorkbookFromFile(fileToParse).getWorkbook();
 
-        return getProductsSheetFromWorkbook(workbook);
+        return getProductsSheetFromWorkbook(workbook, getSheetName());
     }
 
     default Sheet getOrderSheetFromWorkbook(Workbook workbook) {
         // Normally, product sheet is same as order sheet
-        return getProductsSheetFromWorkbook(workbook);
+        return getProductsSheetFromWorkbook(workbook, getSheetName());
     }
 
-    default Sheet getProductsSheetFromWorkbook(Workbook workbook) {
-        String sheetName = getSheetName();
+    default Sheet getProductsSheetFromWorkbook(Workbook workbook, String sheetName) {
         Sheet sheet;
-        if (sheetName==null) {
+        if (sheetName ==null) {
             sheet = workbook.getSheetAt(0);
         } else {
             sheet = workbook.getSheet(sheetName);

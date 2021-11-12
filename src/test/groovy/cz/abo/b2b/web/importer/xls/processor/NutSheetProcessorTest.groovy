@@ -1,14 +1,10 @@
 package cz.abo.b2b.web.importer.xls.processor
 
-
-
-
-
 class NutSheetProcessorTest extends AbstractSheetProcessorTest {
 
     @Override
     protected String getPricelistResourcePath() {
-        return  "/orisek/orisek_01.03.2019.xls"
+        return  "/orisek/orisek_01.10.2021.xls"
     }
 
     def "IterateSheetValues"() {
@@ -19,20 +15,17 @@ class NutSheetProcessorTest extends AbstractSheetProcessorTest {
         then:
 
         items.size() > 0
-        def aloeVera = items["Aloe Vera_1000"]
-        aloeVera.itemQuantity == 1000
-        aloeVera.itemTax == 15
-        aloeVera.itemPrice == 0.239
+        def item1 = items["Aloe Vera_1000"]
+        item1.itemTax == 15
+        item1.itemPrice == 0.239
 
-        def zazvor = items["Zázvor v hořké čokoládě - Anglie_3000"]
-        zazvor.itemQuantity == 3000
-        zazvor.itemTax == 15
-        zazvor.itemPrice == 0.121
+        def item2 = items["Zázvor v hořké čokoládě_3000"]
+        item2.itemTax == 15
+        item2.itemPrice == 0.141
 
-        def pinie = items["Piniové oříšky_1000"]
-        pinie.itemQuantity == 1000
-        pinie.itemTax == 15
-        pinie.itemPrice == 0.732
+        def item3 = items["Zeleninové chipsy_1400"]
+        item3.itemTax == 15
+        item3.itemPrice == 0.331
 
 
     }
@@ -40,13 +33,12 @@ class NutSheetProcessorTest extends AbstractSheetProcessorTest {
     def "Make Order"() {
         given:
         def processor = new NutSheetProcessor()
-        def workbook = processor
         def sheetRead = fillWriteAndReadSheet(processor)
         def sheetWithOrder = sheetRead.getWorkbook().getSheet("Objednávka")
 
         expect:
         sheetWithOrder.getRow(3).getCell(5).getNumericCellValue() == 3
-        sheetWithOrder.getRow(46).getCell(5).getNumericCellValue() == 1
+        sheetWithOrder.getRow(6).getCell(5).getNumericCellValue() == 1
 
     }
 }

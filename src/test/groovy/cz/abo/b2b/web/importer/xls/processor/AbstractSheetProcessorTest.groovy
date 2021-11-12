@@ -1,27 +1,31 @@
 package cz.abo.b2b.web.importer.xls.processor
 
-import cz.abo.b2b.web.importer.xls.dto.Item
+import cz.abo.b2b.web.dao.Product
+import cz.abo.b2b.web.dao.Supplier
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import spock.lang.Specification;
 
 abstract class AbstractSheetProcessorTest extends Specification{
+    def testSupplier = new Supplier("test",BigDecimal.ZERO, "","","" )
     protected Sheet fillWriteAndReadSheet(AbstractSheetProcessor processor, Integer additionalParsedIdx = null) {
         def sheetRead
         def filePath = getPricelistResourcePath()
         def f = resourceFilePath(filePath)
 
         def items = processor.parseItems(new File(f))
+        Map<Product, Integer> orderedProducts = new HashMap<>();
 
 
-        Map<Item, Integer> orderedItems = new TreeMap<>();
-        orderedItems.put(items.get(0), 3)
-        orderedItems.put(items.get(3), 1)
+        orderedProducts.put(items.get(0).toProduct(testSupplier), 3)
+        orderedProducts.put(items.get(3).toProduct(testSupplier), 1)
         if (additionalParsedIdx!=null) {
-            orderedItems.put(items.get(additionalParsedIdx), 1)
+            def item = items.get(additionalParsedIdx)
+            def product = item.toProduct(testSupplier);
+            orderedProducts.put(product, 1)
         }
 
-        Workbook workbook = processor.fillOrder(new File(f), orderedItems)
+        Workbook workbook = processor.fillOrder(new File(f), orderedProducts)
         def outputFilePath = System.getProperty("user.dir") + "/target"+ filePath
         org.apache.commons.io.FileUtils.forceMkdir(new File(outputFilePath).getParentFile())
         def outputStream = new FileOutputStream(outputFilePath)

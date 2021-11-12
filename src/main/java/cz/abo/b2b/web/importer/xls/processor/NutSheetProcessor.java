@@ -24,15 +24,9 @@ public class NutSheetProcessor extends AbstractSheetProcessor
         {
             String[] values = rowData.toArray(new String[0]);
             List<Item> itemsList = new ArrayList<>();
-            //split values from list to array
-            //for two columns in excel we need to parse both
-            if (values.length >= 3)
+            if (values.length >= 6)
             {
-                parseOneItem(values, itemsList, 0);
-            }
-            if (values.length >= 9)
-            {
-                parseOneItem(values, itemsList, 5);
+                parseOneItem(values, itemsList);
             }
             return itemsList;
         }
@@ -41,16 +35,22 @@ public class NutSheetProcessor extends AbstractSheetProcessor
         }
     }
 
-    private void parseOneItem(String[] values, List<Item> itemsList, int startColumnIdx) {
-        String quantityStr = values[startColumnIdx + 1];
-        if (StringUtils.isNumeric(quantityStr)) {
-            String itemName = values[startColumnIdx + 0];
-            double itemQuantity = countKilosToGrams(Double.parseDouble(quantityStr));
-            double itemPrice = Double.parseDouble(values[startColumnIdx + 2])/1000;
-            int itemTax = Integer.parseInt(values[startColumnIdx + 3]);
+    private void parseOneItem(String[] values, List<Item> itemsList) {
+        String quantityStr = values[2];
+        double itemQuantityDouble = 0;
+        try {
+            itemQuantityDouble = Double.parseDouble(quantityStr);
+            String itemName = values[1];
+            double itemQuantity = countKilosToGrams(itemQuantityDouble);
+            double itemPrice = Double.parseDouble(values[3])/1000;
+            int itemTax = (int) (Double.parseDouble(values[4])*100);
             itemsList.add(new Item(itemName, itemQuantity, itemPrice, itemTax));
-        } else
-            LOGGER.warn("Item was not created, because of non numeric value in quantity column!");
+        } catch (NumberFormatException e) {
+            LOGGER.warn("Item was not created, because of non numeric value " + quantityStr +
+                    "in quantity column.");
+        }
+
+
     }
 
     private double countKilosToGrams(Double kilos)
@@ -68,21 +68,10 @@ public class NutSheetProcessor extends AbstractSheetProcessor
     }
 
     @Override
-    public void setOrderQuantityForItem(Sheet orderSheet, Product product, Integer orderQuantity) {
-        int rowIdx = 3;
-        boolean finish = false;
-        // We find item based on its name
-        while (!finish) {
-            Row row = orderSheet.getRow(rowIdx);
-            finish = (row == null);
-            if (!finish) {
-                String name = row.getCell(1).getStringCellValue();
-                if (name!=null && name.equals(product.getProductName())) {
-                    row.createCell(getOrderColumnIdx()).setCellValue(orderQuantity);
-                    finish=true;
-                }
-            }
-            rowIdx++;
-        }
+    public String getSheetName() {
+        return "Objednávka";
     }
+
+
+
 }

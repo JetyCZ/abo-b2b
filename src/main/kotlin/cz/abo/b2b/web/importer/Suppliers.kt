@@ -4,6 +4,7 @@ import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.Supplier
 import cz.abo.b2b.web.importer.xls.processor.BionebioSheetProcessor
 import cz.abo.b2b.web.importer.xls.processor.KServisSheetProcessor
+import cz.abo.b2b.web.importer.xls.processor.NutSheetProcessor
 import org.springframework.stereotype.Component
 import java.math.BigDecimal
 
@@ -14,9 +15,9 @@ class Suppliers {
     fun suppliers(): List<Supplier> {
         var result = ArrayList<Supplier>()
 
-        result.add(
+        /*result.add(
             Supplier("PROBIO", BigDecimal(2500), "", "https://www.probio.cz/data/product-feed/probio/8re6tf8erd5ordd23c7f59a63.xml", "")
-        )
+        )*/
 
         var importerClassName = BionebioSheetProcessor::class.qualifiedName
         if (importerClassName!=null) {
@@ -29,6 +30,13 @@ class Suppliers {
         if (importerClassName!=null) {
             result.add(
                 Supplier("K-servis", BigDecimal(5000), "", "/k-servis/cenik_srpen.xlsx", importerClassName)
+            )
+        }
+
+        importerClassName = NutSheetProcessor::class.qualifiedName
+        if (importerClassName!=null) {
+            result.add(
+                Supplier("Oříšek", BigDecimal(5000), "", "/orisek/orisek_01.10.2021.xls", importerClassName)
             )
         }
 

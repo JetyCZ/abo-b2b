@@ -1,5 +1,6 @@
 package cz.abo.b2b.web.importer.xls.processor;
 
+import cz.abo.b2b.web.dao.Product;
 import cz.abo.b2b.web.importer.xls.dto.Item;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
