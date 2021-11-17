@@ -1,5 +1,7 @@
 package cz.abo.b2b.web.importer.xls.processor
 
+import cz.abo.b2b.web.importer.dto.ImportSource
+
 class KServisSheetProcessorTest extends AbstractSheetProcessorTest {
 
 
@@ -12,7 +14,9 @@ class KServisSheetProcessorTest extends AbstractSheetProcessorTest {
         def f = getClass().getResource(getPricelistResourcePath()).getFile()
 
         when:
-        def items = new KServisSheetProcessor().parseItemsAsMap(new File(f))
+        def items = new KServisSheetProcessor().parseItemsAsMap(
+                ImportSource.fromFile(f)
+        )
         then:
 
         items.size() > 0

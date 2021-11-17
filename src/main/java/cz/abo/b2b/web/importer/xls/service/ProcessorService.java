@@ -3,6 +3,7 @@ package cz.abo.b2b.web.importer.xls.service;
 import cz.abo.b2b.web.dao.Product;
 import cz.abo.b2b.web.dao.Supplier;
 import cz.abo.b2b.web.dao.SupplierRepository;
+import cz.abo.b2b.web.importer.dto.ImportSource;
 import cz.abo.b2b.web.importer.xls.controller.dto.PriceListDTO;
 import cz.abo.b2b.web.importer.xls.processor.ISheetProcessor;
 import cz.abo.b2b.web.shoppingcart.ShoppingCart;
@@ -10,11 +11,13 @@ import cz.abo.b2b.web.shoppingcart.ShoppingCartItem;
 import cz.abo.b2b.web.shoppingcart.ShoppingCartSupplier;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.h2.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,14 +51,14 @@ public class ProcessorService {
     public PriceListDTO getFilledPriceListWithOrder(UUID supplierId) throws IOException {
         Supplier supplier = supplierRepository.getById(supplierId);
 
-        String fileToParse = supplier.resourceFilePath();
+        ImportSource importSource = supplier.importSource();
 
         // Load file from database
         String contentType = "application/vnd.ms-excel";
 
-        String pricelistFileName = new File(fileToParse).getName();
+        String pricelistFileName =importSource.getPath();
         String outputFilename = UPLOADING_DIR  + pricelistFileName;
-        FileUtils.copyFile(new File(fileToParse), new File(outputFilename));
+        IOUtils.copy(importSource.newInputStream(), new FileOutputStream(outputFilename));
 
         Map<Product, Integer> orderedProducts = new HashMap<>();
         ShoppingCartSupplier shoppingCartSupplier = shoppingCart.get(supplierId);

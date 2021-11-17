@@ -1,5 +1,7 @@
 package cz.abo.b2b.web.importer.xls.processor
 
+import cz.abo.b2b.web.importer.dto.ImportSource
+
 class MKMPackSheetProcessorTest extends AbstractSheetProcessorTest {
 
     @Override
@@ -11,7 +13,7 @@ class MKMPackSheetProcessorTest extends AbstractSheetProcessorTest {
         def f = getClass().getResource(getPricelistResourcePath()).getFile()
 
         when:
-        def items = new MkmPackSheetProcessor().parseItemsAsMap(new File(f))
+        def items = new MkmPackSheetProcessor().parseItemsAsMap(ImportSource.fromFile(f))
         then:
 
         items.size() > 0

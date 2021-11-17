@@ -1,5 +1,7 @@
 package cz.abo.b2b.web.importer.xls.processor
 
+import cz.abo.b2b.web.importer.dto.ImportSource
+
 
 class CountryLifeSheetProcessorTest extends AbstractSheetProcessorTest {
 
@@ -13,7 +15,7 @@ class CountryLifeSheetProcessorTest extends AbstractSheetProcessorTest {
         def f = getClass().getResource(getPricelistResourcePath()).getFile()
 
         when:
-        def items = new CountrySheetProcessor().parseItemsAsMap(new File(f))
+        def items = new CountrySheetProcessor().parseItemsAsMap(ImportSource.fromFile(f))
         then:
 
         items.size() > 0

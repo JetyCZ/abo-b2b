@@ -1,5 +1,6 @@
 package cz.abo.b2b.web.importer.xls.processor;
 
+import cz.abo.b2b.web.importer.dto.ImportSource;
 import cz.abo.b2b.web.importer.xls.dto.Item;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 @Component
@@ -15,9 +17,9 @@ public class MkmPackSheetProcessor extends AbstractSheetProcessor
     String category = "";
 
     @Override
-    public List<Item> parseItems(File fileToParse) {
+    public List<Item> parseItems(ImportSource importSource) {
         category = "";
-        return super.parseItems(fileToParse);
+        return super.parseItems(importSource);
     }
 
     @Override

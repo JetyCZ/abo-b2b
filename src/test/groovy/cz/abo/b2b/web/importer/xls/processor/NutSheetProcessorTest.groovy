@@ -1,5 +1,7 @@
 package cz.abo.b2b.web.importer.xls.processor
 
+import cz.abo.b2b.web.importer.dto.ImportSource
+
 class NutSheetProcessorTest extends AbstractSheetProcessorTest {
 
     @Override
@@ -11,7 +13,9 @@ class NutSheetProcessorTest extends AbstractSheetProcessorTest {
         def f = getClass().getResource(getPricelistResourcePath()).getFile()
 
         when:
-        def items = new NutSheetProcessor().parseItemsAsMap(new File(f))
+        def items = new NutSheetProcessor().parseItemsAsMap(
+                ImportSource.fromFile(f)
+        )
         then:
 
         items.size() > 0

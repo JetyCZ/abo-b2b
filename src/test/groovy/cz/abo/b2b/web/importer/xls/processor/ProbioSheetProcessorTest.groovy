@@ -1,7 +1,6 @@
 package cz.abo.b2b.web.importer.xls.processor
 
-
-
+import cz.abo.b2b.web.importer.dto.ImportSource
 
 
 class ProbioSheetProcessorTest extends AbstractSheetProcessorTest {
@@ -15,7 +14,7 @@ class ProbioSheetProcessorTest extends AbstractSheetProcessorTest {
         def f = getClass().getResource(getPricelistResourcePath()).getFile()
 
         when:
-        def items = new ProbioSheetProcessor().parseItemsAsMap(new File(f))
+        def items = new ProbioSheetProcessor().parseItemsAsMap(ImportSource.fromFile(f))
         then:
 
         items.size() > 0

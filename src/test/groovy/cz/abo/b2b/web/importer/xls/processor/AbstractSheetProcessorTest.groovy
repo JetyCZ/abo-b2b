@@ -4,7 +4,9 @@ import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.Supplier
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
-import spock.lang.Specification;
+import spock.lang.Specification
+
+import static cz.abo.b2b.web.importer.dto.ImportSource.fromFile;
 
 abstract class AbstractSheetProcessorTest extends Specification{
     def testSupplier = new Supplier("test",BigDecimal.ZERO, "","","" )
@@ -13,7 +15,7 @@ abstract class AbstractSheetProcessorTest extends Specification{
         def filePath = getPricelistResourcePath()
         def f = resourceFilePath(filePath)
 
-        def items = processor.parseItems(new File(f))
+        def items = processor.parseItems(fromFile(f))
         Map<Product, Integer> orderedProducts = new HashMap<>();
 
 
@@ -32,7 +34,7 @@ abstract class AbstractSheetProcessorTest extends Specification{
         workbook.write(outputStream)
         outputStream.close()
 
-        sheetRead = processor.getProductsSheetFromWorkbook(new File(outputFilePath))
+        sheetRead = processor.getProductsSheetFromWorkbook(fromFile(outputFilePath))
         sheetRead
     }
 

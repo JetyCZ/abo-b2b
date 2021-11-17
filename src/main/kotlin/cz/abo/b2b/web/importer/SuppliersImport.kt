@@ -1,22 +1,15 @@
 package cz.abo.b2b.web.importer
 
-import cz.abo.b2b.web.Application
 import cz.abo.b2b.web.SystemUtils
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.ProductRepository
 import cz.abo.b2b.web.dao.SupplierRepository
+import cz.abo.b2b.web.importer.dto.ImportSource
 import cz.abo.b2b.web.importer.xls.processor.AbstractSheetProcessor
-import cz.abo.b2b.web.importer.xls.processor.ISheetProcessor
 import org.apache.commons.lang3.StringUtils
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.boot.SpringApplication
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Component
-import java.io.File
-import java.net.URL
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.util.*
 
 @Component
@@ -42,19 +35,14 @@ open class SuppliersImport(
 
                 val products: MutableList<Product>
                 if (supplier.importUrl.startsWith("http")) {
-                    var urlStream = URL(supplier.importUrl).openStream()
-                    var tempFilePath =  System.getProperty("java.io.tmpdir") + "/" + UUID.randomUUID()
-                    Files.copy(urlStream, Paths.get(tempFilePath));
-
-                    val tempFile = File(tempFilePath)
-                    products = heurekaXMLParser.parseStream(tempFile, saved)
-                    tempFile.delete()
+                    val importSource = ImportSource.fromPath(supplier.importUrl)
+                    products = heurekaXMLParser.parseStream(importSource, saved)
 
                 } else {
                     val importerClass = Class.forName(supplier.importerClassName)
                     val importer = applicationContext.getBean(importerClass)
-                    val fileToParse = supplier.resourceFilePath()
-                    val items = (importer as AbstractSheetProcessor).parseItems(File(fileToParse))
+                    val importSource = supplier.importSource()
+                    val items = (importer as AbstractSheetProcessor).parseItems(importSource)
                     products = ArrayList()
                     for (item in items) {
                         val product = item.toProduct(saved)

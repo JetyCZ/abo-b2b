@@ -1,6 +1,7 @@
 package cz.abo.b2b.web.importer.xls.processor;
 
 import cz.abo.b2b.web.dao.Product;
+import cz.abo.b2b.web.importer.dto.ImportSource;
 import cz.abo.b2b.web.importer.xls.dto.Item;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -56,8 +58,8 @@ public interface ISheetProcessor
 
     List<Item> disintegrateIntoItem(int rowNum, List<String> rowData);
 
-    default Map<String, Item> parseItemsAsMap(File fileToParse) throws IOException {
-        List<Item> items = parseItems(fileToParse);
+    default Map<String, Item> parseItemsAsMap(ImportSource importSource) {
+        List<Item> items = parseItems(ImportSource.fromFile(importSource.getPath()));
         Map<String, Item> map = new TreeMap<String, Item>();
         int parsedIdx = 0;
         for (Item item : items) {
@@ -69,7 +71,9 @@ public interface ISheetProcessor
         return map;
     }
     default Workbook fillOrder(File fileToParse, Map<Product, Integer> orderedItems){
-        ExcelFile parsedExcel = getWorkbookFromFile(fileToParse);
+        ExcelFile parsedExcel = getWorkbookFromFile(
+                ImportSource.fromFile(fileToParse.getPath())
+        );
         Workbook workbook = parsedExcel.getWorkbook();
         int orderColumnIdx = getOrderColumnIdx();
 
@@ -102,8 +106,8 @@ public interface ISheetProcessor
 
     int getOrderColumnIdx();
 
-    default List<Item> parseItems(File fileToParse) {
-        Sheet sheet = getProductsSheetFromWorkbook(fileToParse);
+    default List<Item> parseItems(ImportSource importSource) {
+        Sheet sheet = getProductsSheetFromWorkbook(importSource);
         Iterator<Row> iterator = sheet.iterator();
         FormulaEvaluator formulaEvaluator = sheet.getWorkbook().getCreationHelper().createFormulaEvaluator();
 
@@ -115,12 +119,12 @@ public interface ISheetProcessor
         return validatedItems;
     }
 
-    default Sheet getProductsSheetFromWorkbook(File fileToParse) {
-        LOGGER.info("XXX before reading " + fileToParse.getName());
-        Workbook workbook = getWorkbookFromFile(fileToParse).getWorkbook();
-        LOGGER.info("XXX after reading " + fileToParse.getName());
+    default Sheet getProductsSheetFromWorkbook(ImportSource inputSource) {
+        LOGGER.info("XXX before reading " + inputSource.getPath());
+        Workbook workbook = getWorkbookFromFile(inputSource).getWorkbook();
+        LOGGER.info("XXX after reading " + inputSource.getPath());
         Sheet productsSheetFromWorkbook = getProductsSheetFromWorkbook(workbook, getSheetName());
-        LOGGER.info("XXX after paresing " + fileToParse.getName());
+        LOGGER.info("XXX after paresing " + inputSource.getPath());
         return productsSheetFromWorkbook;
     }
 
@@ -142,25 +146,24 @@ public interface ISheetProcessor
         return sheet;
     }
 
-    default ExcelFile getWorkbookFromFile(File fileToParse)  {
+    default ExcelFile getWorkbookFromFile(ImportSource importSource)  {
         try {
-            FileInputStream excelFile = new FileInputStream(fileToParse);
             Workbook workbook;
 
-            if (fileToParse.getName().contains(XLS_EXTENSIONS))
+            if (importSource.getPath().contains(XLS_EXTENSIONS))
                 try {
-                    workbook = new HSSFWorkbook(excelFile);
+                    workbook = new HSSFWorkbook(importSource.newInputStream());
                 } catch (OfficeXmlFileException e) {
                     OPCPackage pkg = null;
-                        pkg = OPCPackage.open(new FileInputStream(fileToParse));
+                        pkg = OPCPackage.open(importSource.newInputStream());
                         workbook = new XSSFWorkbook(pkg);
                 }
             else
-                workbook = new XSSFWorkbook(excelFile);
+                workbook = new XSSFWorkbook(importSource.newInputStream());
 
             workbook.setMissingCellPolicy(Row.CREATE_NULL_AS_BLANK);
 
-            return new ExcelFile(workbook, excelFile);
+            return new ExcelFile(workbook, importSource.newInputStream());
         } catch (Exception e) {
             throw new IllegalStateException("Cannot open workbook", e);
         }
@@ -243,9 +246,9 @@ public interface ISheetProcessor
 
     class ExcelFile {
         private Workbook workbook;
-        private FileInputStream excelFile;
+        private InputStream excelFile;
 
-        public ExcelFile(Workbook workbook, FileInputStream excelFile) {
+        public ExcelFile(Workbook workbook, InputStream excelFile) {
             this.workbook = workbook;
             this.excelFile = excelFile;
         }
@@ -258,7 +261,7 @@ public interface ISheetProcessor
             this.workbook = workbook;
         }
 
-        public FileInputStream getExcelFile() {
+        public InputStream getExcelFile() {
             return excelFile;
         }
 

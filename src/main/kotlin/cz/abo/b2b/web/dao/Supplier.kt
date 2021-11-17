@@ -1,6 +1,9 @@
 package cz.abo.b2b.web.dao
 
 import cz.abo.b2b.web.importer.SuppliersImport
+import cz.abo.b2b.web.importer.dto.ImportSource
+import cz.abo.b2b.web.importer.dto.ImportSourceType
+import java.io.File
 import java.math.BigDecimal
 import java.util.*
 import javax.persistence.Column
@@ -28,7 +31,17 @@ class Supplier(
     @GeneratedValue
     val id: UUID = UUID.randomUUID()
 
-    fun resourceFilePath() : String{
-        return Supplier::class.java.getResource(importUrl).getFile().replace("%20", " ")
+    fun importSource() : ImportSource{
+        if (importUrl.startsWith("http")) {
+            return ImportSource(
+                importUrl,
+                ImportSourceType.URL
+            )
+        } else {
+            return ImportSource(
+                importUrl,
+                ImportSourceType.CLASSPATH_RESOURCE
+            )
+        }
     }
 }

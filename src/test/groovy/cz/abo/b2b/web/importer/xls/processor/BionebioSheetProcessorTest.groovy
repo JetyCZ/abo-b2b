@@ -1,5 +1,6 @@
 package cz.abo.b2b.web.importer.xls.processor
 
+import cz.abo.b2b.web.importer.dto.ImportSource
 
 
 class BionebioSheetProcessorTest extends AbstractSheetProcessorTest {
@@ -13,7 +14,7 @@ class BionebioSheetProcessorTest extends AbstractSheetProcessorTest {
         def f = resourceFilePath(getPricelistResourcePath())
 
         when:
-        def items = new BionebioSheetProcessor().parseItemsAsMap(new File(f))
+        def items = new BionebioSheetProcessor().parseItemsAsMap(ImportSource.fromFile(f))
         then:
 
         items.size() > 0
@@ -22,9 +23,9 @@ class BionebioSheetProcessorTest extends AbstractSheetProcessorTest {
         item1.itemTax == 15
         item1.itemPrice == 0.0317
         def item2 = items["Přírodní třtinový cukr SUROVÝ bio*nebio_4000"]
-        item1.itemQuantity == 4000
-        item1.itemTax == 15
-        item1.itemPrice == 0.112/4
+        item2.itemQuantity == 4000
+        item2.itemTax == 15
+        item2.itemPrice == 0.112/4
 
         def item3 = items["Bio kypřící prášek z vinného kamene bio*nebio_4000"]
         item3.itemQuantity == 4000
