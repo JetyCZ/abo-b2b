@@ -6,7 +6,7 @@ class BionebioSheetProcessorTest extends AbstractSheetProcessorTest {
 
     @Override
     protected String getPricelistResourcePath() {
-        return  "/bionebio/OL_bio nebio_11_2021.xls"
+        return  "/bionebio/OL_bio_nebio_11_2021.xls"
     }
 
     def "IterateSheetValues"() {

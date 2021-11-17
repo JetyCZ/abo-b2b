@@ -13,7 +13,13 @@ import org.springframework.web.context.annotation.SessionScope
 
 @SpringBootApplication
 open class Application {
-
+    companion object {
+        private val log = LoggerFactory.getLogger(Application::class.java)
+        @JvmStatic
+        fun main(args: Array<String>) {
+            SpringApplication.run(Application::class.java)
+        }
+    }
 
     @Bean
     open fun loadData(suppliersImport: SuppliersImport): CommandLineRunner {
@@ -29,11 +35,4 @@ open class Application {
         return ShoppingCart()
     }
 
-    companion object {
-        private val log = LoggerFactory.getLogger(Application::class.java)
-        @JvmStatic
-        fun main(args: Array<String>) {
-            SpringApplication.run(Application::class.java)
-        }
-    }
 }

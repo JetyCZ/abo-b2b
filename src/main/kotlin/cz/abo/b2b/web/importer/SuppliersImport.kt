@@ -1,37 +1,42 @@
 package cz.abo.b2b.web.importer
 
+import cz.abo.b2b.web.Application
+import cz.abo.b2b.web.SystemUtils
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.ProductRepository
-import cz.abo.b2b.web.dao.Supplier
 import cz.abo.b2b.web.dao.SupplierRepository
-import cz.abo.b2b.web.importer.xls.dto.Item
 import cz.abo.b2b.web.importer.xls.processor.AbstractSheetProcessor
+import cz.abo.b2b.web.importer.xls.processor.ISheetProcessor
 import org.apache.commons.lang3.StringUtils
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.boot.SpringApplication
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Component
 import java.io.File
-import java.math.BigDecimal
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
-import kotlin.collections.ArrayList
 
 @Component
-class SuppliersImport(
-
+open class SuppliersImport(
     val productRepository: ProductRepository,
     val supplierRepository: SupplierRepository,
     val suppliers: Suppliers,
     val heurekaXMLParser: HeurekaXMLParser,
     val applicationContext: ApplicationContext) {
 
+    companion object {
+        val LOGGER = LoggerFactory.getLogger(SuppliersImport::class.java)
+    }
 
     fun importAll() {
         supplierRepository.deleteAll()
         productRepository.deleteAll()
 
         for (supplier in suppliers.suppliers()) {
+            LOGGER.info("XXX BEFORE: " + supplier.name + "; " + SystemUtils.usedMemory())
             if (!StringUtils.isEmpty(supplier.importUrl)) {
                 val saved = supplierRepository.save(supplier)
 
@@ -59,6 +64,7 @@ class SuppliersImport(
                 productRepository.saveAll(products)
 
             }
+            LOGGER.info("XXX AFTER: " + supplier.name + "; " + SystemUtils.usedMemory())
         }
     }
 

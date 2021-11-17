@@ -1,7 +1,10 @@
 package cz.abo.b2b.web.importer
 
+import cz.abo.b2b.web.Application
+import cz.abo.b2b.web.SystemUtils
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.Supplier
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.io.File
 import java.math.BigDecimal
@@ -9,13 +12,17 @@ import javax.xml.parsers.DocumentBuilderFactory
 
 @Component
 class HeurekaXMLParser() {
-
+    companion object {
+        private val LOGGER = LoggerFactory.getLogger(HeurekaXMLParser::class.java)
+    }
     fun parseStream(file: File, supplier: Supplier): MutableList<Product> {
         val factory = DocumentBuilderFactory.newInstance()
         val builder = factory.newDocumentBuilder()
 
+        LOGGER.info("XXX BEFORE READ: " + file.name + "; " + SystemUtils.usedMemory())
         val document = builder.parse(file)
         document.documentElement.normalize()
+        LOGGER.info("XXX AFTER READ: " + file.name + "; " + SystemUtils.usedMemory())
         val root = document.documentElement
         val result: MutableList<Product> = ArrayList()
         val shopitems = root.getElementsByTagName("SHOPITEM")

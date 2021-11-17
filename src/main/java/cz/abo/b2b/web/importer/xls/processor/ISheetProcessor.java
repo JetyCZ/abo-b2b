@@ -116,9 +116,12 @@ public interface ISheetProcessor
     }
 
     default Sheet getProductsSheetFromWorkbook(File fileToParse) {
+        LOGGER.info("XXX before reading " + fileToParse.getName());
         Workbook workbook = getWorkbookFromFile(fileToParse).getWorkbook();
-
-        return getProductsSheetFromWorkbook(workbook, getSheetName());
+        LOGGER.info("XXX after reading " + fileToParse.getName());
+        Sheet productsSheetFromWorkbook = getProductsSheetFromWorkbook(workbook, getSheetName());
+        LOGGER.info("XXX after paresing " + fileToParse.getName());
+        return productsSheetFromWorkbook;
     }
 
     default Sheet getOrderSheetFromWorkbook(Workbook workbook) {
