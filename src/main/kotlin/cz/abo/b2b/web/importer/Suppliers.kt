@@ -14,10 +14,10 @@ class Suppliers {
     fun suppliers(): List<Supplier> {
         var result = ArrayList<Supplier>()
 
-        result.add(
+        /*result.add(
             Supplier("PROBIO", BigDecimal(2500), "", "https://www.probio.cz/data/product-feed/probio/8re6tf8erd5ordd23c7f59a63.xml", "")
         )
-
+*/
         var importerClassName = BionebioSheetProcessor::class.qualifiedName
         if (importerClassName!=null) {
             result.add(

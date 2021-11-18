@@ -50,7 +50,8 @@ public class BionebioSheetProcessor extends AbstractSheetProcessor
                     String itemNameToUse = matcher.group("itemName").trim();
                     String itemQuantityStr = matcher.group("weight");
                     itemQuantityStr = itemQuantityStr.replaceFirst("\\,","\\.");
-                    double itemQuantity = Double.parseDouble(itemQuantityStr)*1000;
+                    double quantityKg = Double.parseDouble(itemQuantityStr);
+                    double itemQuantity = quantityKg *1000;
                     Double itemPrice = null;
                     if (values[2].length()>0) {
                         itemPrice = Double.parseDouble(values[2])/1000;
@@ -69,7 +70,7 @@ public class BionebioSheetProcessor extends AbstractSheetProcessor
                     String description = "";
                     if (!StringUtils.isEmpty(note)) {
                         if (note.contains("Cena za celé balení")) {
-                            itemPrice = itemPrice/itemQuantity;
+                            itemPrice = itemPrice/quantityKg;
                         } else {
                             description = note;
                         }

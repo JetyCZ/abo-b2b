@@ -4,6 +4,7 @@
  */
 package cz.abo.b2b.web.it.ui
 
+import org.junit.Ignore
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 
@@ -15,6 +16,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.test.assertNotNull
 
 @TestInstance(PER_CLASS)
+@Disabled
 class HomepageIT {
 
     lateinit var driver: WebDriver

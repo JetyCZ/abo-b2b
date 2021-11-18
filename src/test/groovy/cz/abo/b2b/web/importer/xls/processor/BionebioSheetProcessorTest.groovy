@@ -30,7 +30,8 @@ class BionebioSheetProcessorTest extends AbstractSheetProcessorTest {
         def item3 = items["Bio kypřící prášek z vinného kamene bio*nebio_4000"]
         item3.itemQuantity == 4000
         item3.itemTax == 15
-        item3.itemPrice == 0.545
+        item3.itemPrice == 0.545/4
+
 
     }
 
