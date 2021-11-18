@@ -45,10 +45,9 @@ class KServisSheetProcessorTest extends AbstractSheetProcessorTest {
         def sheetRead = fillWriteAndReadSheet(new KServisSheetProcessor(), 102)
 
         expect:
-        sheetRead.getRow(1).getCell(5).getNumericCellValue() == 3
-        sheetRead.getRow(4).getCell(5).getNumericCellValue() == 1
-        sheetRead.getRow(142).getCell(5).getNumericCellValue() == 1
-        sheetRead.getRow(0).getCell(5).getStringCellValue() == "Objednávám tolik balení"
-
+        sheetRead.getRow(1).getCell(6).getNumericCellValue()
+        sheetRead.getRow(4).getCell(6).getNumericCellValue() == 1
+        sheetRead.getRow(117).getCell(6).getNumericCellValue()
+        sheetRead.getRow(0).getCell(6).getStringCellValue() == "Objednávám tolik balení"
     }
 }

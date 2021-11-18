@@ -10,6 +10,7 @@ import cz.abo.b2b.web.shoppingcart.ShoppingCart;
 import cz.abo.b2b.web.shoppingcart.ShoppingCartItem;
 import cz.abo.b2b.web.shoppingcart.ShoppingCartSupplier;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.h2.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +58,7 @@ public class ProcessorService {
         String contentType = "application/vnd.ms-excel";
 
         String pricelistFileName =importSource.getPath();
-        String outputFilename = UPLOADING_DIR  + pricelistFileName;
+        String outputFilename = UPLOADING_DIR  + RandomStringUtils.randomAlphabetic(8) + "-" + new File(pricelistFileName).getName();
         IOUtils.copy(importSource.newInputStream(), new FileOutputStream(outputFilename));
 
         Map<Product, Integer> orderedProducts = new HashMap<>();
