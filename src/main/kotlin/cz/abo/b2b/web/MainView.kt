@@ -1,6 +1,5 @@
 package cz.abo.b2b.web
 
-import com.vaadin.flow.component.ClickEvent
 import com.vaadin.flow.component.Html
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
@@ -16,6 +15,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.tabs.Tab
 import com.vaadin.flow.component.tabs.Tabs
+import com.vaadin.flow.component.textfield.IntegerField
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.provider.SortDirection
 import com.vaadin.flow.data.renderer.ComponentRenderer
@@ -32,7 +32,6 @@ import org.vaadin.klaudeta.PaginatedGrid
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 @Route
@@ -112,19 +111,42 @@ class MainView(val productRepository: ProductRepository,
 
     }*/
 
+    private fun buildCartQuantity(shoppingCartItem: ShoppingCartItem): IntegerField? {
+        val countField = IntegerField()
+        countField.min = 0
+        countField.value = shoppingCartItem.count.toInt()
+        countField.setHasControls(true)
+
+
+        countField.addValueChangeListener {
+                event ->
+            updateCartItem(shoppingCartItem.product, event.value)
+        }
+        return countField
+    }
+
+
     private fun buildBuyButton(p: Product): Button? {
-        val button: Button = Button("Koupit")
-        button.addClickListener { e: ClickEvent<Button?>? ->
+        val button = Button("Koupit")
+        button.addClickListener {
             addToCart(p)
         }
         return button
     }
 
-    private fun addToCart(p: Product) {
-        Notification.show("Produkt '" + p.productName + "' byl přidán do košíku", 2000, Notification.Position.TOP_CENTER)
-        shoppingCart.add(p, 1)
+    private fun addToCart(product: Product) {
+        Notification.show("Produkt '" + product.productName + "' byl přidán do košíku", 2000, Notification.Position.TOP_CENTER)
+        shoppingCart.add(product, 1)
         displayShoppingCart()
     }
+
+    private fun updateCartItem(product: Product, value: Int?) {
+        if (value!=null) {
+            shoppingCart.update(product, value.toDouble())
+            displayShoppingCart()
+        }
+    }
+
 
     private fun displayShoppingCart() {
 
@@ -141,7 +163,7 @@ class MainView(val productRepository: ProductRepository,
 
         shoppingCartGrid.removeAllColumns()
         shoppingCartGrid.addColumn("product.productName").setHeader("V košíku")
-        shoppingCartGrid.addColumn("count").setHeader("Počet")
+        shoppingCartGrid.addComponentColumn(this::buildCartQuantity).setHeader("Množství")
         var items = ArrayList<ShoppingCartItem>()
         val shoppingCartItem = shoppingCartEntry.value
         items.addAll(shoppingCartItem.values)

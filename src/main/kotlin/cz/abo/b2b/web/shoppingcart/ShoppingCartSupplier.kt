@@ -14,6 +14,15 @@ class ShoppingCartSupplier (val supplier: Supplier) : HashMap<UUID, ShoppingCart
         put(product.id, item)
     }
 
+    fun updateCart(product: Product, newCount: Double) {
+        if (newCount.toInt() == 0) {
+            remove(product.id)
+        } else {
+            val item = getOrDefault(product.id, ShoppingCartItem(product, 0L))
+            item.count = newCount.toLong()
+        }
+    }
+
     fun totalPriceNoVAT() : BigDecimal {
         var result : BigDecimal = BigDecimal.ZERO
         for (shoppingCartItem in values) {
