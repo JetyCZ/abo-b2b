@@ -51,6 +51,11 @@ dependencies {
 
     implementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
 
+    // Security
+    implementation "org.springframework.security:spring-security-web"
+    implementation "org.springframework.security:spring-security-config"
+    testImplementation 'org.springframework.security:spring-security-test'
+
     // UI testing
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 

@@ -1,5 +1,7 @@
 package cz.abo.b2b.web
 
+import cz.abo.b2b.web.security.SecurityService
+import com.vaadin.flow.component.ClickEvent
 import com.vaadin.flow.component.Html
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
@@ -20,6 +22,7 @@ import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.provider.SortDirection
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.value.ValueChangeMode
+import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
 import cz.abo.b2b.web.component.StyledText
 import cz.abo.b2b.web.dao.Product
@@ -32,11 +35,16 @@ import org.vaadin.klaudeta.PaginatedGrid
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
+import javax.annotation.security.PermitAll
 
 
 @Route
+@PermitAll
+@PageTitle("Asociace Bezobalu - B2B")
 class MainView(val productRepository: ProductRepository,
-                val shoppingCart: ShoppingCart) : VerticalLayout() {
+                val shoppingCart: ShoppingCart,
+        val securityService: SecurityService
+) : VerticalLayout() {
 
     private val productGrid: PaginatedGrid<Product> = PaginatedGrid(Product::class.java)
 
@@ -211,9 +219,25 @@ class MainView(val productRepository: ProductRepository,
 
         val actionButton1 = Tab(VaadinIcon.HOME.create(), Span("Domů"))
         val actionButton2 = Tab(VaadinIcon.USERS.create(), Span("Nastavení"))
-        val actionButton3 = Tab(VaadinIcon.PACKAGE.create(), Span("Odhlásit"))
-        val buttonBar = Tabs(actionButton1, actionButton2, actionButton3)
-        val topMenu = HorizontalLayout(buttonBar)
+
+
+
+
+        val tabs = Tabs(actionButton1, actionButton2)
+
+
+        val topMenu: HorizontalLayout
+
+        if (securityService.authenticatedUser() != null) {
+            val logoutButton = Button(
+                "Odhlásit"
+            ) { click: ClickEvent<Button?>? -> securityService.logout() }
+            topMenu = HorizontalLayout(tabs, logoutButton)
+        } else {
+            topMenu = HorizontalLayout(tabs)
+        }
+
+
         topMenu.justifyContentMode = JustifyContentMode.CENTER
         topMenu.width = "100%"
 
