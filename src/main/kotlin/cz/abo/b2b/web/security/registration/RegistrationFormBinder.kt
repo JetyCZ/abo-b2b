@@ -1,15 +1,21 @@
 package cz.abo.b2b.web.security.registration
 
+import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.data.binder.BeanValidationBinder
 import com.vaadin.flow.component.notification.NotificationVariant
 import com.vaadin.flow.data.binder.ValidationException
 import com.vaadin.flow.data.binder.ValidationResult
-import com.vaadin.flow.data.binder.Validator
 import com.vaadin.flow.data.binder.ValueContext
+import cz.abo.b2b.web.dao.User
+import cz.abo.b2b.web.dao.UserRepository
 import cz.abo.b2b.web.security.users.UserDetails
+import org.springframework.security.crypto.password.PasswordEncoder
 
-class RegistrationFormBinder(private val registrationForm: RegistrationForm) {
+class RegistrationFormBinder(
+    val registrationForm: RegistrationForm,
+    val userRepository: UserRepository,
+    val passwordEncoder: PasswordEncoder) {
     /**
      * Flag for disabling first run for password validation
      */
@@ -45,15 +51,22 @@ class RegistrationFormBinder(private val registrationForm: RegistrationForm) {
         registrationForm.submitButton.addClickListener { event ->
             try {
                 // Create empty bean to store the details into
-                val userBean = UserDetails()
+                val userDetails = UserDetails()
 
                 // Run validators and write the values to the bean
-                binder.writeBean(userBean)
+                binder.writeBean(userDetails)
 
                 // Typically, you would here call backend to store the bean
-
+                val user = User(userDetails.firstName!!,
+                userDetails.sureName!!,
+                    userDetails.email!!,
+                    userDetails.tarif!!,
+                    "",
+                    passwordEncoder.encode(userDetails.password)
+                )
+                userRepository.save(user)
                 // Show success message if everything went well
-                showSuccess(userBean)
+                showSuccess(userDetails)
             } catch (exception: ValidationException) {
                 // validation errors are already visible for each field,
                 // and bean-level errors are shown in the status label.
@@ -97,7 +110,6 @@ class RegistrationFormBinder(private val registrationForm: RegistrationForm) {
         val notification = Notification.show("Váš nový účet (" + userBean.firstName +
                 " ) byl úspěšně zaregistrován, vítejte.")
         notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS)
-
-        // Here you'd typically redirect the user to another view
+        UI.getCurrent().navigate("/")
     }
 }

@@ -1,4 +1,5 @@
 package cz.abo.b2b.web.security.view
+import com.vaadin.flow.component.html.Anchor
 import com.vaadin.flow.component.html.H1
 import com.vaadin.flow.component.login.LoginForm
 import com.vaadin.flow.component.login.LoginI18n
@@ -13,17 +14,14 @@ import com.vaadin.flow.router.Route
 
 @Route("login")
 @PageTitle("Asociace bezobalu B2B - Přihlášení")
-class LoginView : VerticalLayout(), BeforeEnterObserver {
+class LoginView : AbstractLoginView(), BeforeEnterObserver {
     private val loginForm = LoginForm()
 
     init {
         addClassName("login-view")
-        setSizeFull()
-        justifyContentMode = JustifyContentMode.CENTER
-        alignItems = FlexComponent.Alignment.CENTER
         loginForm.action = "login"
-        add(H1("Asociace Bezobalu - B2B"), loginForm)
-
+        add(loginForm)
+        add(Anchor("/register","Zaregistrovat nový účet"))
         loginForm.setI18n(createLoginI18n())
     }
 

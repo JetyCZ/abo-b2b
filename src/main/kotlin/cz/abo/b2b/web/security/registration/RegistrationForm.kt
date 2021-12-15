@@ -68,4 +68,3 @@ class RegistrationForm : FormLayout() {
             }
         }
     }
-}
