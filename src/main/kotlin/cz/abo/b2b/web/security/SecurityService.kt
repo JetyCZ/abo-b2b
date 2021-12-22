@@ -1,15 +1,34 @@
 package cz.abo.b2b.web.security
 
 import com.vaadin.flow.component.UI
+import com.vaadin.flow.server.VaadinService
 import com.vaadin.flow.server.VaadinServletRequest
+import cz.abo.b2b.web.dao.User
+import cz.abo.b2b.web.dao.UserRepository
+import cz.abo.b2b.web.security.users.Tarif
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler
 import org.springframework.stereotype.Component
 
 
 @Component
-class SecurityService {
+class SecurityService(val userRepository: UserRepository, val passwordEncoder: PasswordEncoder) {
+
+    init {
+        val testEmail = "b2btest@mailinator.com"
+        var testUser = userRepository.findByEmail(testEmail)
+        if (testUser==null) {
+            testUser = User("Pavel", "Jetenský", testEmail, Tarif.PROFITABLE, "",passwordEncoder.encode("test") )
+            userRepository.save(testUser)
+        }
+    }
+
     // Anonymous or no authentication.
     fun authenticatedUser(): UserDetails? {
             val context = SecurityContextHolder.getContext()
@@ -32,4 +51,5 @@ class SecurityService {
     companion object {
         private const val LOGOUT_SUCCESS_URL = "/"
     }
+
 }

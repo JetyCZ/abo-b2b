@@ -31,6 +31,7 @@ import cz.abo.b2b.web.shoppingcart.ShoppingCart
 import cz.abo.b2b.web.shoppingcart.ShoppingCartItem
 import cz.abo.b2b.web.shoppingcart.ShoppingCartSupplier
 import org.apache.commons.lang3.StringUtils
+import org.springframework.security.access.annotation.Secured
 import org.vaadin.klaudeta.PaginatedGrid
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -41,6 +42,7 @@ import javax.annotation.security.PermitAll
 @Route
 @PermitAll
 @PageTitle("Asociace Bezobalu - B2B")
+@Secured("USER")
 class MainView(val productRepository: ProductRepository,
                 val shoppingCart: ShoppingCart,
         val securityService: SecurityService

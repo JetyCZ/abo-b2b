@@ -1,20 +1,27 @@
 package com.example.application.security
 
 import com.vaadin.flow.server.HandlerHelper.RequestType
+import com.vaadin.flow.server.VaadinService
+import com.vaadin.flow.server.VaadinServletRequest
 import com.vaadin.flow.shared.ApplicationConstants
+import cz.abo.b2b.web.security.users.UserDetails
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.security.access.annotation.Secured
 import org.springframework.security.authentication.AnonymousAuthenticationToken
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.web.authentication.WebAuthenticationDetails
+import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import java.util.*
 import java.util.stream.Stream
 import javax.servlet.http.HttpServletRequest
-import kotlin.collections.ArrayList
 
 
-class SecurityUtils {
+class SecurityUtils() {
     companion object {
 
         fun isAccessGranted(securedClass: Class<*>?): Boolean {
@@ -50,6 +57,7 @@ class SecurityUtils {
                 return (authentication != null && authentication !is AnonymousAuthenticationToken
                         && authentication.isAuthenticated)
             }
+
     }
 
 }

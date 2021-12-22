@@ -1,12 +1,12 @@
 package cz.abo.b2b.web.security.registration
 
+import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.button.ButtonVariant
 import com.vaadin.flow.component.formlayout.FormLayout
-import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.html.H3
 import com.vaadin.flow.component.html.Span
-import com.vaadin.flow.component.orderedlayout.VerticalLayout
+import com.vaadin.flow.component.notification.Notification.show
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup
 import com.vaadin.flow.component.radiobutton.RadioGroupVariant
 import com.vaadin.flow.component.textfield.EmailField
@@ -16,21 +16,28 @@ import com.vaadin.flow.data.binder.*
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.validator.EmailValidator
 import com.vaadin.flow.data.validator.StringLengthValidator
-import cz.abo.b2b.web.component.StyledText
-import cz.abo.b2b.web.dao.Product
+import com.vaadin.flow.server.VaadinService
+import com.vaadin.flow.server.VaadinServletRequest
+import cz.abo.b2b.web.MainView
 import cz.abo.b2b.web.dao.User
+import cz.abo.b2b.web.dao.UserRepository
+import cz.abo.b2b.web.security.SecurityService
 import cz.abo.b2b.web.security.users.Tarif
 import cz.abo.b2b.web.security.users.UserDetails
-import java.util.*
-import java.util.Collection
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.crypto.password.PasswordEncoder
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotEmpty
 
 
-class RegistrationForm : FormLayout() {
 
-        val firstName: @NotEmpty TextField = TextField("Jméno")
-        val lastName: TextField = TextField("Příjmení")
+class RegistrationForm(
+    val passwordEncoder: PasswordEncoder,
+    val userRepository: UserRepository
+) : FormLayout() {
+
+        val firstname: @NotEmpty TextField = TextField("Jméno")
+        val lastname: TextField = TextField("Příjmení")
         val email: @Email EmailField = EmailField("Email")
         val password: PasswordField = PasswordField("Heslo")
         val passwordConfirm: PasswordField = PasswordField("Heslo znovu")
@@ -66,7 +73,7 @@ class RegistrationForm : FormLayout() {
             submitButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY)
         val title = H3("Registrace nového uživatele")
         add(
-            title, firstName, lastName, email, password,
+            title, firstname, lastname, email, password,
                 passwordConfirm, errorMessageField, tarif,
                 submitButton
             )
@@ -83,16 +90,16 @@ class RegistrationForm : FormLayout() {
             setColspan(submitButton, 2)
             setColspan(tarif, 2)
 
-            binder.forField(firstName)
+            binder.forField(firstname)
                 .withValidator(StringLengthValidator("Jméno nesmí být prázdné a musí mít alespoň 3 znaky", 3, null))
-                .bind("firstName")
-            binder.forField(lastName)
+                .bind("firstname")
+            binder.forField(lastname)
                 .withValidator(StringLengthValidator("Jméno nesmí být prázdné a musí mít alespoň 3 znaky", 3, null))
-                .bind("lastName")
+                .bind("lastname")
             binder.forField(password)
-                .withValidator(StringLengthValidator("Jméno nesmí být prázdné a musí mít alespoň 3 znaky", 3, null))
-                .bind("lastName")
-            binder.forField(firstName)
+                .withValidator(this::passwordValidator)
+                .bind("password")
+            binder.forField(email)
                 .withValidator(EmailValidator("Prosím zadejte platnou e-mailovou adresu"))
                 .bind("email")
             binder.forField(tarif).bind("tarif")
@@ -133,10 +140,20 @@ class RegistrationForm : FormLayout() {
         try {
             binder.writeBean(userDetails)
             println("Saving user")
-            // var user: User = userDetails.toUser()
+            var user: User = userDetails.toUser(passwordEncoder)
+            userRepository.save(user)
+            show("Váš uživatelský účet ${user.email} byl v pořádku vytvořen, automaticky vás přihlásíme.")
+            autoLoginUser(userDetails)
+            UI.getCurrent().navigate(MainView::class.java)
         } catch (e: ValidationException) {
             e.printStackTrace()
         }
+    }
+
+    fun autoLoginUser(userDetails: UserDetails) {
+        val currentRequest = VaadinService.getCurrentRequest()
+        val vaadinServletRequest : VaadinServletRequest = currentRequest as VaadinServletRequest
+        vaadinServletRequest.httpServletRequest.login(userDetails.email, userDetails.password)
     }
 }
 /*
