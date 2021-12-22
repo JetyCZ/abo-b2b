@@ -14,7 +14,10 @@ import com.vaadin.flow.router.Route
 abstract class AbstractLoginView : VerticalLayout() {
 
     init {
-        addClassName("login-view")
+        initUserFormCommon()
+    }
+
+    protected fun initUserFormCommon() {
         setSizeFull()
         justifyContentMode = JustifyContentMode.CENTER
         alignItems = FlexComponent.Alignment.CENTER

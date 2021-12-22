@@ -1,12 +1,14 @@
 package cz.abo.b2b.web.security
 
 import com.example.application.security.SecurityUtils
+import com.example.application.security.SecurityUtils.Companion.isUserLoggedIn
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.router.BeforeEnterEvent
 import com.vaadin.flow.server.ServiceInitEvent
 import com.vaadin.flow.server.VaadinServiceInitListener
 import cz.abo.b2b.web.security.view.LoginView
 import org.springframework.stereotype.Component
+
 
 @Component
 class ConfigureUIServiceInitListener : VaadinServiceInitListener {
@@ -25,10 +27,15 @@ class ConfigureUIServiceInitListener : VaadinServiceInitListener {
      * before navigation event with event details
      */
     private fun beforeEnter(event: BeforeEnterEvent) {
-        if (!LoginView::class.java.equals(event.getNavigationTarget()) // (3)
-            && !SecurityUtils.isUserLoggedIn()
-        ) {
-            event.rerouteTo(LoginView::class.java) // (5)
+        val accessGranted: Boolean = SecurityUtils.isAccessGranted(event.navigationTarget)
+        if (!accessGranted) {
+            if (isUserLoggedIn()) {
+                event.rerouteToError(AccessDeniedException::class.java)
+            } else {
+                if (!event.location.path.equals("register")) {
+                    event.rerouteTo(LoginView::class.java)
+                }
+            }
         }
     }
 }

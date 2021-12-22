@@ -47,7 +47,7 @@ open class SecurityConfiguration(userRepository: UserRepository) : VaadinWebSecu
     override fun configure(web: WebSecurity) {
         // Configure your static resources with public access here:
         web.ignoring().antMatchers(
-            "/images/**"
+            "/images/**","/register"
         )
 
         // Delegating the ignoring configuration for Vaadin's

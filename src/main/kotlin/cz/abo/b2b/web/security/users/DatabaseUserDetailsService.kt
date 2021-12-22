@@ -11,14 +11,12 @@ import org.springframework.stereotype.Service
 
 
 @Service
-class MyUserDetailsService : UserDetailsService {
-    @Autowired
-    private val userRepository: UserRepository? = null
+class MyUserDetailsService(val userRepository: UserRepository) : UserDetailsService {
     override fun loadUserByUsername(username: String): UserDetails? {
         val user: User = userRepository.findByEmail(username) ?: throw UsernameNotFoundException(username)
         return org.springframework.security.core.userdetails.User(
             username, user.passwordHash,
-            listOf(SimpleGrantedAuthority("USER"))
+            listOf(SimpleGrantedAuthority(UserRole.USER.name))
         )
     }
 }
