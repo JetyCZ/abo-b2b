@@ -1,6 +1,5 @@
 package cz.abo.b2b.web
 
-import cz.abo.b2b.web.security.SecurityService
 import com.vaadin.flow.component.ClickEvent
 import com.vaadin.flow.component.Html
 import com.vaadin.flow.component.button.Button
@@ -27,6 +26,7 @@ import com.vaadin.flow.router.Route
 import cz.abo.b2b.web.component.StyledText
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.ProductRepository
+import cz.abo.b2b.web.security.SecurityService
 import cz.abo.b2b.web.shoppingcart.ShoppingCart
 import cz.abo.b2b.web.shoppingcart.ShoppingCartItem
 import cz.abo.b2b.web.shoppingcart.ShoppingCartSupplier
@@ -172,7 +172,11 @@ class MainView(val productRepository: ProductRepository,
         val shoppingCartGrid: Grid<ShoppingCartItem> = Grid(ShoppingCartItem::class.java)
 
         shoppingCartGrid.removeAllColumns()
-        shoppingCartGrid.addColumn("product.productName").setHeader("V košíku")
+        val productColumn = shoppingCartGrid.addComponentColumn { item ->
+            Html("<span title='${item.product.productName}'>${item.product.productName}</span>")
+        }
+        productColumn.setHeader("V košíku")
+
         shoppingCartGrid.addComponentColumn(this::buildCartQuantity).setHeader("Množství")
         var items = ArrayList<ShoppingCartItem>()
         val shoppingCartItem = shoppingCartEntry.value
@@ -210,7 +214,10 @@ class MainView(val productRepository: ProductRepository,
         transportFreeLabel.append("</div>")
         oneSupplierDiv.add(Html(transportFreeLabel.toString()))
         val downloadAnchor = "<a href='/download-filled/" +shoppingCartEntry.key + "' target='_new'>Stáhnout vyplněný ceník</a>"
-        oneSupplierDiv.add(Html(downloadAnchor))
+
+        val buttonBar = HorizontalLayout()
+        buttonBar.add(Html(downloadAnchor), Button("Objednat"))
+        oneSupplierDiv.add(buttonBar)
         leftColumn.add(oneSupplierDiv)
     }
 
@@ -258,5 +265,7 @@ class MainView(val productRepository: ProductRepository,
         }
     }
 }
+
+
 
 
