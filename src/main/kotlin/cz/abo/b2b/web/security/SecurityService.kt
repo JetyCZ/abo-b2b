@@ -3,6 +3,7 @@ package cz.abo.b2b.web.security
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.server.VaadinService
 import com.vaadin.flow.server.VaadinServletRequest
+import cz.abo.b2b.web.dao.Shop
 import cz.abo.b2b.web.dao.User
 import cz.abo.b2b.web.dao.UserRepository
 import cz.abo.b2b.web.security.users.Tarif
@@ -24,7 +25,9 @@ class SecurityService(val userRepository: UserRepository, val passwordEncoder: P
         val testEmail = "b2btest@mailinator.com"
         var testUser = userRepository.findByEmail(testEmail)
         if (testUser==null) {
-            testUser = User("Pavel", "Jetenský", testEmail, Tarif.PROFITABLE, "",passwordEncoder.encode("test") )
+            testUser = User("Pavel", "Jetenský", testEmail, Tarif.PROFITABLE, "",passwordEncoder.encode("test"),
+            Shop("Krámek bezobalu v Brozanech u Pardubic", "Krámek bezobalu\nBrozany 7\nStaré Hradiště\n53352", "50.0648194N, 15.7965928E")
+            )
             userRepository.save(testUser)
         }
     }
@@ -36,6 +39,19 @@ class SecurityService(val userRepository: UserRepository, val passwordEncoder: P
             return if (principal is UserDetails) {
                 context.authentication.principal as UserDetails
             } else null
+            // Anonymous or no authentication.
+        }
+
+    // Anonymous or no authentication.
+    fun authenticatedDbUser(): User? {
+            val context = SecurityContextHolder.getContext()
+            val principal = context.authentication.principal
+            if (principal is UserDetails) {
+                val email = (context.authentication.principal as UserDetails).username
+                return userRepository.findByEmail(email)
+            } else {
+                return null
+            }
             // Anonymous or no authentication.
         }
 

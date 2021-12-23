@@ -21,21 +21,28 @@ class Suppliers {
         var importerClassName = BionebioSheetProcessor::class.qualifiedName
         if (importerClassName!=null) {
             result.add(
-                Supplier("bio nebio", BigDecimal(0.85 * 3000), "", "/bionebio/OL_bio_nebio_11_2021.xls", importerClassName)
+                Supplier(
+                    "bio nebio",
+                    BigDecimal(0.85 * 3000),
+                    "",
+                    "/bionebio/OL_bio_nebio_11_2021.xls",
+                    importerClassName,
+                    "objednavky@bionebio.cz"
+                )
             )
         }
 
         importerClassName = KServisSheetProcessor::class.qualifiedName
         if (importerClassName!=null) {
             result.add(
-                Supplier("K-servis", BigDecimal(5000), "", "/k-servis/cenik_srpen.xlsx", importerClassName)
+                Supplier("K-servis", BigDecimal(5000), "", "/k-servis/cenik_srpen.xlsx", importerClassName, "k-servis@k-servis.com")
             )
         }
 
         importerClassName = NutSheetProcessor::class.qualifiedName
         if (importerClassName!=null) {
             result.add(
-                Supplier("Oříšek", BigDecimal(5000), "", "/orisek/orisek_01.10.2021.xls", importerClassName)
+                Supplier("Oříšek", BigDecimal(5000), "", "/orisek/orisek_01.10.2021.xls", importerClassName, "orisek@orisek.cz")
             )
         }
 

@@ -5,24 +5,17 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
-class User(
+class Shop(
 
-    var firstname: String,
-    var lastname: String,
-    var email: String,
-    var tarif: Tarif,
-
+    var name: String,
     @Column(columnDefinition = "LONGTEXT")
-    var orderingSignature: String?,
-    var passwordHash: String,
-
-    @OneToOne
-    var shop: Shop
-
+    var address: String,
+    var gps: String
 ) {
 
     @Id
     @GeneratedValue
     val id: UUID = UUID.randomUUID()
+
 
 }

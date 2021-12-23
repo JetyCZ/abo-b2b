@@ -27,6 +27,7 @@ import com.vaadin.flow.router.Route
 import cz.abo.b2b.web.view.component.StyledText
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.ProductRepository
+import cz.abo.b2b.web.order.OrderForm
 import cz.abo.b2b.web.security.SecurityService
 import cz.abo.b2b.web.state.order.Order
 import cz.abo.b2b.web.state.shoppingcart.ShoppingCart
@@ -52,11 +53,11 @@ class MainView(val productRepository: ProductRepository,
 ) : VerticalLayout() {
 
     private val productGrid: PaginatedGrid<Product> = PaginatedGrid(Product::class.java)
-    private val orderForm : VerticalLayout = VerticalLayout()
 
     private val leftColumn  = VerticalLayout()
-    private val rightColumn = VerticalLayout()
-
+    private val productsColumn = VerticalLayout()
+    private val orderColumn = VerticalLayout()
+    private val orderForm = OrderForm(this, order, shoppingCart)
     init {
         height = "100%"
         element.style.set("background-color","#FCFFFC")
@@ -68,23 +69,24 @@ class MainView(val productRepository: ProductRepository,
         workspace.setSizeFull()
 
         leftColumn.width = "33%"
-
+        leftColumn.height = null
         workspace.add(leftColumn)
 
         val filter = TextField()
         filter.placeholder = "Filtrovat podle názvu zboží";
         filter.valueChangeMode = ValueChangeMode.EAGER
         filter.addValueChangeListener { e -> listProducts(e.value) }
-        rightColumn.add(filter)
+        productsColumn.add(filter)
 
         refreshProductGrid()
-        refreshOrderForm()
-        rightColumn.add(productGrid)
-        rightColumn.add(orderForm)
+        productsColumn.add(productGrid)
+        orderColumn.isVisible = false
+        productsColumn.add(orderColumn)
 
-        displayShoppingCart()
+        refreshShoppingCart()
 
-        workspace.add(rightColumn)
+        workspace.add(productsColumn)
+        workspace.add(orderColumn)
         workspace.element.style.set("background-color","#FFFFA0")
         add(workspace)
 
@@ -92,21 +94,20 @@ class MainView(val productRepository: ProductRepository,
 }
 
     private fun refreshOrderForm() {
-        orderForm.removeAll()
+
+
         val orderTabActive = order.idSupplier != null && shoppingCart.containsKey(order.idSupplier)
         if (orderTabActive) {
-            orderForm.add(H1("Objednat zboží od " + shoppingCart.get(order.idSupplier)!!.supplier.name))
-            orderForm.add(Span("blabla"))
-            val cancelOrderButton = Button("Zrušit")
-            cancelOrderButton.addClickListener {
-                orderForm.isVisible = false
-                productGrid.isVisible = true
-                order.idSupplier = null
-            }
-            orderForm.add(cancelOrderButton)
-            orderForm.isVisible = orderTabActive
-            productGrid.isVisible = !orderTabActive
+            val authenticatedDbUser = securityService.authenticatedDbUser()
+            orderForm.authenticatedDbUser = authenticatedDbUser
+
+            orderColumn.removeAll()
+            orderColumn.add(H1("Objednat zboží od " + shoppingCart.get(order.idSupplier)!!.supplier.name))
+            orderColumn.add(orderForm)
         }
+        orderColumn.isVisible = orderTabActive
+        productsColumn.isVisible = !orderTabActive
+
     }
 
     private fun refreshProductGrid() {
@@ -172,18 +173,18 @@ class MainView(val productRepository: ProductRepository,
     private fun addToCart(product: Product) {
         Notification.show("Produkt '" + product.productName + "' byl přidán do košíku", 2000, Notification.Position.TOP_CENTER)
         shoppingCart.add(product, 1)
-        displayShoppingCart()
+        refreshShoppingCart()
     }
 
     private fun updateCartItem(product: Product, value: Int?) {
         if (value!=null) {
             shoppingCart.update(product, value.toDouble())
-            displayShoppingCart()
+            refreshShoppingCart()
         }
     }
 
 
-    private fun displayShoppingCart() {
+    private fun refreshShoppingCart() {
         leftColumn.removeAll()
         for (shoppingCartEntry in shoppingCart.entries) {
             oneSupplierShoppingCart(shoppingCartEntry)
@@ -192,7 +193,7 @@ class MainView(val productRepository: ProductRepository,
 
     private fun oneSupplierShoppingCart(shoppingCartEntry: MutableMap.MutableEntry<UUID, ShoppingCartSupplier>) {
         val shoppingCartGrid: Grid<ShoppingCartItem> = Grid(ShoppingCartItem::class.java)
-
+        shoppingCartGrid.setSizeUndefined()
         shoppingCartGrid.removeAllColumns()
         val productColumn = shoppingCartGrid.addComponentColumn { item ->
             Html("<span title='${item.product.productName}'>${item.product.productName}</span>")
@@ -290,6 +291,19 @@ class MainView(val productRepository: ProductRepository,
         } else {
             productGrid.setItems(productRepository.findByProductNameContainingIgnoreCase(productName))
         }
+    }
+
+    fun cancelOrder() {
+        order.idSupplier = null
+        refreshOrderForm()
+    }
+
+    fun sendOrder() {
+        Notification.show("Vaše objednávka byla odeslána")
+        shoppingCart.remove(order.idSupplier)
+        order.idSupplier = null
+        refreshOrderForm()
+        refreshShoppingCart()
     }
 }
 

@@ -1,9 +1,7 @@
 package cz.abo.b2b.web.dao
 
-import cz.abo.b2b.web.importer.SuppliersImport
 import cz.abo.b2b.web.importer.dto.ImportSource
 import cz.abo.b2b.web.importer.dto.ImportSourceType
-import java.io.File
 import java.math.BigDecimal
 import java.util.*
 import javax.persistence.Column
@@ -24,9 +22,11 @@ class Supplier(
     @Column(columnDefinition = "LONGTEXT")
     var description: String?,
     var importUrl: String,
-    var importerClassName: String
-
+    var importerClassName: String,
+    var orderEmail: String
 ) {
+
+
     @Id
     @GeneratedValue
     val id: UUID = UUID.randomUUID()

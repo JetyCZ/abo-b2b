@@ -4,6 +4,7 @@ import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.button.ButtonVariant
 import com.vaadin.flow.component.formlayout.FormLayout
+import com.vaadin.flow.component.html.H2
 import com.vaadin.flow.component.html.H3
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.notification.Notification.show
@@ -11,6 +12,7 @@ import com.vaadin.flow.component.radiobutton.RadioButtonGroup
 import com.vaadin.flow.component.radiobutton.RadioGroupVariant
 import com.vaadin.flow.component.textfield.EmailField
 import com.vaadin.flow.component.textfield.PasswordField
+import com.vaadin.flow.component.textfield.TextArea
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.binder.*
 import com.vaadin.flow.data.renderer.ComponentRenderer
@@ -19,6 +21,7 @@ import com.vaadin.flow.data.validator.StringLengthValidator
 import com.vaadin.flow.server.VaadinService
 import com.vaadin.flow.server.VaadinServletRequest
 import cz.abo.b2b.web.MainView
+import cz.abo.b2b.web.dao.Shop
 import cz.abo.b2b.web.dao.User
 import cz.abo.b2b.web.dao.UserRepository
 import cz.abo.b2b.web.security.SecurityService
@@ -33,7 +36,8 @@ import javax.validation.constraints.NotEmpty
 
 class RegistrationForm(
     val passwordEncoder: PasswordEncoder,
-    val userRepository: UserRepository
+    val userRepository: UserRepository,
+    val shopRepository: UserRepository
 ) : FormLayout() {
 
         val firstname: @NotEmpty TextField = TextField("Jméno")
@@ -44,6 +48,10 @@ class RegistrationForm(
         val tarif : RadioButtonGroup<Tarif> = RadioButtonGroup<Tarif>()
         val errorMessageField: Span
         val submitButton: Button
+
+        val shopName = TextField("Jméno obchodu")
+        val shopAddress = TextArea("Adresa obchodu")
+        val shopGps = TextField("GPS souřadnice obchodu")
 
         val binder: Binder<UserDetails> = Binder(UserDetails::class.java)
         val userDetails : UserDetails = UserDetails()
@@ -71,40 +79,72 @@ class RegistrationForm(
             submitButton = Button("Vytvořit účet")
             submitButton.addClickListener { event -> validateAndSave() }
             submitButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY)
-        val title = H3("Registrace nového uživatele")
-        add(
-            title, firstname, lastname, email, password,
-                passwordConfirm, errorMessageField, tarif,
-                submitButton
-            )
+
             maxWidth = "500px"
 
             setResponsiveSteps(
                 ResponsiveStep("0", 1, ResponsiveStep.LabelsPosition.TOP),
                 ResponsiveStep("490px", 2, ResponsiveStep.LabelsPosition.TOP)
             )
-            // These components always take full width
-            setColspan(title, 2)
-            setColspan(email, 2)
-            setColspan(errorMessageField, 2)
-            setColspan(submitButton, 2)
-            setColspan(tarif, 2)
-
-            binder.forField(firstname)
-                .withValidator(StringLengthValidator("Jméno nesmí být prázdné a musí mít alespoň 3 znaky", 3, null))
-                .bind("firstname")
-            binder.forField(lastname)
-                .withValidator(StringLengthValidator("Jméno nesmí být prázdné a musí mít alespoň 3 znaky", 3, null))
-                .bind("lastname")
-            binder.forField(password)
-                .withValidator(this::passwordValidator)
-                .bind("password")
-            binder.forField(email)
-                .withValidator(EmailValidator("Prosím zadejte platnou e-mailovou adresu"))
-                .bind("email")
-            binder.forField(tarif).bind("tarif")
+        val h2 = H2("Registrace nového uživatele")
+        setColspan(h2, 2)
+        add(h2)
+        addUserInputs()
+        addShopInputs()
+        add(submitButton)
+        setColspan(submitButton, 2)
         binder.readBean(userDetails)
         }
+
+    private fun addUserInputs() {
+        val h3 = H3("Informace o uživateli")
+        add(h3)
+        setColspan(h3, 2)
+        add(
+            firstname, lastname, email, password,
+            passwordConfirm, errorMessageField, tarif
+        )
+        // These components always take full width
+        setColspan(email, 2)
+        setColspan(errorMessageField, 2)
+        setColspan(tarif, 2)
+
+        binder.forField(firstname)
+            .withValidator(StringLengthValidator("Jméno nesmí být prázdné a musí mít alespoň 3 znaky", 3, null))
+            .bind("firstname")
+        binder.forField(lastname)
+            .withValidator(StringLengthValidator("Jméno nesmí být prázdné a musí mít alespoň 3 znaky", 3, null))
+            .bind("lastname")
+        binder.forField(password)
+            .withValidator(this::passwordValidator)
+            .bind("password")
+        binder.forField(email)
+            .withValidator(EmailValidator("Prosím zadejte platnou e-mailovou adresu"))
+            .bind("email")
+        binder.forField(tarif).bind("tarif")
+    }
+
+    private fun addShopInputs() {
+        val h3 = H3("Informace o obchodu")
+        add(h3)
+        setColspan(h3, 2)
+        add(
+            shopName, shopAddress, shopGps
+        )
+        // These components always take full width
+        setColspan(shopAddress, 2)
+        binder.forField(shopName)
+            .withValidator(StringLengthValidator("Jméno obchodu nesmí být prázdné a musí mít alespoň 3 znaky", 3, null))
+            .bind("shopName")
+
+        binder.forField(shopAddress)
+            .withValidator(StringLengthValidator("Adresa obchodu nesmí být prázdná a musí mít alespoň 10 znaků", 10, null))
+            .bind("shopAddress")
+        binder.forField(shopGps)
+            .withValidator(StringLengthValidator("GPS obchodu nesmí být prázdné a musí mít právě 24 znaků", 24, 24))
+            .bind("shopGps")
+        binder.forField(tarif).bind("tarif")
+    }
 
     /**
      * Method to validate that:
@@ -139,9 +179,11 @@ class RegistrationForm(
     private fun validateAndSave() {
         try {
             binder.writeBean(userDetails)
-            println("Saving user")
+            println("Saving user and shop")
             var user: User = userDetails.toUser(passwordEncoder)
             userRepository.save(user)
+
+
             show("Váš uživatelský účet ${user.email} byl v pořádku vytvořen, automaticky vás přihlásíme.")
             autoLoginUser(userDetails)
             UI.getCurrent().navigate(MainView::class.java)
