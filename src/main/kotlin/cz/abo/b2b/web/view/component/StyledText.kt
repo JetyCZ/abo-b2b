@@ -1,4 +1,4 @@
-package cz.abo.b2b.web.component
+package cz.abo.b2b.web.view.component
 
 import com.vaadin.flow.component.Composite
 import com.vaadin.flow.component.HasText

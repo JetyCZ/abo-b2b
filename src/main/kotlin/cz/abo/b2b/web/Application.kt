@@ -1,9 +1,8 @@
 package cz.abo.b2b.web
 
-import cz.abo.b2b.web.dao.ProductRepository
-import cz.abo.b2b.web.importer.HeurekaXMLParser
 import cz.abo.b2b.web.importer.SuppliersImport
-import cz.abo.b2b.web.shoppingcart.ShoppingCart
+import cz.abo.b2b.web.state.order.Order
+import cz.abo.b2b.web.state.shoppingcart.ShoppingCart
 import org.slf4j.LoggerFactory
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
@@ -34,6 +33,12 @@ open class Application {
     @SessionScope
     open fun sessionScopedBean(): ShoppingCart {
         return ShoppingCart()
+    }
+
+    @Bean
+    @SessionScope
+    open fun order(): Order {
+        return Order(null)
     }
 
 }

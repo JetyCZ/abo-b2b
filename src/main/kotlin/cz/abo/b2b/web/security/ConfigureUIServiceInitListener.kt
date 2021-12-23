@@ -4,6 +4,7 @@ import com.example.application.security.SecurityUtils
 import com.example.application.security.SecurityUtils.Companion.isUserLoggedIn
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.router.BeforeEnterEvent
+import com.vaadin.flow.router.InternalServerError
 import com.vaadin.flow.server.ServiceInitEvent
 import com.vaadin.flow.server.VaadinServiceInitListener
 import cz.abo.b2b.web.security.view.LoginView
@@ -28,6 +29,9 @@ class ConfigureUIServiceInitListener : VaadinServiceInitListener {
      */
     private fun beforeEnter(event: BeforeEnterEvent) {
         val accessGranted: Boolean = SecurityUtils.isAccessGranted(event.navigationTarget)
+        if (event.navigationTarget.isAssignableFrom(InternalServerError::class.java)) {
+            return
+        }
         if (!accessGranted) {
             if (isUserLoggedIn()) {
                 event.rerouteToError(AccessDeniedException::class.java)

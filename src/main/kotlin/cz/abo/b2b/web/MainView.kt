@@ -6,6 +6,7 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.GridSortOrder
 import com.vaadin.flow.component.grid.GridVariant
+import com.vaadin.flow.component.html.H1
 import com.vaadin.flow.component.html.Label
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.Icon
@@ -23,13 +24,14 @@ import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.value.ValueChangeMode
 import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
-import cz.abo.b2b.web.component.StyledText
+import cz.abo.b2b.web.view.component.StyledText
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.ProductRepository
 import cz.abo.b2b.web.security.SecurityService
-import cz.abo.b2b.web.shoppingcart.ShoppingCart
-import cz.abo.b2b.web.shoppingcart.ShoppingCartItem
-import cz.abo.b2b.web.shoppingcart.ShoppingCartSupplier
+import cz.abo.b2b.web.state.order.Order
+import cz.abo.b2b.web.state.shoppingcart.ShoppingCart
+import cz.abo.b2b.web.state.shoppingcart.ShoppingCartItem
+import cz.abo.b2b.web.state.shoppingcart.ShoppingCartSupplier
 import org.apache.commons.lang3.StringUtils
 import org.springframework.security.access.annotation.Secured
 import org.vaadin.klaudeta.PaginatedGrid
@@ -44,13 +46,17 @@ import javax.annotation.security.PermitAll
 @PageTitle("Asociace Bezobalu - B2B")
 @Secured("USER")
 class MainView(val productRepository: ProductRepository,
-                val shoppingCart: ShoppingCart,
-        val securityService: SecurityService
+               val shoppingCart: ShoppingCart,
+               val securityService: SecurityService,
+               val order: Order
 ) : VerticalLayout() {
 
     private val productGrid: PaginatedGrid<Product> = PaginatedGrid(Product::class.java)
+    private val orderForm : VerticalLayout = VerticalLayout()
 
-    private val leftColumn : VerticalLayout = VerticalLayout()
+    private val leftColumn  = VerticalLayout()
+    private val rightColumn = VerticalLayout()
+
     init {
         height = "100%"
         element.style.set("background-color","#FCFFFC")
@@ -64,7 +70,6 @@ class MainView(val productRepository: ProductRepository,
         leftColumn.width = "33%"
 
         workspace.add(leftColumn)
-        val rightColumn = VerticalLayout()
 
         val filter = TextField()
         filter.placeholder = "Filtrovat podle názvu zboží";
@@ -72,10 +77,12 @@ class MainView(val productRepository: ProductRepository,
         filter.addValueChangeListener { e -> listProducts(e.value) }
         rightColumn.add(filter)
 
-        buildProductGrid()
-        displayShoppingCart()
-
+        refreshProductGrid()
+        refreshOrderForm()
         rightColumn.add(productGrid)
+        rightColumn.add(orderForm)
+
+        displayShoppingCart()
 
         workspace.add(rightColumn)
         workspace.element.style.set("background-color","#FFFFA0")
@@ -84,7 +91,25 @@ class MainView(val productRepository: ProductRepository,
 
 }
 
-    private fun buildProductGrid() {
+    private fun refreshOrderForm() {
+        orderForm.removeAll()
+        val orderTabActive = order.idSupplier != null && shoppingCart.containsKey(order.idSupplier)
+        if (orderTabActive) {
+            orderForm.add(H1("Objednat zboží od " + shoppingCart.get(order.idSupplier)!!.supplier.name))
+            orderForm.add(Span("blabla"))
+            val cancelOrderButton = Button("Zrušit")
+            cancelOrderButton.addClickListener {
+                orderForm.isVisible = false
+                productGrid.isVisible = true
+                order.idSupplier = null
+            }
+            orderForm.add(cancelOrderButton)
+            orderForm.isVisible = orderTabActive
+            productGrid.isVisible = !orderTabActive
+        }
+    }
+
+    private fun refreshProductGrid() {
 
         val productList = productRepository.findAll()
         productGrid.setItems(productList)
@@ -159,13 +184,10 @@ class MainView(val productRepository: ProductRepository,
 
 
     private fun displayShoppingCart() {
-
         leftColumn.removeAll()
         for (shoppingCartEntry in shoppingCart.entries) {
             oneSupplierShoppingCart(shoppingCartEntry)
         }
-
-
     }
 
     private fun oneSupplierShoppingCart(shoppingCartEntry: MutableMap.MutableEntry<UUID, ShoppingCartSupplier>) {
@@ -185,7 +207,12 @@ class MainView(val productRepository: ProductRepository,
 
         val oneSupplierDiv = VerticalLayout()
         oneSupplierDiv.element.style.set("background-color", "#F0EEF0")
-        oneSupplierDiv.add(Label("Košík - " + shoppingCartItem.supplier.name))
+        val headerDiv = HorizontalLayout()
+        val idSupplier = shoppingCartEntry.key
+        val downloadAnchor = "<a href='/download-filled/" + idSupplier + "' target='_new'>Vyplněný ceník</a>"
+
+        headerDiv.add(Label("Košík - " + shoppingCartItem.supplier.name), Html(downloadAnchor))
+        oneSupplierDiv.add(headerDiv)
         oneSupplierDiv.add(shoppingCartGrid)
         oneSupplierDiv.add(
             Html(
@@ -213,11 +240,12 @@ class MainView(val productRepository: ProductRepository,
         }
         transportFreeLabel.append("</div>")
         oneSupplierDiv.add(Html(transportFreeLabel.toString()))
-        val downloadAnchor = "<a href='/download-filled/" +shoppingCartEntry.key + "' target='_new'>Stáhnout vyplněný ceník</a>"
-
-        val buttonBar = HorizontalLayout()
-        buttonBar.add(Html(downloadAnchor), Button("Objednat"))
-        oneSupplierDiv.add(buttonBar)
+        val orderButton = Button("Objednat")
+        orderButton.addClickListener {
+            order.idSupplier = idSupplier
+            refreshOrderForm()
+        }
+        oneSupplierDiv.add(orderButton)
         leftColumn.add(oneSupplierDiv)
     }
 
@@ -226,14 +254,13 @@ class MainView(val productRepository: ProductRepository,
         val title = Span("Asociace Bezobalu - B2B platforma")
         val help: Icon = VaadinIcon.QUESTION_CIRCLE.create()
 
-        val actionButton1 = Tab(VaadinIcon.HOME.create(), Span("Domů"))
-        val actionButton2 = Tab(VaadinIcon.USERS.create(), Span("Nastavení"))
-
-
-
-
-        val tabs = Tabs(actionButton1, actionButton2)
-
+        val actionButton1 = Tab(VaadinIcon.HOME.create(), Span("Produkty"))
+        val actionButton2 = Tab(VaadinIcon.USERS.create(), Span("Objednávka"))
+        val tabs = Tabs()
+        tabs.add(actionButton1)
+        if (order.idSupplier!=null) {
+            tabs.add(actionButton2)
+        }
 
         val topMenu: HorizontalLayout
 

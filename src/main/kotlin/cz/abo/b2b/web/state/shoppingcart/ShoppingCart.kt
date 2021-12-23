@@ -1,4 +1,4 @@
-package cz.abo.b2b.web.shoppingcart
+package cz.abo.b2b.web.state.shoppingcart
 
 import cz.abo.b2b.web.dao.Product
 import java.util.*
