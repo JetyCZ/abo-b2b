@@ -99,7 +99,7 @@ class MainView(val productRepository: ProductRepository,
         val orderTabActive = order.idSupplier != null && shoppingCart.containsKey(order.idSupplier)
         if (orderTabActive) {
             val authenticatedDbUser = securityService.authenticatedDbUser()
-            orderForm.authenticatedDbUser = authenticatedDbUser
+            orderForm.fillFormData(authenticatedDbUser!!)
 
             orderColumn.removeAll()
             orderColumn.add(H1("Objednat zboží od " + shoppingCart.get(order.idSupplier)!!.supplier.name))

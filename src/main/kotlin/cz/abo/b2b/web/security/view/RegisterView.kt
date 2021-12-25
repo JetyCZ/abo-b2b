@@ -14,11 +14,11 @@ import org.springframework.security.crypto.password.PasswordEncoder
 @Route("register")
 @PageTitle("Asociace bezobalu B2B - Přihlášení")
 @AnonymousAllowed
-open class RegisterView(userRepository: UserRepository, passwordEncoder: PasswordEncoder) : VerticalLayout() {
-    private val registrationForm = RegistrationForm(passwordEncoder, userRepository)
+open class RegisterView(userRepository: UserRepository, passwordEncoder: PasswordEncoder, shopRepository: UserRepository) : VerticalLayout() {
+    private val registrationForm = RegistrationForm(passwordEncoder, userRepository, shopRepository)
     init {
-        //addClassName("login-view")
-        // Center the RegistrationForm
+
+
         setSizeFull()
         setHorizontalComponentAlignment(FlexComponent.Alignment.CENTER, registrationForm)
         add(registrationForm)

@@ -14,8 +14,7 @@ import cz.abo.b2b.web.state.shoppingcart.ShoppingCart
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
 
-class OrderForm(mainView: MainView, order: Order, shoppingCart: ShoppingCart) : FormLayout() {
-    var authenticatedDbUser: User? = null
+class OrderForm(val mainView: MainView, val order: Order, val shoppingCart: ShoppingCart) : FormLayout() {
     val from = TextField("Váš e-mail (v e-mailu jako odesilatel)")
     val to = TextField("E-mail dodavatele (kam se zašle objednávka)")
     val cc = TextField("Váš e-mail (kam se zašle kopie objednávky)")
@@ -24,7 +23,7 @@ class OrderForm(mainView: MainView, order: Order, shoppingCart: ShoppingCart) : 
     val buttonCancel = Button("Zrušit objednávku")
     val buttonSend = Button("Odeslat objednávku")
     val buttons = HorizontalLayout()
-    val orderFormBinder = Binder<OrderFormData>()
+    val orderFormBinder = Binder(OrderFormData::class.java)
     val orderFormData = OrderFormData()
     init {
         setResponsiveSteps(ResponsiveStep("25em", 1))
@@ -37,15 +36,17 @@ class OrderForm(mainView: MainView, order: Order, shoppingCart: ShoppingCart) : 
         buttonSend.addClickListener {
             mainView.sendOrder()
         }
-
         add(from, to, cc, subject, message, buttons)
-
-        SecurityUtils.isUserLoggedIn()
         orderFormBinder.bindInstanceFields(this)
-        orderFormData.from = authenticatedDbUser!!.email
+    }
+
+    public fun fillFormData(
+        authenticatedDbUser: User
+    ) {
+        orderFormData.from = authenticatedDbUser.email
         orderFormData.to = shoppingCart[order.idSupplier]!!.supplier.orderEmail
-        orderFormData.cc = authenticatedDbUser!!.email
-        val shop = authenticatedDbUser!!.shop
+        orderFormData.cc = authenticatedDbUser.email
+        val shop = authenticatedDbUser.shop
         orderFormData.subject = "Objednávka - " + shop.name
         orderFormData.message = "Dobrý den, do našeho krámku objednáváme zboží.\n" +
                 "Adresa dodání:\n" +

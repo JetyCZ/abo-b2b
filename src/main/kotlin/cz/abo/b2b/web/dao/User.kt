@@ -9,6 +9,7 @@ class User(
 
     var firstname: String,
     var lastname: String,
+    @Column(unique = true)
     var email: String,
     var tarif: Tarif,
 
@@ -16,7 +17,7 @@ class User(
     var orderingSignature: String?,
     var passwordHash: String,
 
-    @OneToOne
+    @OneToOne(cascade = [CascadeType.ALL])
     var shop: Shop
 
 ) {
