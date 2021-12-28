@@ -302,15 +302,22 @@ class MainView(val productRepository: ProductRepository,
     }
 
     fun sendOrder(orderFormData: OrderFormData) {
-        emailService.sendMailWithAttachment(
+        val result = emailService.sendMailWithAttachment(
             orderFormData.from,
-        orderFormData.to,
-        orderFormData.cc,
-        orderFormData.subject,
-        orderFormData.message,
-        null
+            orderFormData.to,
+            orderFormData.cc,
+            orderFormData.subject,
+            orderFormData.message,
+            null
         )
-        Notification.show("Vaše objednávka byla odeslána")
+        if (result) {
+            var message = "Vaše objednávka byla odeslána na ${orderFormData.to}."
+            if (!StringUtils.isEmpty(orderFormData.cc)) {
+                message += " Kopie objednávky byla zaslána na váš e-mail ${orderFormData.cc}"
+            }
+            Notification.show(message)
+        }
+
         shoppingCart.remove(order.idSupplier)
         order.idSupplier = null
         refreshOrderForm()

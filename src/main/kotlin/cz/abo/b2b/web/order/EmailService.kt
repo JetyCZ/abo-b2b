@@ -31,7 +31,7 @@ class EmailService {
         subject: String?,
         body: String?,
         emailAttachment: EmailAttachment?
-    ): String {
+    ): Boolean {
         val preparator = MimeMessagePreparator { mimeMessage: MimeMessage? ->
             val helper = MimeMessageHelper(mimeMessage, true)
             helper.setText(body)
@@ -55,11 +55,11 @@ class EmailService {
         }
         return try {
             mailSender!!.send(preparator)
-            "E-mail s objednávkou byl v pořádku odeslán."
+            true
         } catch (ex: MailException) {
             // simply log it and go on...
             System.err.println(ex.message)
-            "E-mail s objednávkou se nepodařilo odeslat."
+            false
         }
     }
 
