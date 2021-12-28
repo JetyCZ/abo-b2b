@@ -22,6 +22,9 @@ class EmailService {
     @Value("\${mail.from}")
     val mailFrom: String? = null
 
+    @Value("\${spring.mail.password}")
+    val springMailPassword: String? = null
+
     @Autowired
     private val mailSender: JavaMailSender? = null
     fun sendMailWithAttachment(

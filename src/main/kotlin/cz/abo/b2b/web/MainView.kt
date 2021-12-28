@@ -24,7 +24,6 @@ import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.value.ValueChangeMode
 import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
-import cz.abo.b2b.web.view.component.StyledText
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.ProductRepository
 import cz.abo.b2b.web.order.EmailService
@@ -35,6 +34,7 @@ import cz.abo.b2b.web.state.order.Order
 import cz.abo.b2b.web.state.shoppingcart.ShoppingCart
 import cz.abo.b2b.web.state.shoppingcart.ShoppingCartItem
 import cz.abo.b2b.web.state.shoppingcart.ShoppingCartSupplier
+import cz.abo.b2b.web.view.component.StyledText
 import org.apache.commons.lang3.StringUtils
 import org.springframework.security.access.annotation.Secured
 import org.vaadin.klaudeta.PaginatedGrid
@@ -310,18 +310,23 @@ class MainView(val productRepository: ProductRepository,
             orderFormData.message,
             null
         )
+        var message: String
         if (result) {
-            var message = "Vaše objednávka byla odeslána na ${orderFormData.to}."
+            message = "Vaše objednávka byla odeslána na ${orderFormData.to}."
             if (!StringUtils.isEmpty(orderFormData.cc)) {
                 message += " Kopie objednávky byla zaslána na váš e-mail ${orderFormData.cc}"
             }
+            shoppingCart.remove(order.idSupplier)
+            order.idSupplier = null
+            refreshOrderForm()
+            refreshShoppingCart()
             Notification.show(message)
+        } else {
+            val notification: Notification = Notification(message)
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+            notification.open()
         }
 
-        shoppingCart.remove(order.idSupplier)
-        order.idSupplier = null
-        refreshOrderForm()
-        refreshShoppingCart()
     }
 }
 
