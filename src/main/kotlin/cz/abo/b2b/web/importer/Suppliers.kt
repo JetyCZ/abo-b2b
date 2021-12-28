@@ -4,6 +4,7 @@ import cz.abo.b2b.web.dao.Supplier
 import cz.abo.b2b.web.importer.xls.processor.BionebioSheetProcessor
 import cz.abo.b2b.web.importer.xls.processor.KServisSheetProcessor
 import cz.abo.b2b.web.importer.xls.processor.NutSheetProcessor
+import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 import java.math.BigDecimal
 
@@ -45,7 +46,8 @@ class Suppliers {
                 Supplier("Oříšek", BigDecimal(5000), "", "/orisek/orisek_01.10.2021.xls", importerClassName, "orisek@orisek.cz")
             )
         }
-
+        // TODO remove - just for testing
+        result.forEach{r->r.orderEmail = StringUtils.replace(r.orderEmail, "@","AT") + "@mailinator.com"}
         return result
     }
 }

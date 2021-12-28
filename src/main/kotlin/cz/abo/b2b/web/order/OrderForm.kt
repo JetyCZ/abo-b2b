@@ -1,6 +1,5 @@
 package cz.abo.b2b.web.order
 
-import com.example.application.security.SecurityUtils
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.formlayout.FormLayout
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
@@ -15,7 +14,7 @@ import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
 
 class OrderForm(val mainView: MainView, val order: Order, val shoppingCart: ShoppingCart) : FormLayout() {
-    val from = TextField("Váš e-mail (v e-mailu jako odesilatel)")
+    val from = TextField("Váš e-mail (v e-mailu jako adresa pro odpověď)")
     val to = TextField("E-mail dodavatele (kam se zašle objednávka)")
     val cc = TextField("Váš e-mail (kam se zašle kopie objednávky)")
     val subject = TextField("Předmět")
@@ -34,7 +33,7 @@ class OrderForm(val mainView: MainView, val order: Order, val shoppingCart: Shop
             mainView.cancelOrder()
         }
         buttonSend.addClickListener {
-            mainView.sendOrder()
+            mainView.sendOrder(orderFormData)
         }
         add(from, to, cc, subject, message, buttons)
         orderFormBinder.bindInstanceFields(this)

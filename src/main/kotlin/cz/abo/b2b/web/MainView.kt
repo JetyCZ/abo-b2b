@@ -27,7 +27,9 @@ import com.vaadin.flow.router.Route
 import cz.abo.b2b.web.view.component.StyledText
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.ProductRepository
+import cz.abo.b2b.web.order.EmailService
 import cz.abo.b2b.web.order.OrderForm
+import cz.abo.b2b.web.order.OrderFormData
 import cz.abo.b2b.web.security.SecurityService
 import cz.abo.b2b.web.state.order.Order
 import cz.abo.b2b.web.state.shoppingcart.ShoppingCart
@@ -49,6 +51,7 @@ import javax.annotation.security.PermitAll
 class MainView(val productRepository: ProductRepository,
                val shoppingCart: ShoppingCart,
                val securityService: SecurityService,
+               val emailService: EmailService,
                val order: Order
 ) : VerticalLayout() {
 
@@ -298,7 +301,15 @@ class MainView(val productRepository: ProductRepository,
         refreshOrderForm()
     }
 
-    fun sendOrder() {
+    fun sendOrder(orderFormData: OrderFormData) {
+        emailService.sendMailWithAttachment(
+            orderFormData.from,
+        orderFormData.to,
+        orderFormData.cc,
+        orderFormData.subject,
+        orderFormData.message,
+        null
+        )
         Notification.show("Vaše objednávka byla odeslána")
         shoppingCart.remove(order.idSupplier)
         order.idSupplier = null

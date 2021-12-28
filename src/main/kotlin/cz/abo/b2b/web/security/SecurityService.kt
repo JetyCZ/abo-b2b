@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component
 class SecurityService(val userRepository: UserRepository, val passwordEncoder: PasswordEncoder) {
 
     init {
-        val testEmail = "b2btest@mailinator.com"
+        val testEmail = "pavel.jetensky@seznam.cz"
         var testUser = userRepository.findByEmail(testEmail)
         if (testUser==null) {
             testUser = User("Pavel", "Jetenský", testEmail, Tarif.PROFITABLE, "",passwordEncoder.encode("test"),
