@@ -9,7 +9,7 @@ import spock.lang.Specification
 import static cz.abo.b2b.web.importer.dto.ImportSource.fromFile;
 
 abstract class AbstractSheetProcessorTest extends Specification{
-    def testSupplier = new cz.abo.b2b.web.dao.Supplier.Supplier("test",BigDecimal.ZERO, "","","" )
+    def testSupplier = new Supplier("test",BigDecimal.ZERO, "","","" )
     protected Sheet fillWriteAndReadSheet(AbstractSheetProcessor processor, Integer additionalParsedIdx = null) {
         def sheetRead
         def filePath = getPricelistResourcePath()

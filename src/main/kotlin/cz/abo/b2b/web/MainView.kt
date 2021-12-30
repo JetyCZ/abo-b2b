@@ -12,6 +12,7 @@ import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.notification.Notification
+import com.vaadin.flow.component.notification.NotificationVariant
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
@@ -21,6 +22,8 @@ import com.vaadin.flow.component.textfield.IntegerField
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.provider.SortDirection
 import com.vaadin.flow.data.renderer.ComponentRenderer
+import com.vaadin.flow.data.renderer.LocalDateRenderer
+import com.vaadin.flow.data.renderer.Renderer
 import com.vaadin.flow.data.value.ValueChangeMode
 import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
@@ -81,6 +84,10 @@ class MainView(val productRepository: ProductRepository,
         filter.addValueChangeListener { e -> listProducts(e.value) }
         productsColumn.add(filter)
 
+        buildProductGrid()
+
+
+
         refreshProductGrid()
         productsColumn.add(productGrid)
         orderColumn.isVisible = false
@@ -96,34 +103,18 @@ class MainView(val productRepository: ProductRepository,
 
 }
 
-    private fun refreshOrderForm() {
-
-
-        val orderTabActive = order.idSupplier != null && shoppingCart.containsKey(order.idSupplier)
-        if (orderTabActive) {
-            val authenticatedDbUser = securityService.authenticatedDbUser()
-            orderForm.fillFormData(authenticatedDbUser!!)
-
-            orderColumn.removeAll()
-            orderColumn.add(H1("Objednat zboží od " + shoppingCart.get(order.idSupplier)!!.supplier.name))
-            orderColumn.add(orderForm)
-        }
-        orderColumn.isVisible = orderTabActive
-        productsColumn.isVisible = !orderTabActive
-
-    }
-
-    private fun refreshProductGrid() {
-
-        val productList = productRepository.findAll()
-        productGrid.setItems(productList)
+    private fun buildProductGrid() {
         productGrid.removeAllColumns()
         productGrid.addColumn("supplier.name").setHeader("Dodavatel")
-        val productColumn = productGrid.addColumn(Product::productName).setHeader("Název zboží").setWidth("70%")
+        val productColumn = productGrid.addColumn(Product::productName).setHeader("Název zboží").setWidth("60%")
+        productGrid.addColumn(LocalDateRenderer(Product::bestBefore, "dd.MM. yyyy"))
+            .setHeader("DMT")
         productGrid.addColumn(Product::priceNoVAT).setHeader(
-            Html("<span>Cena<br>bez DPH<br>za m.j.</span>"))
+            Html("<span>Cena<br>bez DPH<br>za m.j.</span>")
+        )
         productGrid.addColumn(Product::quantity).setHeader(
-            Html("<span>Množství<br>(ks/kg/l)</span>"))
+            Html("<span>Množství<br>(ks/kg/l)</span>")
+        )
         productGrid.addComponentColumn(this::buildBuyButton).setHeader("Akce")
         productGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         productGrid.setPaginatorTexts("Strana", "z")
@@ -144,6 +135,28 @@ class MainView(val productRepository: ProductRepository,
                 layout
             })
         productGrid.height = "70vh"
+    }
+
+    private fun refreshOrderForm() {
+
+
+        val orderTabActive = order.idSupplier != null && shoppingCart.containsKey(order.idSupplier)
+        if (orderTabActive) {
+            val authenticatedDbUser = securityService.authenticatedDbUser()
+            orderForm.fillFormData(authenticatedDbUser!!)
+
+            orderColumn.removeAll()
+            orderColumn.add(H1("Objednat zboží od " + shoppingCart.get(order.idSupplier)!!.supplier.name))
+            orderColumn.add(orderForm)
+        }
+        orderColumn.isVisible = orderTabActive
+        productsColumn.isVisible = !orderTabActive
+
+    }
+
+    private fun refreshProductGrid() {
+        val productList = productRepository.findAll()
+        productGrid.setItems(productList)
     }
 
     /*private fun onItemClick(event: ItemClickEvent<Product>) {
@@ -322,7 +335,8 @@ class MainView(val productRepository: ProductRepository,
             refreshShoppingCart()
             Notification.show(message)
         } else {
-            val notification: Notification = Notification(message)
+            message = "Při odesílání vaší objednávky e-mailem došlo bohužel k chybě."
+            val notification: Notification = Notification(message, 10000)
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
             notification.open()
         }

@@ -25,6 +25,7 @@ public class Item implements Serializable, Comparable<Item>
     private Integer itemTax;
     private Integer rowNum;
     public String description;
+    public String ean;
 
     public Item() {
     }
@@ -157,7 +158,7 @@ public class Item implements Serializable, Comparable<Item>
         if (quantity.intValueExact() != 1) {
             quantity = quantity.divide(new BigDecimal(1000));
         }
-        Product product = new Product(itemName, priceVAT, VAT, description, quantity, saved);
+        Product product = new Product(itemName, priceVAT, VAT, description, quantity, ean, saved);
         product.setRowNum(rowNum);
         return product;
     }

@@ -1,7 +1,9 @@
 package cz.abo.b2b.web.importer.xls.processor;
 
 import cz.abo.b2b.web.dao.Product;
+import cz.abo.b2b.web.dao.Supplier;
 import cz.abo.b2b.web.importer.dto.ImportSource;
+import cz.abo.b2b.web.importer.dto.OrderAttachment;
 import cz.abo.b2b.web.importer.xls.dto.Item;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -70,7 +72,11 @@ public interface ISheetProcessor
         }
         return map;
     }
-    default Workbook fillOrder(File fileToParse, Map<Product, Integer> orderedItems){
+
+    default String orderAttachmentFileName(Supplier supplier) {
+        return new File(supplier.getImportUrl()).getName();
+    }
+    default OrderAttachment fillOrder(File fileToParse, Map<Product, Integer> orderedItems){
         ExcelFile parsedExcel = getWorkbookFromFile(
                 ImportSource.fromFile(fileToParse.getPath())
         );
@@ -78,7 +84,8 @@ public interface ISheetProcessor
         int orderColumnIdx = getOrderColumnIdx();
 
         // Fill order not implemented yet
-        if (orderColumnIdx==-1) return workbook;
+        if (orderColumnIdx==-1) return new OrderAttachment(fileToParse.getName(), workbook);
+
         Sheet orderSheet = getOrderSheetFromWorkbook(workbook);
         for (Map.Entry<Product, Integer> itemIntegerEntry : orderedItems.entrySet()) {
             Product product = itemIntegerEntry.getKey();
@@ -90,7 +97,7 @@ public interface ISheetProcessor
         } catch (IOException e) {
             throw new IllegalStateException("Cannot close excel file", e);
         }
-        return parsedExcel.getWorkbook();
+        return new OrderAttachment(fileToParse.getName(), parsedExcel.getWorkbook());
     }
 
     default void setOrderQuantityForItem(Sheet orderSheet, Product product, Integer orderQuantity) {

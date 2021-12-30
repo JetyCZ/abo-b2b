@@ -4,6 +4,7 @@ import cz.abo.b2b.web.dao.Supplier
 import cz.abo.b2b.web.importer.xls.processor.BionebioSheetProcessor
 import cz.abo.b2b.web.importer.xls.processor.KServisSheetProcessor
 import cz.abo.b2b.web.importer.xls.processor.NutSheetProcessor
+import cz.abo.b2b.web.importer.xls.processor.WolfberrySheetProcessor
 import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 import java.math.BigDecimal
@@ -19,6 +20,10 @@ class Suppliers {
             Supplier("PROBIO", BigDecimal(2500), "", "https://www.probio.cz/data/product-feed/probio/8re6tf8erd5ordd23c7f59a63.xml", "")
         )
 */
+        result.add(
+            Supplier("Wolfberry", BigDecimal(2000), "", "http://cup.wolfberry.cz/xml-export/bezobalu_cz.xml",
+                WolfberrySheetProcessor::class.qualifiedName!!, "objednavky@wolfberry.cz")
+        )
         var importerClassName = BionebioSheetProcessor::class.qualifiedName
         if (importerClassName!=null) {
             result.add(
@@ -33,10 +38,9 @@ class Suppliers {
             )
         }
 
-        importerClassName = KServisSheetProcessor::class.qualifiedName
         if (importerClassName!=null) {
             result.add(
-                Supplier("K-servis", BigDecimal(5000), "", "/k-servis/cenik_srpen.xlsx", importerClassName, "k-servis@k-servis.com")
+                Supplier("K-servis", BigDecimal(5000), "", "/k-servis/cenik_srpen.xlsx", KServisSheetProcessor::class.qualifiedName!!, "k-servis@k-servis.com")
             )
         }
 

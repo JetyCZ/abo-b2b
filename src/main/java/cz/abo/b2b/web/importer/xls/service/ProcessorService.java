@@ -4,6 +4,7 @@ import cz.abo.b2b.web.dao.Product;
 import cz.abo.b2b.web.dao.Supplier;
 import cz.abo.b2b.web.dao.SupplierRepository;
 import cz.abo.b2b.web.importer.dto.ImportSource;
+import cz.abo.b2b.web.importer.dto.ImportSourceType;
 import cz.abo.b2b.web.importer.xls.controller.dto.PriceListDTO;
 import cz.abo.b2b.web.importer.xls.processor.ISheetProcessor;
 import cz.abo.b2b.web.state.shoppingcart.ShoppingCart;
@@ -52,24 +53,30 @@ public class ProcessorService {
     public PriceListDTO getFilledPriceListWithOrder(UUID supplierId) throws IOException {
         Supplier supplier = supplierRepository.getById(supplierId);
 
+        ISheetProcessor iSheetProcessor = selectProcessor(supplier);
+
         ImportSource importSource = supplier.importSource();
 
         // Load file from database
         String contentType = "application/vnd.ms-excel";
 
-        String pricelistFileName =importSource.getPath();
+        String pricelistFileName =iSheetProcessor.orderAttachmentFileName(supplier);
+
         String outputFilename = UPLOADING_DIR  + RandomStringUtils.randomAlphabetic(8) + "-" + new File(pricelistFileName).getName();
-        IOUtils.copy(importSource.newInputStream(), new FileOutputStream(outputFilename));
+
+        // We will create copy of Excel file to be filled in
+        if (importSource.getType().equals(ImportSourceType.FILE)) {
+            IOUtils.copy(importSource.newInputStream(), new FileOutputStream(outputFilename));
+        }
 
         Map<Product, Integer> orderedProducts = new HashMap<>();
         ShoppingCartSupplier shoppingCartSupplier = shoppingCart.get(supplierId);
         for (ShoppingCartItem shoppingCartItem : shoppingCartSupplier.values()) {
-            Integer count = new Integer((int) shoppingCartItem.getCount());
+            Integer count = (int) shoppingCartItem.getCount();
             orderedProducts.put(shoppingCartItem.getProduct(), count);
         }
 
-        ISheetProcessor sheetProcessor = selectProcessor(supplier);
-        Workbook workbook = sheetProcessor.fillOrder(new File(outputFilename), orderedProducts);
+        Workbook workbook = iSheetProcessor.fillOrder(new File(outputFilename), orderedProducts).getWorkbook();
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
             workbook.write(bos);

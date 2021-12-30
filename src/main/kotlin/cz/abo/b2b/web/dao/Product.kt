@@ -2,6 +2,7 @@ package cz.abo.b2b.web.dao
 
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.time.LocalDate
 import java.util.*
 import javax.persistence.*
 
@@ -17,12 +18,14 @@ class Product(
     var description: String?,
 
     var quantity: BigDecimal,
+    var ean: String?,
     @ManyToOne
     var supplier: Supplier
 
 ) {
 
     var rowNum: Int = 0
+    var bestBefore: LocalDate? = null
 
     @Id
     @GeneratedValue
