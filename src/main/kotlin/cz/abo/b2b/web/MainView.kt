@@ -23,12 +23,12 @@ import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.provider.SortDirection
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.data.renderer.LocalDateRenderer
-import com.vaadin.flow.data.renderer.Renderer
 import com.vaadin.flow.data.value.ValueChangeMode
 import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.ProductRepository
+import cz.abo.b2b.web.importer.xls.service.ProcessorService
 import cz.abo.b2b.web.order.EmailService
 import cz.abo.b2b.web.order.OrderForm
 import cz.abo.b2b.web.order.OrderFormData
@@ -55,7 +55,8 @@ class MainView(val productRepository: ProductRepository,
                val shoppingCart: ShoppingCart,
                val securityService: SecurityService,
                val emailService: EmailService,
-               val order: Order
+               val order: Order,
+               val processorService: ProcessorService
 ) : VerticalLayout() {
 
     private val productGrid: PaginatedGrid<Product> = PaginatedGrid(Product::class.java)
@@ -142,11 +143,15 @@ class MainView(val productRepository: ProductRepository,
 
         val orderTabActive = order.idSupplier != null && shoppingCart.containsKey(order.idSupplier)
         if (orderTabActive) {
+            val supplier = shoppingCart[order.idSupplier]!!.supplier
+            val orderProcessor = processorService.selectProcessor(supplier)
+            val orderAttachmentFileName = orderProcessor.orderAttachmentFileName(supplier)
+
             val authenticatedDbUser = securityService.authenticatedDbUser()
-            orderForm.fillFormData(authenticatedDbUser!!)
+            orderForm.fillFormData(authenticatedDbUser!!, orderAttachmentFileName)
 
             orderColumn.removeAll()
-            orderColumn.add(H1("Objednat zboží od " + shoppingCart.get(order.idSupplier)!!.supplier.name))
+            orderColumn.add(H1("Objednat zboží od " + supplier.name))
             orderColumn.add(orderForm)
         }
         orderColumn.isVisible = orderTabActive
@@ -224,12 +229,8 @@ class MainView(val productRepository: ProductRepository,
 
         val oneSupplierDiv = VerticalLayout()
         oneSupplierDiv.element.style.set("background-color", "#F0EEF0")
-        val headerDiv = HorizontalLayout()
         val idSupplier = shoppingCartEntry.key
-        val downloadAnchor = "<a href='/download-filled/" + idSupplier + "' target='_new'>Vyplněný ceník</a>"
-
-        headerDiv.add(Label("Košík - " + shoppingCartItem.supplier.name), Html(downloadAnchor))
-        oneSupplierDiv.add(headerDiv)
+        oneSupplierDiv.add(Label("Košík - " + shoppingCartItem.supplier.name))
         oneSupplierDiv.add(shoppingCartGrid)
         oneSupplierDiv.add(
             Html(
@@ -315,13 +316,14 @@ class MainView(val productRepository: ProductRepository,
     }
 
     fun sendOrder(orderFormData: OrderFormData) {
+        val fileAttachment = processorService.getFilledPriceListWithOrder(order.idSupplier)
         val result = emailService.sendMailWithAttachment(
             orderFormData.from,
             orderFormData.to,
             orderFormData.cc,
             orderFormData.subject,
             orderFormData.message,
-            null
+            fileAttachment
         )
         var message: String
         if (result) {

@@ -1,11 +1,11 @@
 package cz.abo.b2b.web.importer.xls.controller.dto;
 
-public class PriceListDTO {
+public class FileAttachment {
     private byte[] content;
     private String filename;
     private String contentType;
 
-    public PriceListDTO(byte[] content, String filename, String contentType) {
+    public FileAttachment(byte[] content, String filename, String contentType) {
         this.content = content;
         this.filename = filename;
         this.contentType = contentType;

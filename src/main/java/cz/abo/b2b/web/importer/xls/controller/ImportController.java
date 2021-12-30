@@ -1,7 +1,7 @@
 package cz.abo.b2b.web.importer.xls.controller;
 
 import com.google.common.net.HttpHeaders;
-import cz.abo.b2b.web.importer.xls.controller.dto.PriceListDTO;
+import cz.abo.b2b.web.importer.xls.controller.dto.FileAttachment;
 import cz.abo.b2b.web.importer.xls.service.ProcessorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,11 +37,11 @@ public class ImportController
     public ResponseEntity<Resource> downloadFilledFile(@PathVariable UUID supplierId) {
 
         try {
-            PriceListDTO priceListDTO = processorService.getFilledPriceListWithOrder(supplierId);
+            FileAttachment fileAttachment = processorService.getFilledPriceListWithOrder(supplierId);
             return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(priceListDTO.getContentType()))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + priceListDTO.getFilename() + "\"")
-                .body(new ByteArrayResource(priceListDTO.getContent()));
+                .contentType(MediaType.parseMediaType(fileAttachment.getContentType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileAttachment.getFilename() + "\"")
+                .body(new ByteArrayResource(fileAttachment.getContent()));
         } catch (IOException e) {
             throw new IllegalStateException("Cannot write file", e);
         }

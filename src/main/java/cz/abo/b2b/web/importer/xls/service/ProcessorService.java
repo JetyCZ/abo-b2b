@@ -5,7 +5,7 @@ import cz.abo.b2b.web.dao.Supplier;
 import cz.abo.b2b.web.dao.SupplierRepository;
 import cz.abo.b2b.web.importer.dto.ImportSource;
 import cz.abo.b2b.web.importer.dto.ImportSourceType;
-import cz.abo.b2b.web.importer.xls.controller.dto.PriceListDTO;
+import cz.abo.b2b.web.importer.xls.controller.dto.FileAttachment;
 import cz.abo.b2b.web.importer.xls.processor.ISheetProcessor;
 import cz.abo.b2b.web.state.shoppingcart.ShoppingCart;
 import cz.abo.b2b.web.state.shoppingcart.ShoppingCartItem;
@@ -50,7 +50,7 @@ public class ProcessorService {
         }
     }
 
-    public PriceListDTO getFilledPriceListWithOrder(UUID supplierId) throws IOException {
+    public FileAttachment getFilledPriceListWithOrder(UUID supplierId) throws IOException {
         Supplier supplier = supplierRepository.getById(supplierId);
 
         ISheetProcessor iSheetProcessor = selectProcessor(supplier);
@@ -84,6 +84,6 @@ public class ProcessorService {
             bos.close();
         }
         FileUtils.deleteQuietly(new File(outputFilename));
-        return new PriceListDTO(bos.toByteArray(), pricelistFileName, contentType);
+        return new FileAttachment(bos.toByteArray(), pricelistFileName, contentType);
     }
 }

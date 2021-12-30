@@ -1,7 +1,10 @@
 package cz.abo.b2b.web.order
 
+import com.vaadin.flow.component.Html
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.formlayout.FormLayout
+import com.vaadin.flow.component.html.Anchor
+import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.textfield.TextArea
 import com.vaadin.flow.component.textfield.TextField
@@ -24,6 +27,7 @@ class OrderForm(val mainView: MainView, val order: Order, val shoppingCart: Shop
     val buttons = HorizontalLayout()
     val orderFormBinder = Binder(OrderFormData::class.java)
     val orderFormData = OrderFormData()
+    val downloadAnchor = Anchor()
     init {
         setResponsiveSteps(ResponsiveStep("25em", 1))
         buttons.add(buttonSend, buttonCancel)
@@ -35,12 +39,15 @@ class OrderForm(val mainView: MainView, val order: Order, val shoppingCart: Shop
         buttonSend.addClickListener {
             mainView.sendOrder(orderFormData)
         }
+        downloadAnchor.setTarget("_new")
+        add(downloadAnchor)
         add(from, to, cc, subject, message, buttons)
         orderFormBinder.bindInstanceFields(this)
     }
 
     public fun fillFormData(
-        authenticatedDbUser: User
+        authenticatedDbUser: User,
+        orderAttachmentFileName: String
     ) {
         orderFormData.from = authenticatedDbUser.email
         orderFormData.to = shoppingCart[order.idSupplier]!!.supplier.orderEmail
@@ -52,6 +59,9 @@ class OrderForm(val mainView: MainView, val order: Order, val shoppingCart: Shop
                 shop.address +
                 "\n" +
                 "GPS souřadnice obchodu: " + shop.gps
+        downloadAnchor.add(Span(orderAttachmentFileName))
+        downloadAnchor.href = "/download-filled/" + order.idSupplier
+
         orderFormBinder.readBean(orderFormData)
     }
 }

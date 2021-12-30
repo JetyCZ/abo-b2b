@@ -1,20 +1,15 @@
 package cz.abo.b2b.web.order
 
-import cz.abo.b2b.web.order.dto.EmailAttachment
+import cz.abo.b2b.web.importer.xls.controller.dto.FileAttachment
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.ByteArrayResource
-import org.springframework.core.io.InputStreamSource
 import org.springframework.mail.MailException
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.mail.javamail.MimeMessagePreparator
 import org.springframework.stereotype.Service
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
-import javax.activation.DataSource
 import javax.mail.internet.MimeMessage
 
 @Service
@@ -33,7 +28,7 @@ class EmailService {
         cc: String?,
         subject: String?,
         body: String?,
-        emailAttachment: EmailAttachment?
+        emailAttachment: FileAttachment?
     ): Boolean {
         val preparator = MimeMessagePreparator { mimeMessage: MimeMessage? ->
             val helper = MimeMessageHelper(mimeMessage, true)
