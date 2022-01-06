@@ -29,9 +29,8 @@ class WolfberrySheetProcessor : ISheetProcessor {
     override fun fillOrder(fileToParse: File?, orderedItems: Map<Product, Int>): OrderAttachment {
         val workbook = XSSFWorkbook();
         val sheet = workbook.createSheet()
-
-        for (orderedItem in orderedItems.entries) {
-            val row = sheet.createRow(0)
+        for ((rowNum, orderedItem) in orderedItems.entries.withIndex()) {
+            val row = sheet.createRow(rowNum)
             val eanCell = row.createCell(0)
             eanCell.setCellValue(orderedItem.key.ean)
             val quantityCell = row.createCell(1)

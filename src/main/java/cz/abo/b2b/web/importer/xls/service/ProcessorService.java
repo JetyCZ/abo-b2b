@@ -65,7 +65,9 @@ public class ProcessorService {
         String outputFilename = UPLOADING_DIR  + RandomStringUtils.randomAlphabetic(8) + "-" + new File(pricelistFileName).getName();
 
         // We will create copy of Excel file to be filled in
-        if (importSource.getType().equals(ImportSourceType.FILE)) {
+        if (importSource.getType().equals(ImportSourceType.FILE) ||
+                importSource.getType().equals(ImportSourceType.CLASSPATH_RESOURCE)
+        ) {
             IOUtils.copy(importSource.newInputStream(), new FileOutputStream(outputFilename));
         }
 
