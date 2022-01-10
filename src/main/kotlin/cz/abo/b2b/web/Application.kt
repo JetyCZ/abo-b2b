@@ -1,10 +1,8 @@
 package cz.abo.b2b.web
 
-import cz.abo.b2b.web.importer.SuppliersImport
 import cz.abo.b2b.web.state.order.Order
 import cz.abo.b2b.web.state.shoppingcart.ShoppingCart
 import org.slf4j.LoggerFactory
-import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
@@ -20,14 +18,6 @@ open class Application {
             SpringApplication.run(Application::class.java)
         }
     }
-
-    @Bean
-    open fun loadData(suppliersImport: SuppliersImport): CommandLineRunner {
-        return CommandLineRunner {
-            suppliersImport.importAll()
-        }
-    }
-
 
     @Bean
     @SessionScope

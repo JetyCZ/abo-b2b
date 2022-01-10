@@ -1,5 +1,6 @@
 package cz.abo.b2b.web.security.view
 import com.vaadin.flow.component.html.H1
+import com.vaadin.flow.component.html.Image
 import com.vaadin.flow.component.login.LoginForm
 import com.vaadin.flow.component.login.LoginI18n
 import com.vaadin.flow.component.orderedlayout.FlexComponent
@@ -21,7 +22,7 @@ abstract class AbstractLoginView : VerticalLayout() {
         setSizeFull()
         justifyContentMode = JustifyContentMode.CENTER
         alignItems = FlexComponent.Alignment.CENTER
-        add(H1("Asociace Bezobalu - B2B"))
+        add(Image("/images/abo-logo-b2b.png", "B2B logo"),)
     }
 
 }

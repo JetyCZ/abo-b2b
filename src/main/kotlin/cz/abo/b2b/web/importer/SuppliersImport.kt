@@ -8,7 +8,10 @@ import cz.abo.b2b.web.importer.dto.ImportSource
 import cz.abo.b2b.web.importer.xls.processor.AbstractSheetProcessor
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.InitializingBean
+import org.springframework.boot.CommandLineRunner
 import org.springframework.context.ApplicationContext
+import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
 import java.util.*
 
@@ -18,7 +21,7 @@ open class SuppliersImport(
     val supplierRepository: SupplierRepository,
     val suppliers: Suppliers,
     val heurekaXMLParser: HeurekaXMLParser,
-    val applicationContext: ApplicationContext) {
+    val applicationContext: ApplicationContext):InitializingBean {
 
     companion object {
         val LOGGER = LoggerFactory.getLogger(SuppliersImport::class.java)
@@ -54,6 +57,10 @@ open class SuppliersImport(
             }
             LOGGER.info("XXX AFTER: " + supplier.name + "; " + SystemUtils.usedMemory())
         }
+    }
+
+    override fun afterPropertiesSet() {
+        importAll()
     }
 
 
