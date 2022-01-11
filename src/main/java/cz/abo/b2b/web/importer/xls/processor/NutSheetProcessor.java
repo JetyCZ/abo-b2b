@@ -1,11 +1,10 @@
 package cz.abo.b2b.web.importer.xls.processor;
 
-import cz.abo.b2b.web.dao.Product;
 import cz.abo.b2b.web.importer.xls.dto.Item;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -16,8 +15,10 @@ import java.util.List;
  */
 
 @Component
-public class NutSheetProcessor extends AbstractSheetProcessor
-{
+public class NutSheetProcessor extends AbstractSheetProcessor {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(NutSheetProcessor.class);
+
     @Override
     public List<Item> disintegrateIntoItem(int rowNum, List<String> rowData) {
         if (!rowData.isEmpty())
@@ -63,7 +64,8 @@ public class NutSheetProcessor extends AbstractSheetProcessor
         return super.getOrderSheetFromWorkbook(workbook).getWorkbook().getSheet("Objednávka");
     }
 
-    public int getOrderColumnIdx() {
+    @Override
+    public int orderColumnIdx() {
         return 5;
     }
 

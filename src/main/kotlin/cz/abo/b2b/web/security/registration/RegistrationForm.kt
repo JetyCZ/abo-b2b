@@ -6,6 +6,7 @@ import com.vaadin.flow.component.button.ButtonVariant
 import com.vaadin.flow.component.formlayout.FormLayout
 import com.vaadin.flow.component.html.H2
 import com.vaadin.flow.component.html.H3
+import com.vaadin.flow.component.html.H4
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.notification.Notification.show
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup
@@ -21,18 +22,23 @@ import com.vaadin.flow.data.validator.StringLengthValidator
 import com.vaadin.flow.server.VaadinService
 import com.vaadin.flow.server.VaadinServletRequest
 import cz.abo.b2b.web.MainView
-import cz.abo.b2b.web.dao.Shop
 import cz.abo.b2b.web.dao.User
 import cz.abo.b2b.web.dao.UserRepository
-import cz.abo.b2b.web.security.SecurityService
 import cz.abo.b2b.web.security.users.Tarif
 import cz.abo.b2b.web.security.users.UserDetails
-import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.crypto.password.PasswordEncoder
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotEmpty
 
 
+private const val JMENO_OBCHODU = "Jméno obchodu"
+
+private const val ULICE_S_CISLEM_POPISNYM = "Ulice s číslem popisným"
+
+private const val OBEC = "Obec"
+
+private const val PSC = "PSČ"
+private const val GPS_SOURADNICE_OBCHODU = "GPS souřadnice obchodu"
 
 class RegistrationForm(
     val passwordEncoder: PasswordEncoder,
@@ -49,9 +55,11 @@ class RegistrationForm(
         val errorMessageField: Span
         val submitButton: Button
 
-        val shopName = TextField("Jméno obchodu")
-        val shopAddress = TextArea("Adresa obchodu")
-        val shopGps = TextField("GPS souřadnice obchodu")
+        val shopName = TextField(JMENO_OBCHODU)
+        val shopStreet = TextField(ULICE_S_CISLEM_POPISNYM)
+        val shopCity = TextArea(OBEC)
+        val shopPostcode = TextArea(PSC)
+        val shopGps = TextField(GPS_SOURADNICE_OBCHODU)
 
         val binder: Binder<UserDetails> = Binder(UserDetails::class.java)
         val userDetails : UserDetails = UserDetails()
@@ -128,18 +136,23 @@ class RegistrationForm(
         val h3 = H3("Informace o obchodu")
         add(h3)
         setColspan(h3, 2)
-        add(
-            shopName, shopAddress, shopGps
-        )
-        // These components always take full width
-        setColspan(shopAddress, 2)
+        add(shopName)
+        val h4 = H4("Adresa obchodu")
+        add(h4)
+        setColspan(h4, 2)
+        add(shopStreet, shopPostcode, shopCity)
         binder.forField(shopName)
-            .withValidator(StringLengthValidator("Jméno obchodu nesmí být prázdné a musí mít alespoň 3 znaky", 3, null))
+            .withValidator(StringLengthValidator("$JMENO_OBCHODU nesmí být prázdné a musí mít alespoň 3 znaky", 3, null))
             .bind("shopName")
-
-        binder.forField(shopAddress)
-            .withValidator(StringLengthValidator("Adresa obchodu nesmí být prázdná a musí mít alespoň 10 znaků", 10, null))
-            .bind("shopAddress")
+        binder.forField(shopStreet)
+            .withValidator(StringLengthValidator("$ULICE_S_CISLEM_POPISNYM obchodu nesmí být prázdná a musí mít alespoň 5 znaků", 10, null))
+            .bind("shopStreet")
+        binder.forField(shopCity)
+            .withValidator(StringLengthValidator("$OBEC nesmí být prázdná a musí mít alespoň 2 znaky", 2, null))
+            .bind("shopCity")
+        binder.forField(shopPostcode)
+            .withValidator(StringLengthValidator("$PSC nesmí být prázdné a musí mít právě 5 znaků", 5, 5))
+            .bind("shopPostcode")
         binder.forField(shopGps)
             .withValidator(StringLengthValidator("GPS obchodu nesmí být prázdné a musí mít právě 24 znaků", 24, 24))
             .bind("shopGps")

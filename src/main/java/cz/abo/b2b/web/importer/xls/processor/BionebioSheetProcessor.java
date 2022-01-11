@@ -1,10 +1,12 @@
 package cz.abo.b2b.web.importer.xls.processor;
 
-import cz.abo.b2b.web.dao.Product;
+import cz.abo.b2b.web.importer.HeurekaXMLParser;
 import cz.abo.b2b.web.importer.xls.dto.Item;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -17,8 +19,7 @@ import java.util.regex.Pattern;
  */
 
 @Component
-public class BionebioSheetProcessor extends AbstractSheetProcessor
-{
+public class BionebioSheetProcessor extends AbstractSheetProcessor {
     public static final Double EUR_TO_CZK = new Double(26);
     private static final Logger log = LoggerFactory.getLogger(BionebioSheetProcessor.class);
 
@@ -93,8 +94,10 @@ public class BionebioSheetProcessor extends AbstractSheetProcessor
         return itemsList;
     }
 
-    public int getOrderColumnIdx() {
+    @Override
+    public int orderColumnIdx() {
         return 4;
     }
+
 
 }

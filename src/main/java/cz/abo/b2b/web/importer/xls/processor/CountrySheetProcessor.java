@@ -1,5 +1,6 @@
 package cz.abo.b2b.web.importer.xls.processor;
 
+import cz.abo.b2b.web.importer.HeurekaXMLParser;
 import cz.abo.b2b.web.importer.xls.dto.Item;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -7,6 +8,7 @@ import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -17,8 +19,7 @@ import java.util.List;
  * @author Tomas Kodym
  */
 @Component
-public class CountrySheetProcessor extends AbstractSheetProcessor
-{
+public class CountrySheetProcessor extends AbstractSheetProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CountrySheetProcessor.class);
 
@@ -27,7 +28,6 @@ public class CountrySheetProcessor extends AbstractSheetProcessor
     private static final String KILOS_UPPER = "Kg";
     private static final String KILOS_LOWER = "kg";
     private static final List<String> QUANTITY_FORBIDDEN_VALUES = Arrays.asList("kg", "g");
-
 
     private static boolean isRowOmitted(int rowNumber)
     {
@@ -133,7 +133,8 @@ public class CountrySheetProcessor extends AbstractSheetProcessor
         return false;
     }
 
-    public int getOrderColumnIdx() {
+    @Override
+    public int orderColumnIdx() {
         return 22;
     }
 

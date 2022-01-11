@@ -1,6 +1,5 @@
 package cz.abo.b2b.web.order
 
-import com.vaadin.flow.component.Html
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.formlayout.FormLayout
 import com.vaadin.flow.component.html.Anchor
@@ -56,8 +55,10 @@ class OrderForm(val mainView: MainView, val order: Order, val shoppingCart: Shop
         orderFormData.subject = "Objednávka - " + shop.name
         orderFormData.message = "Dobrý den, do našeho krámku objednáváme zboží.\n" +
                 "Adresa dodání:\n" +
-                shop.address +
-                "\n" +
+                authenticatedDbUser.firstname + " " + authenticatedDbUser.lastname + "\n" +
+                shop.name + "\n" +
+                shop.street + "\n" +
+                shop.postcode + " " + shop.city + "\n" +
                 "GPS souřadnice obchodu: " + shop.gps
         downloadAnchor.add(Span(orderAttachmentFileName))
         downloadAnchor.href = "/download-filled/" + order.idSupplier

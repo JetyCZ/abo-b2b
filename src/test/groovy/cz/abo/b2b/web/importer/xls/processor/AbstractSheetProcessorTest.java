@@ -5,8 +5,8 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class ISheetProcessorTest {
-    private ISheetProcessor countrySheetProcessor = new CountrySheetProcessor();
+public class AbstractSheetProcessorTest {
+    private AbstractSheetProcessor countrySheetProcessor = new CountrySheetProcessor();
 
     @Test
     public void itemIsNotValidatedTest() {

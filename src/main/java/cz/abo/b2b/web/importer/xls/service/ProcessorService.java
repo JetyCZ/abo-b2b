@@ -6,7 +6,7 @@ import cz.abo.b2b.web.dao.SupplierRepository;
 import cz.abo.b2b.web.importer.dto.ImportSource;
 import cz.abo.b2b.web.importer.dto.ImportSourceType;
 import cz.abo.b2b.web.importer.xls.controller.dto.FileAttachment;
-import cz.abo.b2b.web.importer.xls.processor.ISheetProcessor;
+import cz.abo.b2b.web.importer.xls.processor.AbstractSheetProcessor;
 import cz.abo.b2b.web.state.shoppingcart.ShoppingCart;
 import cz.abo.b2b.web.state.shoppingcart.ShoppingCartItem;
 import cz.abo.b2b.web.state.shoppingcart.ShoppingCartSupplier;
@@ -40,11 +40,11 @@ public class ProcessorService {
     ApplicationContext applicationContext;
 
 
-    public ISheetProcessor selectProcessor(Supplier supplier)
+    public AbstractSheetProcessor selectProcessor(Supplier supplier)
     {
         String importerClassName = supplier.getImporterClassName();
         try {
-            return (ISheetProcessor) applicationContext.getBean(Class.forName(importerClassName));
+            return (AbstractSheetProcessor) applicationContext.getBean(Class.forName(importerClassName));
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException("Cannot get importer", e);
         }
@@ -53,14 +53,14 @@ public class ProcessorService {
     public FileAttachment getFilledPriceListWithOrder(UUID supplierId) throws IOException {
         Supplier supplier = supplierRepository.getById(supplierId);
 
-        ISheetProcessor iSheetProcessor = selectProcessor(supplier);
+        AbstractSheetProcessor abstractSheetProcessor = selectProcessor(supplier);
 
         ImportSource importSource = supplier.importSource();
 
         // Load file from database
         String contentType = "application/vnd.ms-excel";
 
-        String pricelistFileName =iSheetProcessor.orderAttachmentFileName(supplier);
+        String pricelistFileName = abstractSheetProcessor.orderAttachmentFileName(supplier);
 
         String outputFilename = UPLOADING_DIR  + RandomStringUtils.randomAlphabetic(8) + "-" + new File(pricelistFileName).getName();
 
@@ -78,7 +78,7 @@ public class ProcessorService {
             orderedProducts.put(shoppingCartItem.getProduct(), count);
         }
 
-        Workbook workbook = iSheetProcessor.fillOrder(new File(outputFilename), orderedProducts).getWorkbook();
+        Workbook workbook = abstractSheetProcessor.fillOrder(new File(outputFilename), orderedProducts).getWorkbook();
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
             workbook.write(bos);

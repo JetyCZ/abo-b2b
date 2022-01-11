@@ -148,7 +148,7 @@ class MainView(val productRepository: ProductRepository,
             val orderAttachmentFileName = orderProcessor.orderAttachmentFileName(supplier)
 
             val authenticatedDbUser = securityService.authenticatedDbUser()
-            orderForm.fillFormData(authenticatedDbUser!!, orderAttachmentFileName)
+            orderForm.fillFormData(authenticatedDbUser!!, orderAttachmentFileName!!)
 
             orderColumn.removeAll()
             orderColumn.add(H1("Objednat zboží od " + supplier.name))
@@ -193,13 +193,13 @@ class MainView(val productRepository: ProductRepository,
 
     private fun addToCart(product: Product) {
         Notification.show("Produkt '" + product.productName + "' byl přidán do košíku", 2000, Notification.Position.TOP_CENTER)
-        shoppingCart.add(product, 1)
+        shoppingCart.add(processorService, product, 1, securityService.authenticatedDbUser()!!.shop)
         refreshShoppingCart()
     }
 
     private fun updateCartItem(product: Product, value: Int?) {
         if (value!=null) {
-            shoppingCart.update(product, value.toDouble())
+            shoppingCart.update(processorService, product, value.toDouble(), securityService.authenticatedDbUser()!!.shop)
             refreshShoppingCart()
         }
     }

@@ -9,7 +9,7 @@ import spock.lang.Specification
 import static cz.abo.b2b.web.importer.dto.ImportSource.fromFile;
 
 abstract class AbstractSheetProcessorTest extends Specification{
-    def testSupplier = new Supplier("test",BigDecimal.ZERO, "","","" )
+    def testSupplier = new Supplier("test",BigDecimal.ZERO, "","","","" )
     protected Sheet fillWriteAndReadSheet(AbstractSheetProcessor processor, Integer additionalParsedIdx = null) {
         def sheetRead
         def filePath = getPricelistResourcePath()
@@ -27,7 +27,7 @@ abstract class AbstractSheetProcessorTest extends Specification{
             orderedProducts.put(product, 1)
         }
 
-        Workbook workbook = processor.fillOrder(new File(f), orderedProducts)
+        Workbook workbook = processor.fillOrder(new File(f), orderedProducts).getWorkbook()
         def outputFilePath = System.getProperty("user.dir") + "/target"+ filePath
         org.apache.commons.io.FileUtils.forceMkdir(new File(outputFilePath).getParentFile())
         def outputStream = new FileOutputStream(outputFilePath)

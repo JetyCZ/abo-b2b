@@ -26,7 +26,7 @@ class SecurityService(val userRepository: UserRepository, val passwordEncoder: P
         var testUser = userRepository.findByEmail(testEmail)
         if (testUser==null) {
             testUser = User("Pavel", "Jetenský", testEmail, Tarif.PROFITABLE, "",passwordEncoder.encode("test"),
-            Shop("Krámek bezobalu v Brozanech u Pardubic", "Krámek bezobalu\nBrozany 7\nStaré Hradiště\n53352", "50.0648194N, 15.7965928E")
+            Shop("Krámek bezobalu v Brozanech u Pardubic", "Brozany 7", "53352", "Staré Hradiště", "50.0648194N, 15.7965928E")
             )
             userRepository.save(testUser)
         }

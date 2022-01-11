@@ -12,8 +12,8 @@ import java.util.List;
  */
 
 @Component
-public class ProbioSheetProcessor extends AbstractSheetProcessor
-{
+public class ProbioSheetProcessor extends AbstractSheetProcessor {
+
     @Override
     public String getSheetName() {
         return "GASTRO+ BEZOBALU";
@@ -42,7 +42,8 @@ public class ProbioSheetProcessor extends AbstractSheetProcessor
         return 4;
     }
 
-    public int getOrderColumnIdx() {
+    @Override
+    public int orderColumnIdx() {
         return 14;
     }
 }

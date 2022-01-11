@@ -1,7 +1,10 @@
 package cz.abo.b2b.web.security.users
 
+import com.vaadin.flow.component.textfield.TextArea
+import com.vaadin.flow.component.textfield.TextField
 import cz.abo.b2b.web.dao.Shop
 import cz.abo.b2b.web.dao.User
+import cz.abo.b2b.web.security.registration.*
 import org.springframework.security.crypto.password.PasswordEncoder
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotEmpty
@@ -17,7 +20,7 @@ open class UserDetails {
     }
 
     fun toShop(): Shop {
-        return Shop(shopName, shopAddress, shopGps)
+        return Shop(shopName, shopStreet, shopCity, shopPostcode, shopGps)
     }
 
     var firstname: @NotEmpty String? = null
@@ -26,8 +29,9 @@ open class UserDetails {
     var tarif: Tarif = Tarif.TRIAL_3_MONTHS
     var password: @Size(min = 5, max = 64, message = "Heslo musí mít 5-64 znaků") String = ""
     var shopName: String = ""
-    var shopAddress: String = ""
-    var shopGps: String = ""
-
+    var shopStreet: String = ""
+    var shopCity: String = ""
+    var shopPostcode: String = ""
+    var shopGps : String = ""
 
 }

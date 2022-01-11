@@ -4,14 +4,11 @@ import cz.abo.b2b.web.SystemUtils
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.ProductRepository
 import cz.abo.b2b.web.dao.SupplierRepository
-import cz.abo.b2b.web.importer.dto.ImportSource
 import cz.abo.b2b.web.importer.xls.processor.AbstractSheetProcessor
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.InitializingBean
-import org.springframework.boot.CommandLineRunner
 import org.springframework.context.ApplicationContext
-import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
 import java.util.*
 
@@ -36,22 +33,10 @@ open class SuppliersImport(
             if (!StringUtils.isEmpty(supplier.importUrl)) {
                 val saved = supplierRepository.save(supplier)
 
-                val products: MutableList<Product>
-                if (supplier.importUrl.startsWith("http")) {
-                    val importSource = ImportSource.fromPath(supplier.importUrl)
-                    products = heurekaXMLParser.parseStream(importSource, saved)
-
-                } else {
-                    val importerClass = Class.forName(supplier.importerClassName)
-                    val importer = applicationContext.getBean(importerClass)
-                    val importSource = supplier.importSource()
-                    val items = (importer as AbstractSheetProcessor).parseItems(importSource)
-                    products = ArrayList()
-                    for (item in items) {
-                        val product = item.toProduct(saved)
-                        products.add(product)
-                    }
-                }
+                val importerClass = Class.forName(supplier.importerClassName)
+                val importer = applicationContext.getBean(importerClass)
+                val importSource = supplier.importSource()
+                val products = (importer as AbstractSheetProcessor).parseItemsWithSupplier(saved, importSource)
                 productRepository.saveAll(products)
 
             }

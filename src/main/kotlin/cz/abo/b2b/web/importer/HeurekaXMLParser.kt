@@ -4,12 +4,14 @@ import cz.abo.b2b.web.SystemUtils
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.Supplier
 import cz.abo.b2b.web.importer.dto.ImportSource
+import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.w3c.dom.NodeList
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.regex.Pattern
 import javax.xml.parsers.DocumentBuilderFactory
 
 @Component
@@ -19,6 +21,7 @@ class HeurekaXMLParser {
     }
 
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd") // 2024-02-24
+    val productNamePattern = Pattern.compile("^.*(?<quantity>\\d+)\\skg(\\s|$).*")
 
     fun parseStream(importSource: ImportSource, supplier: Supplier): MutableList<Product> {
         val factory = DocumentBuilderFactory.newInstance()
@@ -39,14 +42,27 @@ class HeurekaXMLParser {
                 var productName: String? = null
                 var description: String? = null
                 var priceVAT: BigDecimal? = null
+                var quantity: BigDecimal? = null
                 var bestBefore: LocalDate? = null
                 var vat = 0.15
                 var ean: String? = null
                 for (j in 1 until shopItemChildrenCount) {
                     val shopItemChild = shopItemChildren.item(j)
+                    if (shopItemChild.firstChild==null || StringUtils.isEmpty(shopItemChild.firstChild.nodeValue)) {
+                        continue;
+                    }
                     val nodeName = shopItemChild.nodeName
                     if ("PRODUCTNAME" == nodeName) {
                         productName = shopItemChild.firstChild.nodeValue
+                        try {
+                            val matcher = productNamePattern.matcher(productName)
+                            if (matcher.matches()) {
+                                quantity = matcher.group("quantity").toBigDecimal()
+                            }
+                        } catch (e: Exception) {
+                            LOGGER.warn("Error calculating quantity from product name: " + productName)
+                        }
+
                     } else if ("DESCRIPTION" == nodeName) {
                         description = shopItemChild.firstChild.nodeValue
                     } else if ("BESTBEFORE" == nodeName) {
@@ -69,7 +85,7 @@ class HeurekaXMLParser {
                         }
                     }
                 }
-
+                if (quantity==null) quantity = BigDecimal.ONE
                 val product = Product(productName!!, priceVAT!!, vat, description, BigDecimal.ONE, ean, supplier)
                 product.bestBefore = bestBefore
                 result.add(product)

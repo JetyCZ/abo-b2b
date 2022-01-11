@@ -1,6 +1,5 @@
 package cz.abo.b2b.web.dao
 
-import cz.abo.b2b.web.security.users.Tarif
 import java.util.*
 import javax.persistence.*
 
@@ -8,8 +7,9 @@ import javax.persistence.*
 class Shop(
 
     var name: String,
-    @Column(columnDefinition = "LONGTEXT")
-    var address: String,
+    var street: String,
+    var postcode: String,
+    var city: String,
     var gps: String
 ) {
 

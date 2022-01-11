@@ -2,31 +2,25 @@ package cz.abo.b2b.web.importer.xls.processor
 
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.Supplier
-import cz.abo.b2b.web.importer.dto.ImportSource.Companion.fromFile
+import cz.abo.b2b.web.importer.HeurekaXMLParser
 import cz.abo.b2b.web.importer.dto.OrderAttachment
 import cz.abo.b2b.web.importer.xls.dto.Item
-import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.stereotype.Component
 import java.io.File
-import java.io.IOException
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
-/**
- * @author Tomas Kodym
- */
 @Component
-class WolfberrySheetProcessor : ISheetProcessor {
-    override fun disintegrateIntoItem(rowNum: Int, rowData: MutableList<String>?): MutableList<Item> {
+class WolfberrySheetProcessor : AbstractSheetProcessor() {
+
+    override fun disintegrateIntoItem(rowNum: Int, rowData: List<String>?): List<Item> {
         TODO("Not yet implemented")
     }
 
-    override fun getOrderColumnIdx(): Int {
+    override fun orderColumnIdx(): Int {
         TODO("Not yet implemented")
     }
 
-    override fun fillOrder(fileToParse: File?, orderedItems: Map<Product, Int>): OrderAttachment {
+    override fun fillOrder(fileToParse: File, orderedItems: Map<Product, Int>): OrderAttachment {
         val workbook = XSSFWorkbook();
         val sheet = workbook.createSheet()
         for ((rowNum, orderedItem) in orderedItems.entries.withIndex()) {
@@ -41,7 +35,7 @@ class WolfberrySheetProcessor : ISheetProcessor {
         return OrderAttachment("objednavka.xlsx", workbook)
     }
 
-    override fun orderAttachmentFileName(supplier: Supplier?): String {
+    override fun orderAttachmentFileName(supplier: Supplier): String {
         return "objednavka.xlsx"
     }
 }

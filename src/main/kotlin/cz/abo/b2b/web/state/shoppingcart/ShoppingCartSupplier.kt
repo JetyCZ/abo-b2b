@@ -7,7 +7,7 @@ import java.math.RoundingMode
 import java.util.*
 import kotlin.collections.HashMap
 
-class ShoppingCartSupplier (val supplier: Supplier) : HashMap<UUID, ShoppingCartItem>() {
+class ShoppingCartSupplier(val supplier: Supplier, freeTransportFrom: BigDecimal?) : HashMap<UUID, ShoppingCartItem>() {
     fun addToCart(product: Product, count: Long) {
         val item = getOrDefault(product.id, ShoppingCartItem(product, 0L))
         item.count += count

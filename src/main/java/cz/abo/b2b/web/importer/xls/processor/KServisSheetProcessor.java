@@ -1,11 +1,11 @@
 package cz.abo.b2b.web.importer.xls.processor;
 
 import cz.abo.b2b.web.dao.Product;
-import cz.abo.b2b.web.importer.dto.ImportSource;
+import cz.abo.b2b.web.importer.HeurekaXMLParser;
 import cz.abo.b2b.web.importer.dto.OrderAttachment;
 import cz.abo.b2b.web.importer.xls.dto.Item;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -20,8 +20,7 @@ import java.util.regex.Pattern;
  */
 
 @Component
-public class KServisSheetProcessor extends AbstractSheetProcessor
-{
+public class KServisSheetProcessor extends AbstractSheetProcessor {
     String lastCategory = null;
 
     @Override
@@ -66,15 +65,15 @@ public class KServisSheetProcessor extends AbstractSheetProcessor
         }
         return itemsList;
     }
-
-    public int getOrderColumnIdx() {
+    @Override
+    public int orderColumnIdx() {
         return 6;
     }
 
     @Override
     public OrderAttachment fillOrder(File fileToParse, Map<Product, Integer> orderedItems) {
         OrderAttachment orderAttachment = super.fillOrder(fileToParse, orderedItems);
-        getProductsSheetFromWorkbook(orderAttachment.getWorkbook(), getSheetName()).getRow(0).getCell(getOrderColumnIdx()).setCellValue("Objednávám tolik balení");
+        getProductsSheetFromWorkbook(orderAttachment.getWorkbook(), getSheetName()).getRow(0).getCell(orderColumnIdx()).setCellValue("Objednávám tolik balení");
         return orderAttachment;
     }
 
