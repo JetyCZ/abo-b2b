@@ -45,12 +45,11 @@ public class NutSheetProcessor extends AbstractSheetProcessor {
         try {
             double productQuantityKg = Double.parseDouble(quantityStr);
             String productName = values[1];
-            double productQuantity = countKilosToGrams(productQuantityKg);
-            double productPrice = Double.parseDouble(values[3])/1000;
+            double productPrice = Double.parseDouble(values[3]);
             double vat = (Double.parseDouble(values[4]));
 
             Product product = new Product(productName, new BigDecimal(productPrice), vat, "",
-                    new BigDecimal(productQuantity), UnitEnum.KG, null, supplier);
+                    new BigDecimal(productQuantityKg), UnitEnum.KG, null, supplier);
 
             productList.add(product);
         } catch (NumberFormatException e) {

@@ -34,8 +34,8 @@ public class ProbioSheetProcessor extends AbstractSheetProcessor {
             if (StringUtils.isNumeric(values[8])) {
                 String productName = values[2].trim();
                 String itemQuantityStr = values[8].replaceFirst("\\s+kg","");
-                double itemQuantity = Double.parseDouble(itemQuantityStr)*1000;
-                double itemPrice = Double.parseDouble(values[10])/1000;
+                double itemQuantity = Double.parseDouble(itemQuantityStr);
+                double itemPrice = Double.parseDouble(values[10]);
                 int itemTax = (int) (Double.parseDouble(values[9])*100);
 
                 itemsList.add(new Product(productName, new BigDecimal(itemPrice), 0.15, "", new BigDecimal(itemQuantity), UnitEnum.KG, null, supplier));

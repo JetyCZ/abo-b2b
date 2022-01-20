@@ -19,17 +19,18 @@ class NutSheetProcessorTest extends AbstractSheetProcessorTest {
         then:
 
         items.size() > 0
-        def item1 = items["Aloe Vera_1000"]
+        def item1 = items["Aloe Vera_1"]
         item1.VAT == 0.15
-        item1.priceNoVAT == 0.239
+        item1.priceNoVAT == 239
 
-        def item2 = items["Zázvor v hořké čokoládě_3000"]
+        def item2 = items["Zázvor v hořké čokoládě_3"]
         item2.VAT == 0.15
-        item2.priceNoVAT == 0.141
+        item2.priceNoVAT == 141
 
-        def item3 = items["Zeleninové chipsy_1400"]
+        def item3 = items["Zeleninové chipsy_1.4"]
         item3.VAT == 0.15
-        item3.priceNoVAT == 0.331
+        item3.priceNoVAT == 331
+        item3.quantity == 1.4
 
 
     }

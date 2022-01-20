@@ -88,6 +88,9 @@ class HeurekaXMLParser {
                     }
                 }
                 if (quantity==null) quantity = BigDecimal.ONE
+                if (unit.equals(UnitEnum.KG) && quantity.compareTo(BigDecimal.ONE)<0) {
+                    continue;
+                }
                 val product = Product(productName, priceVAT!!, vat, description, quantity, unit, ean, supplier)
                 product.bestBefore = bestBefore
                 result.add(product)

@@ -53,10 +53,9 @@ public class BionebioSheetProcessor extends AbstractSheetProcessor {
                     String productQuantityStr = matcher.group("weight");
                     productQuantityStr = productQuantityStr.replaceFirst("\\,","\\.");
                     double quantityKg = Double.parseDouble(productQuantityStr);
-                    double productQuantity = quantityKg *1000;
                     Double productPrice = null;
                     if (values[2].length()>0) {
-                        productPrice = Double.parseDouble(values[2])/1000;
+                        productPrice = Double.parseDouble(values[2]);
                     } else {
                         String eurColumnValue = values[3];
                         if (!StringUtils.isEmpty(eurColumnValue)) {
@@ -83,7 +82,7 @@ public class BionebioSheetProcessor extends AbstractSheetProcessor {
 
 
                     if (productPrice!=null) {
-                        Product product = new Product(productNameToUse, new BigDecimal(productPrice), 0.15, description, new BigDecimal(productQuantity), UnitEnum.KG, null, supplier);
+                        Product product = new Product(productNameToUse, new BigDecimal(productPrice), 0.15, description, new BigDecimal(quantityKg), UnitEnum.KG, null, supplier);
                         itemsList.add(product);
                     }
                 }

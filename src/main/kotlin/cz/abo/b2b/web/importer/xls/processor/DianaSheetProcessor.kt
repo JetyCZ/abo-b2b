@@ -215,7 +215,8 @@ class DianaSheetProcessor : AbstractSheetProcessor() {
             val eanCell = row.createCell(0)
             eanCell.setCellValue(orderedItem.key.ean)
             val quantityCell = row.createCell(1)
-            quantityCell.setCellValue(orderedItem.value.toDouble())
+            val quantity = orderedItem.value.toDouble()
+            quantityCell.setCellValue(quantity)
             val productNameCell = row.createCell(2)
             productNameCell.setCellValue(orderedItem.key.productName)
         }

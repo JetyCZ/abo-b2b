@@ -3,6 +3,7 @@ package cz.abo.b2b.web.importer.xls.processor
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.Shop
 import cz.abo.b2b.web.dao.Supplier
+import cz.abo.b2b.web.dao.UnitEnum
 import cz.abo.b2b.web.importer.HeurekaXMLParser
 import cz.abo.b2b.web.importer.dto.ImportSource
 import cz.abo.b2b.web.importer.dto.ImportSource.Companion.fromFile
@@ -56,7 +57,7 @@ abstract class AbstractSheetProcessor {
         val map: MutableMap<String, Product?> = TreeMap()
         var parsedIdx = 0
         for (product in products) {
-            val key = product!!.productName + "_" + product.quantity.toInt()
+            val key = product!!.productName + "_" + product.quantity.toPlainString()
             product.parseIdx = parsedIdx
             map[key] = product
             parsedIdx++
@@ -190,8 +191,11 @@ abstract class AbstractSheetProcessor {
     }
 
     fun validateImportedObject(product: Product): Boolean {
+        if (product.unit == UnitEnum.KG && product.quantity.compareTo(BigDecimal(0.5))<0) {
+            return false;
+        }
         return !product.productName.isEmpty() && product.productName != null &&
-                product.quantity!=null && product.quantity.compareTo(BigDecimal(500))>0 &&
+                product.quantity!=null &&
                 product.priceNoVAT != null
     }
 

@@ -46,18 +46,17 @@ public class MkmPackSheetProcessor extends AbstractSheetProcessor {
                 String productName = values[1].trim().replaceFirst("\\s+á?kg","");
                 if (productName.toUpperCase().contains("VYPRODÁNO")) return new ArrayList<>();
                 productName += category;
-                int itemTax = 15;
                 double productPrice = 0;
                 double productQuantity = 0;
                 try{
-                    productPrice = Double.valueOf(priceStr5kg)/5000;
-                    productQuantity = 5000;
+                    productPrice = Double.valueOf(priceStr5kg)/5;
+                    productQuantity = 5;
                 } catch (NumberFormatException e) {
                     // This is OK
                     try {
                         // Packaging per 1kg
-                        productPrice = Double.valueOf(readPrice(values[2]))/1000;
-                        productQuantity = 1000;
+                        productPrice = Double.valueOf(readPrice(values[2]));
+                        productQuantity = 1;
                     } catch (NumberFormatException ex) {
                         // This is OK
                     }

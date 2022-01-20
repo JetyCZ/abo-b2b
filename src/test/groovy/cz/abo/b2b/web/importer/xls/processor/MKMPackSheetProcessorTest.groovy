@@ -19,15 +19,15 @@ class MKMPackSheetProcessorTest extends AbstractSheetProcessorTest {
         then:
 
         items.size() > 0
-        def amarantZrno = items["Amarant zrno (OBILOVINY)_5000"]
-        amarantZrno.quantity == 5000
+        def amarantZrno = items["Amarant zrno (OBILOVINY)_5"]
+        amarantZrno.quantity == 5
         amarantZrno.VAT == 0.15
-        amarantZrno.priceNoVAT == 0.0451
+        amarantZrno.priceNoVAT == 45.1
 
-        def spalda = items["Špalda pufovaná (PUFOVANÉ)_1000"]
-        spalda.quantity == 1000
+        def spalda = items["Špalda pufovaná (PUFOVANÉ)_1"]
+        spalda.quantity == 1
         spalda.VAT == 0.15
-        spalda.priceNoVAT == 0.0359
+        spalda.priceNoVAT == 35.9
 
 
 

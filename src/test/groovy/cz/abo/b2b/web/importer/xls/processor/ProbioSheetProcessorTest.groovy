@@ -20,15 +20,15 @@ class ProbioSheetProcessorTest extends AbstractSheetProcessorTest {
         then:
 
         items.size() > 0
-        def item1 = items["Pšenice červená  3 kg BIOHARMONIE_3000"]
-        item1.quantity == 3000
+        def item1 = items["Pšenice červená  3 kg BIOHARMONIE_3"]
+        item1.quantity == 3
         item1.VAT == 0.15
-        item1.priceNoVAT == 0.1137
+        item1.priceNoVAT == 113.7
 
-        def item2 = items["Semínka slunečnicová  2 kg BIOHARMONIE_2000"]
-        item2.quantity == 2000
+        def item2 = items["Semínka slunečnicová  2 kg BIOHARMONIE_2"]
+        item2.quantity == 2
         item2.VAT == 0.15
-        item2.priceNoVAT == 0.156
+        item2.priceNoVAT == 156
     }
 
     def "Make Order"() {

@@ -34,10 +34,10 @@ class Product {
         supplier: Supplier
     ) {
         this.productName = productName
-        this.priceNoVAT = priceNoVAT.setScale(5, RoundingMode.HALF_UP)
+        this.priceNoVAT = priceNoVAT.setScale(5, RoundingMode.HALF_UP).stripTrailingZeros()
         this.VAT = VAT
         this.description = description
-        this.quantity = quantity
+        this.quantity = quantity.setScale(5, RoundingMode.HALF_UP).stripTrailingZeros()
         this.unit = unit
         this.ean = ean
         this.supplier = supplier

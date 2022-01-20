@@ -49,8 +49,8 @@ public class KServisSheetProcessor extends AbstractSheetProcessor {
                             .replaceFirst("x1kg", "")
                             .replaceFirst("kg","");
 
-                    double itemQuantity = Double.parseDouble(itemQuantityParsed)*1000;
-                    double itemPrice = Double.parseDouble(priceStr)/1000;
+                    double itemQuantity = Double.parseDouble(itemQuantityParsed);
+                    double itemPrice = Double.parseDouble(priceStr);
 
                     String description = "<b>Bez přid. cukru:</b> " + (("X".equals(values[2]))?"Ano":"Ne") + "<br>";
                     description += "<b>Bez SO2:</b> " + (("X".equals(values[3]))?"Ano":"Ne") + "<br>";
