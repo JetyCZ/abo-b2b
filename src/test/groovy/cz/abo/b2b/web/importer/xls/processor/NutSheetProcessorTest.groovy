@@ -13,23 +13,23 @@ class NutSheetProcessorTest extends AbstractSheetProcessorTest {
         def f = getClass().getResource(getPricelistResourcePath()).getFile()
 
         when:
-        def items = new NutSheetProcessor().parseItemsAsMap(
-                ImportSource.fromFile(f)
+        def items = new NutSheetProcessor().parseProductsAsMap(
+                ImportSource.fromFile(f), testSupplier
         )
         then:
 
         items.size() > 0
         def item1 = items["Aloe Vera_1000"]
-        item1.itemTax == 15
-        item1.itemPrice == 0.239
+        item1.VAT == 0.15
+        item1.priceNoVAT == 0.239
 
         def item2 = items["Zázvor v hořké čokoládě_3000"]
-        item2.itemTax == 15
-        item2.itemPrice == 0.141
+        item2.VAT == 0.15
+        item2.priceNoVAT == 0.141
 
         def item3 = items["Zeleninové chipsy_1400"]
-        item3.itemTax == 15
-        item3.itemPrice == 0.331
+        item3.VAT == 0.15
+        item3.priceNoVAT == 0.331
 
 
     }

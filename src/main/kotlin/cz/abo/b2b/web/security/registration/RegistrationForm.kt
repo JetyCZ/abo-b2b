@@ -32,13 +32,12 @@ import javax.validation.constraints.NotEmpty
 
 
 private const val JMENO_OBCHODU = "Jméno obchodu"
-
 private const val ULICE_S_CISLEM_POPISNYM = "Ulice s číslem popisným"
-
 private const val OBEC = "Obec"
-
 private const val PSC = "PSČ"
 private const val GPS_SOURADNICE_OBCHODU = "GPS souřadnice obchodu"
+private const val ICO = "IČO"
+private const val DIC = "DIČ"
 
 class RegistrationForm(
     val passwordEncoder: PasswordEncoder,
@@ -49,6 +48,7 @@ class RegistrationForm(
         val firstname: @NotEmpty TextField = TextField("Jméno")
         val lastname: TextField = TextField("Příjmení")
         val email: @Email EmailField = EmailField("Email")
+        val phone = TextField("Telefon")
         val password: PasswordField = PasswordField("Heslo")
         val passwordConfirm: PasswordField = PasswordField("Heslo znovu")
         val tarif : RadioButtonGroup<Tarif> = RadioButtonGroup<Tarif>()
@@ -59,6 +59,8 @@ class RegistrationForm(
         val shopStreet = TextField(ULICE_S_CISLEM_POPISNYM)
         val shopCity = TextArea(OBEC)
         val shopPostcode = TextArea(PSC)
+        val shopIco = TextField(ICO)
+        val shopDic = TextField(DIC)
         val shopGps = TextField(GPS_SOURADNICE_OBCHODU)
 
         val binder: Binder<UserDetails> = Binder(UserDetails::class.java)
@@ -109,7 +111,7 @@ class RegistrationForm(
         add(h3)
         setColspan(h3, 2)
         add(
-            firstname, lastname, email, password,
+            firstname, lastname, email, phone, password,
             passwordConfirm, errorMessageField, tarif
         )
         // These components always take full width
@@ -129,6 +131,9 @@ class RegistrationForm(
         binder.forField(email)
             .withValidator(EmailValidator("Prosím zadejte platnou e-mailovou adresu"))
             .bind("email")
+        binder.forField(email)
+            .withValidator(StringLengthValidator("Telefon nesmí být prázdný a musí mít alespoň 9 znaků", 9, null))
+            .bind("phone")
         binder.forField(tarif).bind("tarif")
     }
 
@@ -136,7 +141,12 @@ class RegistrationForm(
         val h3 = H3("Informace o obchodu")
         add(h3)
         setColspan(h3, 2)
-        add(shopName)
+        add(shopName, shopIco, shopDic)
+        binder.forField(shopIco)
+            .withValidator(StringLengthValidator("$ICO nesmí být prázdné a musí mít právě 8 znaků", 8, 8))
+            .bind("shopIco")
+        binder.forField(shopDic)
+            .bind("shopDic")
         val h4 = H4("Adresa obchodu")
         add(h4)
         setColspan(h4, 2)
@@ -153,6 +163,7 @@ class RegistrationForm(
         binder.forField(shopPostcode)
             .withValidator(StringLengthValidator("$PSC nesmí být prázdné a musí mít právě 5 znaků", 5, 5))
             .bind("shopPostcode")
+
         binder.forField(shopGps)
             .withValidator(StringLengthValidator("GPS obchodu nesmí být prázdné a musí mít právě 24 znaků", 24, 24))
             .bind("shopGps")

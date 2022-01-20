@@ -2,9 +2,7 @@ package cz.abo.b2b.web.importer.xls.processor
 
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.Supplier
-import cz.abo.b2b.web.importer.HeurekaXMLParser
 import cz.abo.b2b.web.importer.dto.OrderAttachment
-import cz.abo.b2b.web.importer.xls.dto.Item
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.stereotype.Component
 import java.io.File
@@ -12,7 +10,7 @@ import java.io.File
 @Component
 class WolfberrySheetProcessor : AbstractSheetProcessor() {
 
-    override fun disintegrateIntoItem(rowNum: Int, rowData: List<String>?): List<Item> {
+    override fun disintegrateIntoProduct(rowNum: Int, rowData: List<String>?, supplier: Supplier): List<Product> {
         TODO("Not yet implemented")
     }
 
@@ -20,10 +18,10 @@ class WolfberrySheetProcessor : AbstractSheetProcessor() {
         TODO("Not yet implemented")
     }
 
-    override fun fillOrder(fileToParse: File, orderedItems: Map<Product, Int>): OrderAttachment {
+    override fun fillOrder(fileToParse: File, orderedProducts: Map<Product, Int>): OrderAttachment {
         val workbook = XSSFWorkbook();
         val sheet = workbook.createSheet()
-        for ((rowNum, orderedItem) in orderedItems.entries.withIndex()) {
+        for ((rowNum, orderedItem) in orderedProducts.entries.withIndex()) {
             val row = sheet.createRow(rowNum)
             val eanCell = row.createCell(0)
             eanCell.setCellValue(orderedItem.key.ean)

@@ -2,6 +2,7 @@ package cz.abo.b2b.web.importer.xls.processor
 
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.Supplier
+import org.apache.commons.io.FileUtils
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import spock.lang.Specification
@@ -15,21 +16,20 @@ abstract class AbstractSheetProcessorTest extends Specification{
         def filePath = getPricelistResourcePath()
         def f = resourceFilePath(filePath)
 
-        def items = processor.parseItems(fromFile(f))
+        def products = processor.parseProductsWithSupplier(testSupplier, fromFile(f))
         Map<Product, Integer> orderedProducts = new HashMap<>();
 
 
-        orderedProducts.put(items.get(0).toProduct(testSupplier), 3)
-        orderedProducts.put(items.get(3).toProduct(testSupplier), 1)
+        orderedProducts.put(products.get(0), 3)
+        orderedProducts.put(products.get(3), 1)
         if (additionalParsedIdx!=null) {
-            def item = items.get(additionalParsedIdx)
-            def product = item.toProduct(testSupplier);
+            def product = products.get(additionalParsedIdx)
             orderedProducts.put(product, 1)
         }
 
         Workbook workbook = processor.fillOrder(new File(f), orderedProducts).getWorkbook()
         def outputFilePath = System.getProperty("user.dir") + "/target"+ filePath
-        org.apache.commons.io.FileUtils.forceMkdir(new File(outputFilePath).getParentFile())
+        FileUtils.forceMkdir(new File(outputFilePath).getParentFile())
         def outputStream = new FileOutputStream(outputFilePath)
         workbook.write(outputStream)
         outputStream.close()

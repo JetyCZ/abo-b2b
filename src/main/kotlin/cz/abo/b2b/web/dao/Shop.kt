@@ -10,7 +10,9 @@ class Shop(
     var street: String,
     var postcode: String,
     var city: String,
-    var gps: String
+    var ico: String?,
+    var dic: String?,
+    var gps: String,
 ) {
 
     @Id

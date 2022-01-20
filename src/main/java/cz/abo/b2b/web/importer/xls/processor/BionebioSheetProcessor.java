@@ -1,14 +1,15 @@
 package cz.abo.b2b.web.importer.xls.processor;
 
-import cz.abo.b2b.web.importer.HeurekaXMLParser;
-import cz.abo.b2b.web.importer.xls.dto.Item;
+import cz.abo.b2b.web.dao.Product;
+import cz.abo.b2b.web.dao.Supplier;
+import cz.abo.b2b.web.dao.UnitEnum;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -33,37 +34,37 @@ public class BionebioSheetProcessor extends AbstractSheetProcessor {
     Double parsedEurValue = null;
 
     @Override
-    public List<Item> disintegrateIntoItem(int rowNum, List<String> sheetData) {
-        List<Item> itemsList = new ArrayList<>();
+    public List<Product> disintegrateIntoProduct(int rowNum, @Nullable List<String> rowData, Supplier supplier) {
+        List<Product> itemsList = new ArrayList<>();
 
         //split values from list to array
-        String[] values = sheetData.toArray(new String[0]);
+        String[] values = rowData.toArray(new String[0]);
 
 
         if (values.length>=4) {
             if (rowNum ==2 && values.length>=4) {
                 parsedEurValue = Double.parseDouble(values[3]);
             }
-            String itemName = values[1].trim();
-            if (itemName.endsWith(" kg")) {
-                Matcher matcher = nameWithWeight.matcher(itemName);
+            String productName = values[1].trim();
+            if (productName.endsWith(" kg")) {
+                Matcher matcher = nameWithWeight.matcher(productName);
                 if (matcher.matches()) {
-                    String itemNameToUse = matcher.group("itemName").trim();
-                    String itemQuantityStr = matcher.group("weight");
-                    itemQuantityStr = itemQuantityStr.replaceFirst("\\,","\\.");
-                    double quantityKg = Double.parseDouble(itemQuantityStr);
-                    double itemQuantity = quantityKg *1000;
-                    Double itemPrice = null;
+                    String productNameToUse = matcher.group("itemName").trim();
+                    String productQuantityStr = matcher.group("weight");
+                    productQuantityStr = productQuantityStr.replaceFirst("\\,","\\.");
+                    double quantityKg = Double.parseDouble(productQuantityStr);
+                    double productQuantity = quantityKg *1000;
+                    Double productPrice = null;
                     if (values[2].length()>0) {
-                        itemPrice = Double.parseDouble(values[2])/1000;
+                        productPrice = Double.parseDouble(values[2])/1000;
                     } else {
                         String eurColumnValue = values[3];
                         if (!StringUtils.isEmpty(eurColumnValue)) {
                             double eurValue = Double.parseDouble(eurColumnValue);
                             Double eurToCzk = parsedEurValue==null?EUR_TO_CZK:parsedEurValue;
-                            itemPrice = eurValue * eurToCzk;
+                            productPrice = eurValue * eurToCzk;
                         } else {
-                            log.warn("No price for: " + itemNameToUse);
+                            log.warn("No price for: " + productNameToUse);
                         }
                     }
 
@@ -71,7 +72,7 @@ public class BionebioSheetProcessor extends AbstractSheetProcessor {
                     String description = "";
                     if (!StringUtils.isEmpty(note)) {
                         if (note.contains("Cena za celé balení")) {
-                            itemPrice = itemPrice/quantityKg;
+                            productPrice = productPrice/quantityKg;
                         } else {
                             description = note;
                         }
@@ -80,12 +81,10 @@ public class BionebioSheetProcessor extends AbstractSheetProcessor {
                         description += "<br><b>Výrobce/dodavatel</b>: " + values[8];
                     }
 
-                    int itemTax = 15;
 
-                    if (itemPrice!=null) {
-                        Item item = new Item(itemNameToUse, itemQuantity, itemPrice, itemTax);
-                        item.description = description;
-                        itemsList.add(item);
+                    if (productPrice!=null) {
+                        Product product = new Product(productNameToUse, new BigDecimal(productPrice), 0.15, description, new BigDecimal(productQuantity), UnitEnum.KG, null, supplier);
+                        itemsList.add(product);
                     }
                 }
 

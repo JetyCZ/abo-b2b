@@ -1,12 +1,16 @@
 package cz.abo.b2b.web.importer.xls.processor;
 
-import cz.abo.b2b.web.importer.xls.dto.Item;
+import cz.abo.b2b.web.dao.Product;
+import cz.abo.b2b.web.dao.Supplier;
+import cz.abo.b2b.web.dao.UnitEnum;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,32 +24,35 @@ public class NutSheetProcessor extends AbstractSheetProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(NutSheetProcessor.class);
 
     @Override
-    public List<Item> disintegrateIntoItem(int rowNum, List<String> rowData) {
+    public List<Product> disintegrateIntoProduct(int rowNum, @Nullable List<String> rowData, Supplier supplier) {
         if (!rowData.isEmpty())
         {
             String[] values = rowData.toArray(new String[0]);
-            List<Item> itemsList = new ArrayList<>();
+            List<Product> productList = new ArrayList<>();
             if (values.length >= 6)
             {
-                parseOneItem(values, itemsList);
+                parseOneItem(values, productList, supplier);
             }
-            return itemsList;
+            return productList;
         }
         else {
             return new ArrayList<>();
         }
     }
 
-    private void parseOneItem(String[] values, List<Item> itemsList) {
+    private void parseOneItem(String[] values, List<Product> productList, Supplier supplier) {
         String quantityStr = values[2];
-        double itemQuantityDouble = 0;
         try {
-            itemQuantityDouble = Double.parseDouble(quantityStr);
-            String itemName = values[1];
-            double itemQuantity = countKilosToGrams(itemQuantityDouble);
-            double itemPrice = Double.parseDouble(values[3])/1000;
-            int itemTax = (int) (Double.parseDouble(values[4])*100);
-            itemsList.add(new Item(itemName, itemQuantity, itemPrice, itemTax));
+            double productQuantityKg = Double.parseDouble(quantityStr);
+            String productName = values[1];
+            double productQuantity = countKilosToGrams(productQuantityKg);
+            double productPrice = Double.parseDouble(values[3])/1000;
+            double vat = (Double.parseDouble(values[4]));
+
+            Product product = new Product(productName, new BigDecimal(productPrice), vat, "",
+                    new BigDecimal(productQuantity), UnitEnum.KG, null, supplier);
+
+            productList.add(product);
         } catch (NumberFormatException e) {
             LOGGER.warn("Item was not created, because of non numeric value " + quantityStr +
                     "in quantity column.");

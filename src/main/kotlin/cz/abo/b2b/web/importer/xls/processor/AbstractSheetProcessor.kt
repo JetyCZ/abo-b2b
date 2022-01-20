@@ -7,7 +7,6 @@ import cz.abo.b2b.web.importer.HeurekaXMLParser
 import cz.abo.b2b.web.importer.dto.ImportSource
 import cz.abo.b2b.web.importer.dto.ImportSource.Companion.fromFile
 import cz.abo.b2b.web.importer.dto.OrderAttachment
-import cz.abo.b2b.web.importer.xls.dto.Item
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.openxml4j.opc.OPCPackage
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException
@@ -15,7 +14,6 @@ import org.apache.poi.ss.usermodel.*
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.jdbc.core.JdbcTemplate
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -29,9 +27,9 @@ abstract class AbstractSheetProcessor {
     @Autowired
     lateinit var heurekaXMLParser: HeurekaXMLParser
 
-    fun iterateSheetValues(formulaEvaluator: FormulaEvaluator, rowIterator: Iterator<Row>): List<Item> {
+    fun iterateSheetValues(formulaEvaluator: FormulaEvaluator, rowIterator: Iterator<Row>, supplier: Supplier): List<Product> {
         var row: Row
-        val allItems = ArrayList<Item>()
+        val allProducts = ArrayList<Product>()
 
         //Iterate through all rows
         while (rowIterator.hasNext()) {
@@ -39,27 +37,28 @@ abstract class AbstractSheetProcessor {
             val rowData: MutableList<String> = ArrayList()
             parseRow(row, formulaEvaluator, rowData)
             if (!rowData.isEmpty()) {
-                val itemList = disintegrateIntoItem(row.rowNum, rowData)
-                for (item in itemList) {
-                    if (item != null) {
-                        allItems.add(item)
-                        item.rowNum = row.rowNum
+                val productList = disintegrateIntoProduct(row.rowNum, rowData, supplier)
+                for (product in productList) {
+                    if (product != null) {
+                        allProducts.add(product)
+                        product.rowNum = row.rowNum
                     }
                 }
             }
         }
-        return allItems
+        return allProducts
     }
 
-    abstract open fun disintegrateIntoItem(rowNum: Int, rowData: List<String>?): List<Item>
-    fun parseItemsAsMap(importSource: ImportSource): Map<String, Item?>? {
-        val items = parseItems(fromFile(importSource.path))
-        val map: MutableMap<String, Item?> = TreeMap()
+    abstract open fun disintegrateIntoProduct(rowNum: Int, rowData: List<String>?, supplier: Supplier): List<Product>
+
+    fun parseProductsAsMap(importSource: ImportSource, supplier: Supplier): Map<String, Product?>? {
+        val products = parseProducts(fromFile(importSource.path), supplier)
+        val map: MutableMap<String, Product?> = TreeMap()
         var parsedIdx = 0
-        for (item in items) {
-            val key = item!!.itemName + "_" + item.itemQuantity.toInt() + if (item.isBio) "_BIO" else ""
-            item.parsedIdx = parsedIdx
-            map[key] = item
+        for (product in products) {
+            val key = product!!.productName + "_" + product.quantity.toInt()
+            product.parseIdx = parsedIdx
+            map[key] = product
             parsedIdx++
         }
         return map
@@ -69,7 +68,7 @@ abstract class AbstractSheetProcessor {
         return File(supplier.importUrl).name
     }
 
-    open fun fillOrder(fileToParse: File, orderedItems: Map<Product, Int>): OrderAttachment {
+    open fun fillOrder(fileToParse: File, orderedProducts: Map<Product, Int>): OrderAttachment {
         val parsedExcel = getWorkbookFromFile(
             fromFile(fileToParse.path)
         )
@@ -79,8 +78,8 @@ abstract class AbstractSheetProcessor {
         // Fill order not implemented yet
         if (orderColumnIdx == -1) return OrderAttachment(fileToParse.name, workbook)
         val orderSheet = getOrderSheetFromWorkbook(workbook)
-        for ((product, orderQuantity) in orderedItems) {
-            setOrderQuantityForItem(orderSheet, product, orderQuantity)
+        for ((product, orderQuantity) in orderedProducts) {
+            setOrderQuantityForProduct(orderSheet, product, orderQuantity)
         }
         try {
             parsedExcel.excelFile.close()
@@ -90,7 +89,7 @@ abstract class AbstractSheetProcessor {
         return OrderAttachment(fileToParse.name, parsedExcel.workbook)
     }
 
-    fun setOrderQuantityForItem(orderSheet: Sheet?, product: Product, orderQuantity: Int) {
+    fun setOrderQuantityForProduct(orderSheet: Sheet?, product: Product, orderQuantity: Int) {
         val row = orderSheet!!.getRow(product.rowNum)
         row.createCell(orderColumnIdx()).setCellValue(orderQuantity.toDouble())
     }
@@ -110,30 +109,25 @@ abstract class AbstractSheetProcessor {
         return supplier.freeTransportFrom
     }
 
-    open fun parseItemsWithSupplier(supplier: Supplier, importSource: ImportSource): List<Product> {
+    open fun parseProductsWithSupplier(supplier: Supplier, importSource: ImportSource): List<Product> {
 
         if (importSource.path.startsWith("http")) {
             return heurekaXMLParser.parseStream(importSource, supplier)
         }
 
-        val items = parseItems(importSource)
-        val products = ArrayList<Product>()
-        for (item in items) {
-            val product = item.toProduct(supplier)
-            products.add(product)
-        }
+        val products = parseProducts(importSource, supplier)
         return products
     }
 
-    open fun parseItems(importSource: ImportSource): List<Item> {
+    open fun parseProducts(importSource: ImportSource, supplier: Supplier): List<Product> {
         val sheet = getProductsSheetFromWorkbook(importSource)
         val iterator: Iterator<Row> = sheet!!.iterator()
         val formulaEvaluator = sheet.workbook.creationHelper.createFormulaEvaluator()
         LOGGER.info("Started parsing the values from the file with:" + this.javaClass.name)
-        val items =
-            iterateSheetValues(formulaEvaluator, iterator)
-                .stream().filter { i: Item -> validateImportedObject(i) }.collect(Collectors.toList())
-        return items
+        val products =
+            iterateSheetValues(formulaEvaluator, iterator, supplier)
+                .stream().filter { i: Product -> validateImportedObject(i) }.collect(Collectors.toList())
+        return products
     }
 
     fun getProductsSheetFromWorkbook(inputSource: ImportSource): Sheet? {
@@ -195,12 +189,14 @@ abstract class AbstractSheetProcessor {
         return true
     }
 
-    fun validateImportedObject(item: Item): Boolean {
-        return !item.itemName.isEmpty() && item.itemName != null && !item.itemQuantity.isNaN() && item.itemQuantity != null && item.itemQuantity >= 500 && !item.itemPrice.isNaN() && item.itemPrice != null && item.itemName != null
+    fun validateImportedObject(product: Product): Boolean {
+        return !product.productName.isEmpty() && product.productName != null &&
+                product.quantity!=null && product.quantity.compareTo(BigDecimal(500))>0 &&
+                product.priceNoVAT != null
     }
 
-    fun countValueForOneGram(priceForKilos: Double, itemQuantity: Double): Double {
-        return priceForKilos / itemQuantity
+    fun countValueForOneGram(priceForKilos: Double, productQuantity: Double): Double {
+        return priceForKilos / productQuantity
     }
 
     fun cleanStringBuilder(stringBuilder: StringBuilder) {

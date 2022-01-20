@@ -14,26 +14,26 @@ class KServisSheetProcessorTest extends AbstractSheetProcessorTest {
         def f = getClass().getResource(getPricelistResourcePath()).getFile()
 
         when:
-        def items = new KServisSheetProcessor().parseItemsAsMap(
-                ImportSource.fromFile(f)
+        def items = new KServisSheetProcessor().parseProductsAsMap(
+                ImportSource.fromFile(f), testSupplier
         )
         then:
 
         items.size() > 0
         def item2 = items["Aloe Vera plátky (SUŠENÉ OVOCE)_20000"]
-        item2.itemTax == 15
-        item2.itemPrice == 0.204
+        item2.getVAT() == 0.15
+        item2.getPriceNoVAT() == 0.204
         item2.rowNum == 1
 
 
         def item1 = items["Ananas kostky 8-10mm (SUŠENÉ OVOCE)_20000"]
-        item1.itemTax == 15
-        item1.itemPrice == 0.109
+        item1.VAT == 0.15
+        item1.priceNoVAT == 0.109
         item1.rowNum == 4
 
         def item3 = items["Rozinková (OVOCNÉ PASTY)_10000"]
-        item3.itemTax == 15
-        item3.itemPrice == 0.053
+        item3.VAT == 0.15
+        item3.priceNoVAT == 0.053
 
 
 
@@ -45,9 +45,9 @@ class KServisSheetProcessorTest extends AbstractSheetProcessorTest {
         def sheetRead = fillWriteAndReadSheet(new KServisSheetProcessor(), 102)
 
         expect:
-        sheetRead.getRow(1).getCell(6).getNumericCellValue()
+        sheetRead.getRow(1).getCell(6).getNumericCellValue() == 3
         sheetRead.getRow(4).getCell(6).getNumericCellValue() == 1
-        sheetRead.getRow(117).getCell(6).getNumericCellValue()
+        sheetRead.getRow(120).getCell(6).getNumericCellValue() == 1
         sheetRead.getRow(0).getCell(6).getStringCellValue() == "Objednávám tolik balení"
     }
 }

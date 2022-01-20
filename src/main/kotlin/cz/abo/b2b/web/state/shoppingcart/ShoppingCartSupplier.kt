@@ -26,12 +26,10 @@ class ShoppingCartSupplier(val supplier: Supplier, freeTransportFrom: BigDecimal
     fun totalPriceNoVAT() : BigDecimal {
         var result : BigDecimal = BigDecimal.ZERO
         for (shoppingCartItem in values) {
-            val withoutVATDivider = BigDecimal(1 + shoppingCartItem.product.VAT)
             result = result.add(
-                shoppingCartItem.product.priceVAT
+                shoppingCartItem.product.priceNoVAT
                     .multiply(BigDecimal(shoppingCartItem.count))
                     .multiply(shoppingCartItem.product.quantity)
-                    .divide(withoutVATDivider, 2, RoundingMode.HALF_UP)
             )
         }
         return result.setScale(2, RoundingMode.HALF_UP)
@@ -40,10 +38,12 @@ class ShoppingCartSupplier(val supplier: Supplier, freeTransportFrom: BigDecimal
     fun totalPriceVAT() : BigDecimal {
         var result : BigDecimal = BigDecimal.ZERO
         for (shoppingCartItem in values) {
+            val vatMultiplier = BigDecimal(1 + shoppingCartItem.product.VAT)
             result = result.add(
-                shoppingCartItem.product.priceVAT
+                shoppingCartItem.product.priceNoVAT
                     .multiply(BigDecimal(shoppingCartItem.count))
                     .multiply(shoppingCartItem.product.quantity)
+                    .multiply(vatMultiplier)
             )
         }
         return result.setScale(2, RoundingMode.HALF_UP)

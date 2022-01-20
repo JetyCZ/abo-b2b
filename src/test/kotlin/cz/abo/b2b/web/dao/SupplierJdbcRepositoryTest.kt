@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.context.ApplicationContext
 import org.springframework.jdbc.core.JdbcTemplate
 import java.math.BigDecimal
 
@@ -18,12 +17,6 @@ import java.math.BigDecimal
 @AutoConfigureTestDatabase
 @AutoConfigureDataJpa
 open class SupplierJdbcRepositoryTest()  {
-
-    companion object {
-        init {
-            System.setProperty("SPRING_MAIL_PASSWORD","")
-        }
-    }
 
     @Autowired
     lateinit var jdbcTemplate: JdbcTemplate
@@ -52,10 +45,10 @@ open class SupplierJdbcRepositoryTest()  {
             )
         )
         productRepository.save(
-            Product("aaa", BigDecimal(0.15), 0.15, "",BigDecimal(0), "EAN", saved )
+            Product("aaa", BigDecimal(0.15), 0.15, "",BigDecimal(0), UnitEnum.KG, "EAN", saved )
         )
         productRepository.save(
-            Product("bbb", BigDecimal(0.15), 0.15, "",BigDecimal(0), "EAN2", saved )
+            Product("bbb", BigDecimal(0.15), 0.15, "",BigDecimal(0), UnitEnum.KG, "EAN2", saved )
         )
         val supplierDetails = supplierJdbcRepository.supplierDetails()
         assertEquals(1, supplierDetails.size)

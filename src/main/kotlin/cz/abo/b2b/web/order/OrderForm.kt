@@ -12,6 +12,7 @@ import cz.abo.b2b.web.MainView
 import cz.abo.b2b.web.dao.User
 import cz.abo.b2b.web.state.order.Order
 import cz.abo.b2b.web.state.shoppingcart.ShoppingCart
+import org.apache.commons.lang3.StringUtils
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
 
@@ -49,17 +50,51 @@ class OrderForm(val mainView: MainView, val order: Order, val shoppingCart: Shop
         orderAttachmentFileName: String
     ) {
         orderFormData.from = authenticatedDbUser.email
-        orderFormData.to = shoppingCart[order.idSupplier]!!.supplier.orderEmail
+        val shoppingCartSupplier = shoppingCart[order.idSupplier]!!
+        orderFormData.to = shoppingCartSupplier.supplier.orderEmail
         orderFormData.cc = authenticatedDbUser.email
         val shop = authenticatedDbUser.shop
         orderFormData.subject = "Objednávka - " + shop.name
-        orderFormData.message = "Dobrý den, do našeho krámku objednáváme zboží.\n" +
-                "Adresa dodání:\n" +
-                authenticatedDbUser.firstname + " " + authenticatedDbUser.lastname + "\n" +
-                shop.name + "\n" +
-                shop.street + "\n" +
-                shop.postcode + " " + shop.city + "\n" +
-                "GPS souřadnice obchodu: " + shop.gps
+        val icoLine = if (StringUtils.isEmpty(shop.ico)) "" else "IČO: ${shop.name}\n"
+        val dicLine = if (StringUtils.isEmpty(shop.dic)) "" else "DIČ: ${shop.name}\n"
+        val phoneLine = if (StringUtils.isEmpty(authenticatedDbUser.phone)) "" else "Telefon: ${authenticatedDbUser.phone}\b"
+        var orderTable = ""
+
+        for (entry in shoppingCartSupplier) {
+
+            val shoppingCartItem = entry.value
+            val product = shoppingCartItem.product
+            val priceNoVAT = product.priceNoVAT
+            orderTable +=
+                product.ean + "\t" +
+                product.productName + "\t" +
+                product.unit + "\t" +
+                product.quantity + "\t"
+                shoppingCartItem.count.toString() + "\t"
+                priceNoVAT.toPlainString() + "\t"
+                priceNoVAT.multiply(product.quantity).multiply(shoppingCartItem.count.toBigDecimal()).toPlainString() + "\t"
+        }
+        orderFormData.message = """
+Dobrý den, do našeho krámku objednáváme zboží.
+
+Odběratel:
+    ${shop.name}
+    ${icoLine}${dicLine}
+    
+Adresa dodání:
+    ${shop.name}
+    ${shop.street}
+    ${shop.postcode} ${shop.city}
+    GPS souřadnice obchodu: ${shop.gps}
+
+Objednávané zboží:
+EAN	Název	MJ	Množství	Cena\MJ	Objednávám ks/balení	Celkem bez DPH	DPH %
+${orderTable}
+
+Kontaktní osoba:
+    ${authenticatedDbUser.firstname} ${authenticatedDbUser.lastname}
+    ${phoneLine}Email: ${authenticatedDbUser.email}
+    """
         downloadAnchor.add(Span(orderAttachmentFileName))
         downloadAnchor.href = "/download-filled/" + order.idSupplier
 

@@ -1,7 +1,6 @@
 package cz.abo.b2b.web.importer
 
 import cz.abo.b2b.web.SystemUtils
-import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.ProductRepository
 import cz.abo.b2b.web.dao.SupplierRepository
 import cz.abo.b2b.web.importer.xls.processor.AbstractSheetProcessor
@@ -10,7 +9,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Component
 open class SuppliersImport(
@@ -36,7 +34,7 @@ open class SuppliersImport(
                 val importerClass = Class.forName(supplier.importerClassName)
                 val importer = applicationContext.getBean(importerClass)
                 val importSource = supplier.importSource()
-                val products = (importer as AbstractSheetProcessor).parseItemsWithSupplier(saved, importSource)
+                val products = (importer as AbstractSheetProcessor).parseProductsWithSupplier(saved, importSource)
                 productRepository.saveAll(products)
 
             }

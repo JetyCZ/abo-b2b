@@ -11,6 +11,7 @@ class User(
     var lastname: String,
     @Column(unique = true)
     var email: String,
+    var phone: String,
     var tarif: Tarif,
 
     @Column(columnDefinition = "LONGTEXT")
@@ -21,6 +22,7 @@ class User(
     var shop: Shop
 
 ) {
+
 
     @Id
     @GeneratedValue

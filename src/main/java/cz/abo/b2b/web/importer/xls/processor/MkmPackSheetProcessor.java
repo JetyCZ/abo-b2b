@@ -1,10 +1,15 @@
 package cz.abo.b2b.web.importer.xls.processor;
 
+import cz.abo.b2b.web.dao.Product;
+import cz.abo.b2b.web.dao.Supplier;
+import cz.abo.b2b.web.dao.UnitEnum;
 import cz.abo.b2b.web.importer.dto.ImportSource;
-import cz.abo.b2b.web.importer.xls.dto.Item;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,15 +18,16 @@ import java.util.List;
 public class MkmPackSheetProcessor extends AbstractSheetProcessor {
     String category = "";
 
+    @NotNull
     @Override
-    public List<Item> parseItems(ImportSource importSource) {
+    public List<Product> parseProducts(@NotNull ImportSource importSource, @NotNull Supplier supplier) {
         category = "";
-        return super.parseItems(importSource);
+        return super.parseProducts(importSource, supplier);
     }
 
     @Override
-    public List<Item> disintegrateIntoItem(int rowNum, List<String> sheetData) {
-        List<Item> itemsList = new ArrayList<>();
+    public List<Product> disintegrateIntoProduct(int rowNum, @Nullable List<String> sheetData, Supplier supplier) {
+        List<Product> productList = new ArrayList<>();
         //split values from list to array
         String[] values = sheetData.toArray(new String[0]);
 
@@ -37,30 +43,33 @@ public class MkmPackSheetProcessor extends AbstractSheetProcessor {
         if (values.length>6) {
             String priceStr5kg = readPrice(values[4]);
 
-                String itemName = values[1].trim().replaceFirst("\\s+á?kg","");
-                if (itemName.toUpperCase().contains("VYPRODÁNO")) return new ArrayList<>();
-                itemName += category;
+                String productName = values[1].trim().replaceFirst("\\s+á?kg","");
+                if (productName.toUpperCase().contains("VYPRODÁNO")) return new ArrayList<>();
+                productName += category;
                 int itemTax = 15;
+                double productPrice = 0;
+                double productQuantity = 0;
                 try{
-                    double itemPrice = Double.valueOf(priceStr5kg)/5000;
-                    double itemQuantity = 5000;
-                    itemsList.add(new Item(itemName, itemQuantity, itemPrice, itemTax));
+                    productPrice = Double.valueOf(priceStr5kg)/5000;
+                    productQuantity = 5000;
                 } catch (NumberFormatException e) {
                     // This is OK
                     try {
                         // Packaging per 1kg
-                        double itemPrice = Double.valueOf(readPrice(values[2]))/1000;
-                        double itemQuantity = 1000;
-                        itemsList.add(new Item(itemName, itemQuantity, itemPrice, itemTax));
+                        productPrice = Double.valueOf(readPrice(values[2]))/1000;
+                        productQuantity = 1000;
                     } catch (NumberFormatException ex) {
                         // This is OK
                     }
-
                 }
+                Product product = new Product(productName, new BigDecimal(productPrice), 0.15, "",
+                    new BigDecimal(productQuantity), UnitEnum.KG, null, supplier);
+
+                productList.add(product);
 
 
         }
-        return itemsList;
+        return productList;
     }
 
     public String readPrice(String value) {

@@ -14,6 +14,14 @@ import javax.mail.internet.MimeMessage
 
 @Service
 class EmailService {
+    companion object {
+        init {
+            if (System.getProperty("SPRING_MAIL_PASSWORD")==null) {
+                System.setProperty("SPRING_MAIL_PASSWORD","")
+            }
+        }
+    }
+
     @Value("\${mail.from}")
     val mailFrom: String? = null
 

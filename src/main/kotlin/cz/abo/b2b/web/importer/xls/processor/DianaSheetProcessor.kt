@@ -3,9 +3,9 @@ package cz.abo.b2b.web.importer.xls.processor
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.Shop
 import cz.abo.b2b.web.dao.Supplier
+import cz.abo.b2b.web.dao.UnitEnum
 import cz.abo.b2b.web.importer.dto.ImportSource
 import cz.abo.b2b.web.importer.dto.OrderAttachment
-import cz.abo.b2b.web.importer.xls.dto.Item
 import org.apache.commons.lang3.StringUtils
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.stereotype.Component
@@ -140,7 +140,7 @@ class DianaSheetProcessor : AbstractSheetProcessor() {
 	</zasoba>
  */
 
-    override fun parseItemsWithSupplier(supplier: Supplier, importSource: ImportSource): List<Product> {
+    override fun parseProductsWithSupplier(supplier: Supplier, importSource: ImportSource): List<Product> {
             val factory = DocumentBuilderFactory.newInstance()
             val builder = factory.newDocumentBuilder()
 
@@ -160,6 +160,7 @@ class DianaSheetProcessor : AbstractSheetProcessor() {
                     var bestBefore: LocalDate? = null
                     var vat = 0.15
                     var quantity: BigDecimal = BigDecimal.ONE
+                    var unit = UnitEnum.KS
                     var ean: String? = null
                     for (j in 1 until zasobaChildrenCount) {
                         val shopItemChild = zasobaChildren.item(j)
@@ -167,27 +168,28 @@ class DianaSheetProcessor : AbstractSheetProcessor() {
                         if (shopItemChild.firstChild==null || StringUtils.isEmpty(shopItemChild.firstChild.nodeValue)) {
                             continue;
                         }
+                        val nodeText = shopItemChild.firstChild.nodeValue
                         if ("nazev" == nodeName) {
-                            productName = shopItemChild.firstChild.nodeValue
+                            productName = nodeText
                         } else if ("slozeni_produktu_cj" == nodeName) {
-                            description += "Složení: " + shopItemChild.firstChild.nodeValue + "\n"
+                            description += "Složení: " + nodeText + "\n"
                         } else if ("stat_puvodu" == nodeName) {
-                            description += "Země původu: " + shopItemChild.firstChild.nodeValue + "\n"
+                            description += "Země původu: " + nodeText + "\n"
                         } else if ("cena" == nodeName) {
-                            var priceVatStr = shopItemChild.firstChild.nodeValue
+                            var priceVatStr = nodeText
                             priceVatStr = priceVatStr.replace(',', '.')
                             priceVAT = BigDecimal(priceVatStr.toDouble())
                         } else if ("hmotnost" == nodeName) {
-                            var hmotnostStr = shopItemChild.firstChild.nodeValue
+                            var hmotnostStr = nodeText
                             hmotnostStr = hmotnostStr.replace(',', '.')
                             quantity = BigDecimal(hmotnostStr.toDouble())
+                        } else if ("mj" == nodeName) {
+                            unit = UnitEnum.valueOf(nodeText.uppercase())
                         } else if ("ean" == nodeName) {
-                            if (shopItemChild.firstChild!=null) {
-                                ean = shopItemChild.firstChild.nodeValue
-                            }
+                            ean = nodeText
                         }
                     }
-                    val product = Product(productName!!, priceVAT!!, vat, description, quantity, ean, supplier)
+                    val product = Product(productName!!, priceVAT!!, vat, description, quantity, unit, ean, supplier)
                     result.add(product)
                 } catch (e: Exception) {
                     //TODO email problem with importing product
@@ -197,7 +199,7 @@ class DianaSheetProcessor : AbstractSheetProcessor() {
             return result
     }
 
-    override fun disintegrateIntoItem(rowNum: Int, rowData: List<String>?): List<Item> {
+    override fun disintegrateIntoProduct(rowNum: Int, rowData: List<String>?, supplier: Supplier): List<Product> {
         TODO("Not yet implemented")
     }
 
@@ -205,10 +207,10 @@ class DianaSheetProcessor : AbstractSheetProcessor() {
         TODO("Not yet implemented")
     }
 
-    override fun fillOrder(fileToParse: File, orderedItems: Map<Product, Int>): OrderAttachment {
+    override fun fillOrder(fileToParse: File, orderedProducts: Map<Product, Int>): OrderAttachment {
         val workbook = XSSFWorkbook();
         val sheet = workbook.createSheet()
-        for ((rowNum, orderedItem) in orderedItems.entries.withIndex()) {
+        for ((rowNum, orderedItem) in orderedProducts.entries.withIndex()) {
             val row = sheet.createRow(rowNum)
             val eanCell = row.createCell(0)
             eanCell.setCellValue(orderedItem.key.ean)

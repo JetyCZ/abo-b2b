@@ -3,11 +3,11 @@ package cz.abo.b2b.web.importer
 import cz.abo.b2b.web.SystemUtils
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.Supplier
+import cz.abo.b2b.web.dao.UnitEnum
 import cz.abo.b2b.web.importer.dto.ImportSource
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import org.w3c.dom.NodeList
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -39,13 +39,14 @@ class HeurekaXMLParser {
                 val shopItem = shopitems.item(i)
                 val shopItemChildren = shopItem.childNodes
                 val shopItemChildrenCount = shopItemChildren.length
-                var productName: String? = null
+                var productName = "Neznámý produkt"
                 var description: String? = null
                 var priceVAT: BigDecimal? = null
-                var quantity: BigDecimal? = null
+                var quantity = BigDecimal.ONE
                 var bestBefore: LocalDate? = null
                 var vat = 0.15
                 var ean: String? = null
+                var unit = UnitEnum.KS
                 for (j in 1 until shopItemChildrenCount) {
                     val shopItemChild = shopItemChildren.item(j)
                     if (shopItemChild.firstChild==null || StringUtils.isEmpty(shopItemChild.firstChild.nodeValue)) {
@@ -58,6 +59,7 @@ class HeurekaXMLParser {
                             val matcher = productNamePattern.matcher(productName)
                             if (matcher.matches()) {
                                 quantity = matcher.group("quantity").toBigDecimal()
+                                unit = UnitEnum.KG
                             }
                         } catch (e: Exception) {
                             LOGGER.warn("Error calculating quantity from product name: " + productName)
@@ -86,7 +88,7 @@ class HeurekaXMLParser {
                     }
                 }
                 if (quantity==null) quantity = BigDecimal.ONE
-                val product = Product(productName!!, priceVAT!!, vat, description, BigDecimal.ONE, ean, supplier)
+                val product = Product(productName, priceVAT!!, vat, description, quantity, unit, ean, supplier)
                 product.bestBefore = bestBefore
                 result.add(product)
             } catch (e: Exception) {

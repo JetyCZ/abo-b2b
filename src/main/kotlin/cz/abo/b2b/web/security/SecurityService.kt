@@ -25,8 +25,8 @@ class SecurityService(val userRepository: UserRepository, val passwordEncoder: P
         val testEmail = "pavel.jetensky@seznam.cz"
         var testUser = userRepository.findByEmail(testEmail)
         if (testUser==null) {
-            testUser = User("Pavel", "Jetenský", testEmail, Tarif.PROFITABLE, "",passwordEncoder.encode("test"),
-            Shop("Krámek bezobalu v Brozanech u Pardubic", "Brozany 7", "53352", "Staré Hradiště", "50.0648194N, 15.7965928E")
+            testUser = User("Pavel", "Jetenský", testEmail, "777045366", Tarif.PROFITABLE, "",passwordEncoder.encode("test"),
+            Shop("Krámek bezobalu v Brozanech u Pardubic", "Brozany 7", "53352", "Staré Hradiště", "04641515", null, "50.0648194N, 15.7965928E")
             )
             userRepository.save(testUser)
         }
