@@ -43,6 +43,7 @@ class Product {
         this.supplier = supplier
     }
 
+    var supplierCode: String? = null
     var productName: String
 
     /**

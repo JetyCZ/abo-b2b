@@ -7,6 +7,7 @@ import cz.abo.b2b.web.dao.UnitEnum
 import cz.abo.b2b.web.importer.dto.ImportSource
 import cz.abo.b2b.web.importer.dto.OrderAttachment
 import org.apache.commons.lang3.StringUtils
+import org.apache.poi.xssf.usermodel.XSSFFont
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.stereotype.Component
 import java.io.File
@@ -14,7 +15,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.*
 import javax.xml.parsers.DocumentBuilderFactory
-import kotlin.collections.ArrayList
+
 
 @Component
 class DianaSheetProcessor : AbstractSheetProcessor() {
@@ -162,6 +163,7 @@ class DianaSheetProcessor : AbstractSheetProcessor() {
                     var quantity: BigDecimal = BigDecimal.ONE
                     var unit = UnitEnum.KS
                     var ean: String? = null
+                    var supplierCode: String? = null
                     for (j in 1 until zasobaChildrenCount) {
                         val shopItemChild = zasobaChildren.item(j)
                         val nodeName = shopItemChild.nodeName
@@ -187,9 +189,13 @@ class DianaSheetProcessor : AbstractSheetProcessor() {
                             unit = UnitEnum.valueOf(nodeText.uppercase())
                         } else if ("ean" == nodeName) {
                             ean = nodeText
+                        } else if ("kod" == nodeName) {
+                            supplierCode = nodeText
                         }
                     }
+                    if (quantity.toDouble()<0.5) continue;
                     val product = Product(productName!!, priceVAT!!, vat, description, quantity, unit, ean, supplier)
+                    product.supplierCode = supplierCode
                     result.add(product)
                 } catch (e: Exception) {
                     //TODO email problem with importing product
@@ -210,15 +216,40 @@ class DianaSheetProcessor : AbstractSheetProcessor() {
     override fun fillOrder(fileToParse: File, orderedProducts: Map<Product, Int>): OrderAttachment {
         val workbook = XSSFWorkbook();
         val sheet = workbook.createSheet()
+        val headerRow = sheet.createRow(0)
+        var colIdx = 0
+
+        val boldStyle = workbook.createCellStyle()
+        boldStyle.borderTop = 6.toShort() // double lines border
+        boldStyle.borderBottom = 1.toShort() // single line border
+        val font = workbook.createFont()
+        font.boldweight = XSSFFont.BOLDWEIGHT_BOLD
+        boldStyle.setFont(font)
+
+        headerRow.createCell(colIdx++).setCellValue("Kód dodavatele")
+        headerRow.createCell(colIdx++).setCellValue("Název")
+        headerRow.createCell(colIdx++).setCellValue("MJ")
+        headerRow.createCell(colIdx++).setCellValue("Množství")
+        headerRow.createCell(colIdx++).setCellValue("Cena/MJ")
+        headerRow.createCell(colIdx++).setCellValue("Celkem bez DPH")
+        headerRow.createCell(colIdx++).setCellValue("%")
+        for (cell in headerRow.cellIterator()) {
+            cell.cellStyle = boldStyle
+        }
+
         for ((rowNum, orderedItem) in orderedProducts.entries.withIndex()) {
-            val row = sheet.createRow(rowNum)
-            val eanCell = row.createCell(0)
-            eanCell.setCellValue(orderedItem.key.ean)
-            val quantityCell = row.createCell(1)
-            val quantity = orderedItem.value.toDouble()
-            quantityCell.setCellValue(quantity)
-            val productNameCell = row.createCell(2)
-            productNameCell.setCellValue(orderedItem.key.productName)
+            colIdx = 0;
+            val product = orderedItem.key
+            val productRow = sheet.createRow(rowNum+1)
+            productRow.createCell(colIdx++).setCellValue(product.supplierCode)
+            productRow.createCell(colIdx++).setCellValue(product.productName)
+            productRow.createCell(colIdx++).setCellValue(product.unit.name.lowercase())
+            val orderedQuantity = orderedItem.value.toDouble()
+            productRow.createCell(colIdx++).setCellValue(orderedQuantity)
+            productRow.createCell(colIdx++).setCellValue(product.priceNoVAT.toDouble())
+            productRow.createCell(colIdx++).setCellValue(orderedQuantity*product.priceNoVAT.toDouble())
+            productRow.createCell(colIdx++).setCellValue(product.VAT*100)
+
         }
         return OrderAttachment("objednavka.xlsx", workbook)
     }
