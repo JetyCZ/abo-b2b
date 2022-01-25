@@ -29,7 +29,7 @@ class Supplier(
 
     @Id
     @GeneratedValue
-    val id: UUID = UUID.randomUUID()
+    val id: Long = 0
 
     fun importSource() : ImportSource{
         if (importUrl.startsWith("http")) {

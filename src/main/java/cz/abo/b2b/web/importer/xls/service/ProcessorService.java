@@ -50,7 +50,7 @@ public class ProcessorService {
         }
     }
 
-    public FileAttachment getFilledPriceListWithOrder(UUID supplierId) throws IOException {
+    public FileAttachment getFilledPriceListWithOrder(Long supplierId) throws IOException {
         Supplier supplier = supplierRepository.getById(supplierId);
 
         AbstractSheetProcessor abstractSheetProcessor = selectProcessor(supplier);

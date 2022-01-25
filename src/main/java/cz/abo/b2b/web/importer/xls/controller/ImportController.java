@@ -1,6 +1,7 @@
 package cz.abo.b2b.web.importer.xls.controller;
 
 import com.google.common.net.HttpHeaders;
+import cz.abo.b2b.web.dao.Product;
 import cz.abo.b2b.web.importer.xls.controller.dto.FileAttachment;
 import cz.abo.b2b.web.importer.xls.service.ProcessorService;
 import org.slf4j.Logger;
@@ -15,6 +16,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -34,7 +38,7 @@ public class ImportController
 
 
     @GetMapping("/download-filled/{supplierId}")
-    public ResponseEntity<Resource> downloadFilledFile(@PathVariable UUID supplierId) {
+    public ResponseEntity<Resource> downloadFilledFile(@PathVariable Long supplierId) {
 
         try {
             FileAttachment fileAttachment = processorService.getFilledPriceListWithOrder(supplierId);

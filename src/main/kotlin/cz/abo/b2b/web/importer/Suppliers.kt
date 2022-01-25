@@ -46,7 +46,7 @@ class Suppliers {
                     "bio nebio",
                     BigDecimal(0.85 * 3000),
                     "",
-                    "/bionebio/OL_bio_nebio_11_2021.xls",
+                    "/bionebio/OL_bio_nebio_12_2021.xls",
                     importerClassName,
                     "objednavky@bionebio.cz"
                 )

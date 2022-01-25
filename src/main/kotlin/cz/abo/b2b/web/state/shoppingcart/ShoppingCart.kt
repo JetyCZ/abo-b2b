@@ -6,7 +6,7 @@ import cz.abo.b2b.web.importer.xls.service.ProcessorService
 import java.util.*
 import kotlin.collections.HashMap
 
-open class ShoppingCart : HashMap<UUID, ShoppingCartSupplier>() {
+open class ShoppingCart : HashMap<Long, ShoppingCartSupplier>() {
     fun add(processorService: ProcessorService, product: Product, count: Long, shop: Shop) {
         val shoppingCartSupplier = shoppingCartSupplier(processorService, product, shop)
         shoppingCartSupplier.addToCart(product, count)

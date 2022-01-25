@@ -7,7 +7,7 @@ import cz.abo.b2b.web.dao.UnitEnum
 import cz.abo.b2b.web.importer.dto.ImportSource
 import cz.abo.b2b.web.importer.dto.OrderAttachment
 import org.apache.commons.lang3.StringUtils
-import org.apache.poi.xssf.usermodel.XSSFFont
+import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.stereotype.Component
 import java.io.File
@@ -15,75 +15,76 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.*
 import javax.xml.parsers.DocumentBuilderFactory
+import kotlin.collections.ArrayList
 
 
 @Component
-class DianaSheetProcessor : AbstractSheetProcessor() {
+class DianaSheetProcessor(val excelUtil: ExcelUtil) : AbstractSheetProcessor() {
     private var prahaPsc = ArrayList<String>()
 
     init {
         prahaPsc.addAll(
             Arrays.asList(
-        "10000",
-        "10100",
-        "10200",
-        "10300",
-        "10400",
-        "10600",
-        "10700",
-        "10800",
-        "10900",
-        "11000",
-        "11800",
-        "11900",
-        "12000",
-        "12800",
-        "13000",
-        "14000",
-        "14100",
-        "14200",
-        "14300",
-        "14700",
-        "14800",
-        "14900",
-        "15000",
-        "15200",
-        "15300",
-        "15400",
-        "15500",
-        "15521",
-        "15531",
-        "15600",
-        "15800",
-        "15900",
-        "16000",
-        "16100",
-        "16200",
-        "16300",
-        "16400",
-        "16500",
-        "16900",
-        "17000",
-        "17100",
-        "18000",
-        "18100",
-        "18200",
-        "18400",
-        "18600",
-        "19000",
-        "19011",
-        "19012",
-        "19014",
-        "19015",
-        "19016",
-        "19017",
-        "19300",
-        "19600",
-        "19700",
-        "19800",
-        "19900",
-        "25226",
-        "25228"))
+                "10000",
+                "10100",
+                "10200",
+                "10300",
+                "10400",
+                "10600",
+                "10700",
+                "10800",
+                "10900",
+                "11000",
+                "11800",
+                "11900",
+                "12000",
+                "12800",
+                "13000",
+                "14000",
+                "14100",
+                "14200",
+                "14300",
+                "14700",
+                "14800",
+                "14900",
+                "15000",
+                "15200",
+                "15300",
+                "15400",
+                "15500",
+                "15521",
+                "15531",
+                "15600",
+                "15800",
+                "15900",
+                "16000",
+                "16100",
+                "16200",
+                "16300",
+                "16400",
+                "16500",
+                "16900",
+                "17000",
+                "17100",
+                "18000",
+                "18100",
+                "18200",
+                "18400",
+                "18600",
+                "19000",
+                "19011",
+                "19012",
+                "19014",
+                "19015",
+                "19016",
+                "19017",
+                "19300",
+                "19600",
+                "19700",
+                "19800",
+                "19900",
+                "25226",
+                "25228"))
     }
 
 /*
@@ -142,67 +143,67 @@ class DianaSheetProcessor : AbstractSheetProcessor() {
  */
 
     override fun parseProductsWithSupplier(supplier: Supplier, importSource: ImportSource): List<Product> {
-            val factory = DocumentBuilderFactory.newInstance()
-            val builder = factory.newDocumentBuilder()
+        val factory = DocumentBuilderFactory.newInstance()
+        val builder = factory.newDocumentBuilder()
 
-            val document = builder.parse(importSource.newInputStream())
-            document.documentElement.normalize()
-            val root = document.documentElement
-            val result = ArrayList<Product>()
-            val zasobaElems = root.getElementsByTagName("zasoba")
-            for (i in 0 until zasobaElems.length) {
-                try {
-                    val zasoba = zasobaElems.item(i)
-                    val zasobaChildren = zasoba.childNodes
-                    val zasobaChildrenCount = zasobaChildren.length
-                    var productName: String? = null
-                    var description: String? = ""
-                    var priceVAT: BigDecimal? = BigDecimal(0.15)
-                    var bestBefore: LocalDate? = null
-                    var vat = 0.15
-                    var quantity: BigDecimal = BigDecimal.ONE
-                    var unit = UnitEnum.KS
-                    var ean: String? = null
-                    var supplierCode: String? = null
-                    for (j in 1 until zasobaChildrenCount) {
-                        val shopItemChild = zasobaChildren.item(j)
-                        val nodeName = shopItemChild.nodeName
-                        if (shopItemChild.firstChild==null || StringUtils.isEmpty(shopItemChild.firstChild.nodeValue)) {
-                            continue;
-                        }
-                        val nodeText = shopItemChild.firstChild.nodeValue
-                        if ("nazev" == nodeName) {
-                            productName = nodeText
-                        } else if ("slozeni_produktu_cj" == nodeName) {
-                            description += "Složení: " + nodeText + "\n"
-                        } else if ("stat_puvodu" == nodeName) {
-                            description += "Země původu: " + nodeText + "\n"
-                        } else if ("cena" == nodeName) {
-                            var priceVatStr = nodeText
-                            priceVatStr = priceVatStr.replace(',', '.')
-                            priceVAT = BigDecimal(priceVatStr.toDouble())
-                        } else if ("hmotnost" == nodeName) {
-                            var hmotnostStr = nodeText
-                            hmotnostStr = hmotnostStr.replace(',', '.')
-                            quantity = BigDecimal(hmotnostStr.toDouble())
-                        } else if ("mj" == nodeName) {
-                            unit = UnitEnum.valueOf(nodeText.uppercase())
-                        } else if ("ean" == nodeName) {
-                            ean = nodeText
-                        } else if ("kod" == nodeName) {
-                            supplierCode = nodeText
-                        }
+        val document = builder.parse(importSource.newInputStream())
+        document.documentElement.normalize()
+        val root = document.documentElement
+        val result = ArrayList<Product>()
+        val zasobaElems = root.getElementsByTagName("zasoba")
+        for (i in 0 until zasobaElems.length) {
+            try {
+                val zasoba = zasobaElems.item(i)
+                val zasobaChildren = zasoba.childNodes
+                val zasobaChildrenCount = zasobaChildren.length
+                var productName: String? = null
+                var description: String? = ""
+                var priceVAT: BigDecimal? = BigDecimal(0.15)
+                var bestBefore: LocalDate? = null
+                var vat = 0.15
+                var quantity: BigDecimal = BigDecimal.ONE
+                var unit = UnitEnum.KS
+                var ean: String? = null
+                var supplierCode: String? = null
+                for (j in 1 until zasobaChildrenCount) {
+                    val shopItemChild = zasobaChildren.item(j)
+                    val nodeName = shopItemChild.nodeName
+                    if (shopItemChild.firstChild==null || StringUtils.isEmpty(shopItemChild.firstChild.nodeValue)) {
+                        continue;
                     }
-                    if (quantity.toDouble()<0.5) continue;
-                    val product = Product(productName!!, priceVAT!!, vat, description, quantity, unit, ean, supplier)
-                    product.supplierCode = supplierCode
-                    result.add(product)
-                } catch (e: Exception) {
-                    //TODO email problem with importing product
-                    println(e)
+                    val nodeText = shopItemChild.firstChild.nodeValue
+                    if ("nazev" == nodeName) {
+                        productName = nodeText
+                    } else if ("slozeni_produktu_cj" == nodeName) {
+                        description += "Složení: " + nodeText + "\n"
+                    } else if ("stat_puvodu" == nodeName) {
+                        description += "Země původu: " + nodeText + "\n"
+                    } else if ("cena" == nodeName) {
+                        var priceVatStr = nodeText
+                        priceVatStr = priceVatStr.replace(',', '.')
+                        priceVAT = BigDecimal(priceVatStr.toDouble())
+                    } else if ("hmotnost" == nodeName) {
+                        var hmotnostStr = nodeText
+                        hmotnostStr = hmotnostStr.replace(',', '.')
+                        quantity = BigDecimal(hmotnostStr.toDouble())
+                    } else if ("mj" == nodeName) {
+                        unit = UnitEnum.valueOf(nodeText.uppercase())
+                    } else if ("ean" == nodeName) {
+                        ean = nodeText
+                    } else if ("kod" == nodeName) {
+                        supplierCode = nodeText
+                    }
                 }
+                if (quantity.toDouble()<0.5) continue;
+                val product = Product(productName!!, priceVAT!!, vat, description, quantity, unit, ean, supplier)
+                product.supplierCode = supplierCode
+                result.add(product)
+            } catch (e: Exception) {
+                //TODO email problem with importing product
+                println(e)
             }
-            return result
+        }
+        return result
     }
 
     override fun disintegrateIntoProduct(rowNum: Int, rowData: List<String>?, supplier: Supplier): List<Product> {
@@ -216,41 +217,36 @@ class DianaSheetProcessor : AbstractSheetProcessor() {
     override fun fillOrder(fileToParse: File, orderedProducts: Map<Product, Int>): OrderAttachment {
         val workbook = XSSFWorkbook();
         val sheet = workbook.createSheet()
-        val headerRow = sheet.createRow(0)
-        var colIdx = 0
 
-        val boldStyle = workbook.createCellStyle()
-        boldStyle.borderTop = 6.toShort() // double lines border
-        boldStyle.borderBottom = 1.toShort() // single line border
-        val font = workbook.createFont()
-        font.boldweight = XSSFFont.BOLDWEIGHT_BOLD
-        boldStyle.setFont(font)
+        excelUtil.createHeaderRow(
+            workbook, sheet, Arrays.asList(
+                "Kód dodavatele",
+                "Název",
+                "MJ",
+                "Objednávaný počet",
+                "Cena/MJ",
+                "Celkem bez DPH",
+                "%",
+            )
+        )
 
-        headerRow.createCell(colIdx++).setCellValue("Kód dodavatele")
-        headerRow.createCell(colIdx++).setCellValue("Název")
-        headerRow.createCell(colIdx++).setCellValue("MJ")
-        headerRow.createCell(colIdx++).setCellValue("Množství")
-        headerRow.createCell(colIdx++).setCellValue("Cena/MJ")
-        headerRow.createCell(colIdx++).setCellValue("Celkem bez DPH")
-        headerRow.createCell(colIdx++).setCellValue("%")
-        for (cell in headerRow.cellIterator()) {
-            cell.cellStyle = boldStyle
-        }
-
-        for ((rowNum, orderedItem) in orderedProducts.entries.withIndex()) {
-            colIdx = 0;
+        val rowsData: MutableList<List<Any>> = ArrayList()
+        for (orderedItem in orderedProducts) {
             val product = orderedItem.key
-            val productRow = sheet.createRow(rowNum+1)
-            productRow.createCell(colIdx++).setCellValue(product.supplierCode)
-            productRow.createCell(colIdx++).setCellValue(product.productName)
-            productRow.createCell(colIdx++).setCellValue(product.unit.name.lowercase())
             val orderedQuantity = orderedItem.value.toDouble()
-            productRow.createCell(colIdx++).setCellValue(orderedQuantity)
-            productRow.createCell(colIdx++).setCellValue(product.priceNoVAT.toDouble())
-            productRow.createCell(colIdx++).setCellValue(orderedQuantity*product.priceNoVAT.toDouble())
-            productRow.createCell(colIdx++).setCellValue(product.VAT*100)
-
+            val oneRowData = listOf(
+                product.supplierCode,
+                product.productName,
+                product.unit.name.lowercase(),
+                orderedQuantity,
+                product.priceNoVAT.toDouble(),
+                orderedQuantity * product.priceNoVAT.toDouble(),
+                product.VAT * 100,
+            )
+            rowsData.add(oneRowData as List<Object>)
         }
+        excelUtil.createRows(sheet, rowsData)
+
         return OrderAttachment("objednavka.xlsx", workbook)
     }
 

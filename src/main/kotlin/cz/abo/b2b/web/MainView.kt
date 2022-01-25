@@ -43,6 +43,7 @@ import org.springframework.security.access.annotation.Secured
 import org.vaadin.klaudeta.PaginatedGrid
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.annotation.security.PermitAll
 
@@ -59,6 +60,9 @@ class MainView(val productRepository: ProductRepository,
                val processorService: ProcessorService
 ) : VerticalLayout() {
 
+    companion object {
+        public val dateFormatter = DateTimeFormatter.ofPattern("dd.MM. yyyy") // 2024-02-24
+    }
     private val productGrid: PaginatedGrid<Product> = PaginatedGrid(Product::class.java)
 
     private val leftColumn  = VerticalLayout()
@@ -212,12 +216,30 @@ class MainView(val productRepository: ProductRepository,
         }
     }
 
-    private fun oneSupplierShoppingCart(shoppingCartEntry: MutableMap.MutableEntry<UUID, ShoppingCartSupplier>) {
+    private fun oneSupplierShoppingCart(shoppingCartEntry: MutableMap.MutableEntry<Long, ShoppingCartSupplier>) {
         val shoppingCartGrid: Grid<ShoppingCartItem> = Grid(ShoppingCartItem::class.java)
         shoppingCartGrid.setSizeUndefined()
         shoppingCartGrid.removeAllColumns()
+
+
         val productColumn = shoppingCartGrid.addComponentColumn { item ->
-            Html("<span title='${item.product.productName}'>${item.product.productName}</span>")
+
+            val product = item.product
+            val ean = if (!StringUtils.isEmpty(product.ean)) "\nEAN: "  + product.ean else ""
+            val supplierCode = if (!StringUtils.isEmpty(product.ean)) "\nKód dodavatele: "  + product.supplierCode else ""
+            val bestBefore = if (product.bestBefore!=null) "\nDatum minimální trvanlivost: "  + MainView.dateFormatter.format(product.bestBefore) else ""
+            val rowNum = if (product.rowNum>0) "\nČíslo řádku v ceníku: "  + product.rowNum else ""
+            val description = if (!StringUtils.isEmpty(product.description)) "\nPopis: "  + product.description else ""
+            val title = """
+Název produktu: ${product.productName}
+Cena za ${product.unit.name.lowercase()} bez DPH: ${product.priceNoVAT}
+Objednáno ${product.unit.name.lowercase()}: ${item.count}
+Celkem cena bez DPH: ${item.totalPriceNoVAT()}
+Celkem cena s DPH: ${item.totalPriceVAT()}${ean}${supplierCode}${bestBefore}${rowNum}${description}                
+            """.trimIndent()
+
+            Html("<span title='${title}'>${item.product.productName}</span>")
+
         }
         productColumn.setHeader("V košíku")
 

@@ -15,12 +15,8 @@ class ShoppingCartSupplier(val supplier: Supplier, freeTransportFrom: BigDecimal
     }
 
     fun updateCart(product: Product, newCount: Double) {
-        if (newCount.toInt() == 0) {
-            remove(product.id)
-        } else {
-            val item = getOrDefault(product.id, ShoppingCartItem(product, 0L))
-            item.count = newCount.toLong()
-        }
+        val item = getOrDefault(product.id, ShoppingCartItem(product, 0L))
+        item.count = newCount.toLong()
     }
 
     fun totalPriceNoVAT() : BigDecimal {
