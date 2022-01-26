@@ -226,15 +226,15 @@ class MainView(val productRepository: ProductRepository,
 
             val product = item.product
             val ean = if (!StringUtils.isEmpty(product.ean)) "\nEAN: "  + product.ean else ""
-            val supplierCode = if (!StringUtils.isEmpty(product.ean)) "\nKód dodavatele: "  + product.supplierCode else ""
+            val supplierCode = if (!StringUtils.isEmpty(product.supplierCode)) "\nKód dodavatele: "  + product.supplierCode else ""
             val bestBefore = if (product.bestBefore!=null) "\nDatum minimální trvanlivost: "  + MainView.dateFormatter.format(product.bestBefore) else ""
             val rowNum = if (product.rowNum>0) "\nČíslo řádku v ceníku: "  + product.rowNum else ""
             val description = if (!StringUtils.isEmpty(product.description)) "\nPopis: "  + product.description else ""
             val title = """
 Název produktu: ${product.productName}
-Cena za ${product.unit.name.lowercase()} bez DPH: ${product.priceNoVAT}
+Cena za ${product.unit.name.lowercase()} bez DPH: ${product.priceNoVAT.toPlainString()}
 Objednáno ${product.unit.name.lowercase()}: ${item.count}
-Celkem cena bez DPH: ${item.totalPriceNoVAT()}
+Celkem cena bez DPH: ${item.totalPriceNoVAT().toPlainString()}
 Celkem cena s DPH: ${item.totalPriceVAT()}${ean}${supplierCode}${bestBefore}${rowNum}${description}                
             """.trimIndent()
 

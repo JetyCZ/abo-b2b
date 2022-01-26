@@ -66,7 +66,7 @@ class Suppliers {
             )
         }
         // TODO remove - just for testing
-        result.forEach{r->r.orderEmail = StringUtils.replace(r.orderEmail, "@","AT") + "@mailinator.com"}
+        // result.forEach{r->r.orderEmail = StringUtils.replace(r.orderEmail, "@","AT") + "@mailinator.com"}
         return result
     }
 }
