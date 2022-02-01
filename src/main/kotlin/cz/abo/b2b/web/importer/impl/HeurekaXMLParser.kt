@@ -1,37 +1,24 @@
-package cz.abo.b2b.web.importer
+package cz.abo.b2b.web.importer.impl
 
-import cz.abo.b2b.web.SystemUtils
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.Supplier
 import cz.abo.b2b.web.dao.UnitEnum
 import cz.abo.b2b.web.importer.dto.ImportSource
 import org.apache.commons.lang3.StringUtils
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
-import javax.xml.parsers.DocumentBuilderFactory
 
 @Component
-class HeurekaXMLParser {
-    companion object {
-        private val LOGGER = LoggerFactory.getLogger(HeurekaXMLParser::class.java)
-    }
+class HeurekaXMLParser : AbstractXMLParser() {
 
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd") // 2024-02-24
     val productNamePattern = Pattern.compile("^.*(?<quantity>\\d+)\\skg(\\s|$).*")
 
     fun parseStream(importSource: ImportSource, supplier: Supplier): MutableList<Product> {
-        val factory = DocumentBuilderFactory.newInstance()
-        val builder = factory.newDocumentBuilder()
-
-        LOGGER.info("XXX BEFORE READ: " + importSource.path + "; " + SystemUtils.usedMemory())
-        val document = builder.parse(importSource.newInputStream())
-        document.documentElement.normalize()
-        LOGGER.info("XXX AFTER READ: " + importSource.path + "; " + SystemUtils.usedMemory())
-        val root = document.documentElement
+        val root = parseToXMLDocument(importSource)
         val result: MutableList<Product> = ArrayList()
         val shopitems = root.getElementsByTagName("SHOPITEM")
         for (i in 0 until shopitems.length) {
@@ -87,11 +74,11 @@ class HeurekaXMLParser {
                         }
                     }
                 }
-                if (quantity==null) quantity = BigDecimal.ONE
                 if (unit.equals(UnitEnum.KG) && quantity.compareTo(BigDecimal.ONE)<0) {
                     continue;
                 }
-                val product = Product(productName, priceVAT!!, vat, description, quantity, unit, ean, supplier)
+                val priceNoVAT = vatToNoVat(priceVAT, vat)
+                val product = Product(productName, priceNoVAT, vat, description, quantity, unit, ean, supplier)
                 product.bestBefore = bestBefore
                 result.add(product)
             } catch (e: Exception) {
@@ -101,4 +88,5 @@ class HeurekaXMLParser {
         }
         return result
     }
+
 }

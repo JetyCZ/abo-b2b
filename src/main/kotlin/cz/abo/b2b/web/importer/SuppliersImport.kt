@@ -3,6 +3,7 @@ package cz.abo.b2b.web.importer
 import cz.abo.b2b.web.SystemUtils
 import cz.abo.b2b.web.dao.ProductRepository
 import cz.abo.b2b.web.dao.SupplierRepository
+import cz.abo.b2b.web.importer.impl.HeurekaXMLParser
 import cz.abo.b2b.web.importer.xls.processor.AbstractSheetProcessor
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
@@ -15,7 +16,7 @@ open class SuppliersImport(
     val productRepository: ProductRepository,
     val supplierRepository: SupplierRepository,
     val suppliers: Suppliers,
-    val heurekaXMLParser: HeurekaXMLParser,
+    val HeurekaXMLParser: HeurekaXMLParser,
     val applicationContext: ApplicationContext):InitializingBean {
 
     companion object {
@@ -34,7 +35,7 @@ open class SuppliersImport(
                 val importerClass = Class.forName(supplier.importerClassName)
                 val importer = applicationContext.getBean(importerClass)
                 val importSource = supplier.importSource()
-                val products = (importer as AbstractSheetProcessor).parseProductsWithSupplier(saved, importSource)
+                val products = (importer as AbstractSheetProcessor).parseProducts(importSource, saved)
                 productRepository.saveAll(products)
 
             }

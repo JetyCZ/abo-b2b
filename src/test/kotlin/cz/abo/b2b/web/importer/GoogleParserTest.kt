@@ -1,21 +1,22 @@
 package cz.abo.b2b.web.importer
 
+import cz.abo.b2b.web.TestUtils
 import cz.abo.b2b.web.dao.Supplier
 import cz.abo.b2b.web.importer.dto.ImportSource
-import cz.abo.b2b.web.importer.impl.HeurekaXMLParser
+import cz.abo.b2b.web.importer.impl.GoogleXMLParser
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 import java.io.File
 import java.math.BigDecimal
 
-internal class HeurekaXMLParserTest {
+internal class GoogleParserTest {
 
-    val heurekaXMLParser: HeurekaXMLParser = HeurekaXMLParser()
+    val googleXMLParser: GoogleXMLParser = GoogleXMLParser()
 
     @Test
     fun parseStream() {
-        val file = HeurekaXMLParser::class.java.getResource("/xml/example.xml").file
+        val file = GoogleXMLParser::class.java.getResource("/xml/google-example.xml").file
         val input = File(file)
 
         val supplier = Supplier(
@@ -26,8 +27,10 @@ internal class HeurekaXMLParserTest {
             "",
             ""
         )
-        val products = heurekaXMLParser.parseStream(ImportSource.fromFile(input.absolutePath), supplier)
+        val products = googleXMLParser.parseStream(ImportSource.fromFile(input.absolutePath), supplier)
         val product1 = products.get(0)
+        assertEquals("Itumbe Victoria Green", product1.productName)
         assertEquals(0.15, product1.VAT, 0.1)
+        TestUtils.assertBigDecimal(1000/1.15, product1.priceNoVAT)
     }
 }

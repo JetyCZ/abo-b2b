@@ -80,5 +80,9 @@ class Product {
     @GeneratedValue
     val id: UUID = UUID.randomUUID()
 
+    fun priceVat(quantity: Int):BigDecimal {
+        return priceVAT().multiply(BigDecimal(quantity))
+    }
 
+    fun priceVAT() = priceNoVAT.multiply(BigDecimal(1 + VAT)).setScale(5).stripTrailingZeros()
 }

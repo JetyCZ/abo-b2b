@@ -6,6 +6,9 @@ import cz.abo.b2b.web.dao.Supplier
 import cz.abo.b2b.web.dao.UnitEnum
 import cz.abo.b2b.web.importer.dto.ImportSource
 import cz.abo.b2b.web.importer.dto.OrderAttachment
+import cz.abo.b2b.web.importer.xls.ExcelUtil
+import cz.abo.b2b.web.importer.xls.ExcelUtil.Companion.createHeaderRow
+import cz.abo.b2b.web.importer.xls.ExcelUtil.Companion.createRows
 import org.apache.commons.lang3.StringUtils
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
@@ -19,7 +22,7 @@ import kotlin.collections.ArrayList
 
 
 @Component
-class DianaSheetProcessor(val excelUtil: ExcelUtil) : AbstractSheetProcessor() {
+class DianaSheetProcessor() : AbstractSheetProcessor() {
     private var prahaPsc = ArrayList<String>()
 
     init {
@@ -142,7 +145,7 @@ class DianaSheetProcessor(val excelUtil: ExcelUtil) : AbstractSheetProcessor() {
 	</zasoba>
  */
 
-    override fun parseProductsWithSupplier(supplier: Supplier, importSource: ImportSource): List<Product> {
+    override fun parseProducts(importSource: ImportSource, supplier: Supplier): List<Product> {
         val factory = DocumentBuilderFactory.newInstance()
         val builder = factory.newDocumentBuilder()
 
@@ -206,19 +209,11 @@ class DianaSheetProcessor(val excelUtil: ExcelUtil) : AbstractSheetProcessor() {
         return result
     }
 
-    override fun disintegrateIntoProduct(rowNum: Int, rowData: List<String>?, supplier: Supplier): List<Product> {
-        TODO("Not yet implemented")
-    }
-
-    override fun orderColumnIdx(): Int {
-        TODO("Not yet implemented")
-    }
-
-    override fun fillOrder(fileToParse: File, orderedProducts: Map<Product, Int>): OrderAttachment {
+    override fun fillOrder(fileWithOrderAttachment: File, orderedProducts: Map<Product, Int>): OrderAttachment {
         val workbook = XSSFWorkbook();
         val sheet = workbook.createSheet()
 
-        excelUtil.createHeaderRow(
+        createHeaderRow(
             workbook, sheet, Arrays.asList(
                 "Kód dodavatele",
                 "Název",
@@ -245,7 +240,7 @@ class DianaSheetProcessor(val excelUtil: ExcelUtil) : AbstractSheetProcessor() {
             )
             rowsData.add(oneRowData as List<Object>)
         }
-        excelUtil.createRows(sheet, rowsData)
+        createRows(sheet, rowsData)
 
         return OrderAttachment("objednavka.xlsx", workbook)
     }

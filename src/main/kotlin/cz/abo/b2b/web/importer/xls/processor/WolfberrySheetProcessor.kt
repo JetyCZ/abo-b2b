@@ -2,6 +2,8 @@ package cz.abo.b2b.web.importer.xls.processor
 
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.Supplier
+import cz.abo.b2b.web.importer.ProductImporter
+import cz.abo.b2b.web.importer.dto.ImportSource
 import cz.abo.b2b.web.importer.dto.OrderAttachment
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.stereotype.Component
@@ -10,15 +12,11 @@ import java.io.File
 @Component
 class WolfberrySheetProcessor : AbstractSheetProcessor() {
 
-    override fun disintegrateIntoProduct(rowNum: Int, rowData: List<String>?, supplier: Supplier): List<Product> {
-        TODO("Not yet implemented")
+    override fun parseProducts(importSource: ImportSource, supplier: Supplier): List<Product> {
+        return heurekaXMLParser.parseStream(importSource, supplier)
     }
 
-    override fun orderColumnIdx(): Int {
-        TODO("Not yet implemented")
-    }
-
-    override fun fillOrder(fileToParse: File, orderedProducts: Map<Product, Int>): OrderAttachment {
+    override fun fillOrder(fileWithOrderAttachment: File, orderedProducts: Map<Product, Int>): OrderAttachment {
         val workbook = XSSFWorkbook();
         val sheet = workbook.createSheet()
         for ((rowNum, orderedItem) in orderedProducts.entries.withIndex()) {

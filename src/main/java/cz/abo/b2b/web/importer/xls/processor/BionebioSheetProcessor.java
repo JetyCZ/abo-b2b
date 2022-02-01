@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
  */
 
 @Component
-public class BionebioSheetProcessor extends AbstractSheetProcessor {
+public class BionebioSheetProcessor extends AbstractExcelSheetProcessor {
     public static final Double EUR_TO_CZK = new Double(26);
     private static final Logger log = LoggerFactory.getLogger(BionebioSheetProcessor.class);
 

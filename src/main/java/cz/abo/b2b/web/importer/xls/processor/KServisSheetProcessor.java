@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
  */
 
 @Component
-public class KServisSheetProcessor extends AbstractSheetProcessor {
+public class KServisSheetProcessor extends AbstractExcelSheetProcessor {
     String lastCategory = null;
 
     @Override
@@ -52,7 +52,8 @@ public class KServisSheetProcessor extends AbstractSheetProcessor {
                     double itemQuantity = Double.parseDouble(itemQuantityParsed);
                     double itemPrice = Double.parseDouble(priceStr);
 
-                    String description = "<b>Bez přid. cukru:</b> " + (("X".equals(values[2]))?"Ano":"Ne") + "<br>";
+                    String description = "<b>Hmotnost balení v kg:</b> " + itemQuantityStr + "<br>";
+                    description = "<b>Bez přid. cukru:</b> " + (("X".equals(values[2]))?"Ano":"Ne") + "<br>";
                     description += "<b>Bez SO2:</b> " + (("X".equals(values[3]))?"Ano":"Ne") + "<br>";
                     Product product = new Product(itemName, new BigDecimal(itemPrice), 0.15, description, new BigDecimal(itemQuantity), UnitEnum.KG, null, supplier);
                     productList.add(product);
@@ -69,8 +70,8 @@ public class KServisSheetProcessor extends AbstractSheetProcessor {
     }
 
     @Override
-    public OrderAttachment fillOrder(File fileToParse, Map<Product, Integer> orderedProducts) {
-        OrderAttachment orderAttachment = super.fillOrder(fileToParse, orderedProducts);
+    public OrderAttachment fillOrder(File fileWithOrderAttachment, Map<Product, Integer> orderedProducts) {
+        OrderAttachment orderAttachment = super.fillOrder(fileWithOrderAttachment, orderedProducts);
         getProductsSheetFromWorkbook(orderAttachment.getWorkbook(), getSheetName()).getRow(0).getCell(orderColumnIdx()).setCellValue("Objednávám tolik balení");
         return orderAttachment;
     }

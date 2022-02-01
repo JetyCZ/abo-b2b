@@ -15,7 +15,7 @@ import java.util.List;
 
 
 @Component
-public class MkmPackSheetProcessor extends AbstractSheetProcessor {
+public class MkmPackSheetProcessor extends AbstractExcelSheetProcessor {
     String category = "";
 
     @NotNull

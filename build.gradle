@@ -48,6 +48,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-mail")
 
+    // XML Parser
+    implementation("org.jsoup:jsoup:1.7.2")
 
     implementation("com.h2database:h2")
 

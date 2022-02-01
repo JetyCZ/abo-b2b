@@ -16,7 +16,7 @@ abstract class AbstractSheetProcessorTest extends Specification{
         def filePath = getPricelistResourcePath()
         def f = resourceFilePath(filePath)
 
-        def products = processor.parseProductsWithSupplier(testSupplier, fromFile(f))
+        def products = processor.parseProducts(fromFile(f), testSupplier)
         Map<Product, Integer> orderedProducts = new HashMap<>();
 
 

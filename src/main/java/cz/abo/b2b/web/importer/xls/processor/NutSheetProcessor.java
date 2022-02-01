@@ -19,7 +19,7 @@ import java.util.List;
  */
 
 @Component
-public class NutSheetProcessor extends AbstractSheetProcessor {
+public class NutSheetProcessor extends AbstractExcelSheetProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NutSheetProcessor.class);
 
