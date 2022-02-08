@@ -19,18 +19,36 @@ import org.springframework.stereotype.Component
 
 
 @Component
-class SecurityService(val userRepository: UserRepository, val passwordEncoder: PasswordEncoder) {
+open class SecurityService(val userRepository: UserRepository, val passwordEncoder: PasswordEncoder) {
 
+    companion object {
+        private const val LOGOUT_SUCCESS_URL = "/"
+
+        @JvmStatic
+        fun testUser(testEmail: String) =
+            User(
+                "Pavel", "Jetenský", testEmail, "777045366", Tarif.PROFITABLE, "", "",
+                Shop(
+                    "Krámek bezobalu v Brozanech u Pardubic",
+                    "Brozany 7",
+                    "53352",
+                    "Staré Hradiště",
+                    "04641515",
+                    null,
+                    "50.0648194N, 15.7965928E"
+                )
+            )
+    }
     init {
         val testEmail = "pavel.jetensky@seznam.cz"
         var testUser = userRepository.findByEmail(testEmail)
         if (testUser==null) {
-            testUser = User("Pavel", "Jetenský", testEmail, "777045366", Tarif.PROFITABLE, "",passwordEncoder.encode("test"),
-            Shop("Krámek bezobalu v Brozanech u Pardubic", "Brozany 7", "53352", "Staré Hradiště", "04641515", null, "50.0648194N, 15.7965928E")
-            )
+            testUser = testUser(testEmail)
+            testUser.passwordHash = passwordEncoder.encode("test")
             userRepository.save(testUser)
         }
     }
+
 
     // Anonymous or no authentication.
     fun authenticatedUser(): UserDetails? {
@@ -43,11 +61,12 @@ class SecurityService(val userRepository: UserRepository, val passwordEncoder: P
         }
 
     // Anonymous or no authentication.
-    fun authenticatedDbUser(): User? {
-            val context = SecurityContextHolder.getContext()
-            val principal = context.authentication.principal
+    open fun authenticatedDbUser(): User? {
+            val context = SecurityContextHolder.getContext() ?: return null
+        val authentication = context.authentication ?: return null
+        val principal = authentication.principal
             if (principal is UserDetails) {
-                val email = (context.authentication.principal as UserDetails).username
+                val email = (authentication.principal as UserDetails).username
                 return userRepository.findByEmail(email)
             } else {
                 return null
@@ -64,8 +83,5 @@ class SecurityService(val userRepository: UserRepository, val passwordEncoder: P
         )
     }
 
-    companion object {
-        private const val LOGOUT_SUCCESS_URL = "/"
-    }
 
 }

@@ -1,4 +1,5 @@
 package cz.abo.b2b.web.security.view
+import com.vaadin.flow.component.Html
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.html.*
 import com.vaadin.flow.component.login.LoginForm
@@ -32,10 +33,14 @@ class LoginView(val supplierJdbcRepository: SupplierJdbcRepository) : AbstractLo
         add(mainPane)
             mainPane.add(leftSide)
                 leftSide.setWidthFull()
-                leftSide.add(
-                    Section(
-                        Span("Tento systém je určen pro provozovatele bezobalových obchodů a usnadňuje jim proces objednávání zboží."))
+                var info = VerticalLayout()
+                info.add(
+                    Span("Vstoupili jste na stránku platformy, která vznikla pro účely zjednodušení spolupráce bezobalových obchodů s dodavateli kvalitních potravin a dalšího spotřebního zboží. Systém je tvořen komunitou bezobalových obchodů pro vlastní potřeby. Projekt je financován z příspěvků placených uživatelů a jeho cílem je usnadnit práci. Veškeré finance jsou zpět vraceny do rozvoje systému."),
+                    Span("Pokud jste provozovatel bezobalového obchodu a máte zájem o vstup do systému, může rovnou přistoupit k registraci. Pokud jste dodavatel a chtěli byste do systému vstoupit, tak nás oslovte na " +
+                    "asociacebezobalub2b[NAHRAĎTE ZA ZAVINÁČ]gmail.com"),
+                    Span("Projekt byl realizován za podpory Ministerstva Životního prostředí")
                 )
+                leftSide.add(info)
                 supplierGrid.removeAllColumns()
                 supplierGrid.addColumn(SupplierDetails::name).setHeader("Zboží od těchto dodavatelů")
                 supplierGrid.addColumn(SupplierDetails::productCount).setHeader("Počet produktů")

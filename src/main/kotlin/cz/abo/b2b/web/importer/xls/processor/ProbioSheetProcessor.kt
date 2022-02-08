@@ -10,6 +10,7 @@ import cz.abo.b2b.web.importer.dto.OrderAttachment
 import cz.abo.b2b.web.importer.xls.ExcelUtil
 import cz.abo.b2b.web.importer.xls.ExcelUtil.Companion.createHeaderRow
 import cz.abo.b2b.web.importer.xls.ExcelUtil.Companion.createRows
+import cz.abo.b2b.web.view.component.ViewUtils.Companion.round
 import org.apache.commons.lang3.StringUtils
 import org.apache.poi.xssf.usermodel.XSSFFont
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
@@ -47,14 +48,14 @@ class ProbioSheetProcessor() : AbstractSheetProcessor() {
         val rowsData: MutableList<List<Any>> = ArrayList()
         for (orderedItem in orderedProducts) {
             val product = orderedItem.key
-            val orderedQuantity = orderedItem.value.toDouble()
+            val orderedQuantity = orderedItem.value
             val oneRowData = listOf(
                 product.ean,
                 product.productName,
                 product.unit.name.lowercase(),
                 orderedQuantity,
-                product.priceNoVAT.toDouble(),
-                orderedQuantity * product.priceNoVAT.toDouble(),
+                round(product.priceNoVAT),
+                round(product.priceNoVAT(orderedQuantity)),
                 product.VAT * 100,
             )
             rowsData.add(oneRowData as List<Object>)

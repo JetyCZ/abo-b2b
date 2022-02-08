@@ -52,13 +52,18 @@ abstract class AbstractSheetProcessor {
     abstract fun fillOrder(fileWithOrderAttachment: File, orderedProducts: Map<Product, Int>): OrderAttachment
 
     fun validateImportedObject(product: Product): Boolean {
-        if (product.unit == UnitEnum.KG && product.quantity.compareTo(BigDecimal(0.5))<0) {
+        if (product.unit == UnitEnum.KG && product.quantity.compareTo(BigDecimal(validMinimalProductWeight()))<0) {
             return false;
         }
         return !product.productName.isEmpty() && product.productName != null &&
                 product.quantity!=null &&
                 product.priceNoVAT != null
     }
+
+    /**
+     * During import, ignore products, that weight less then this value (in kg)
+     */
+    open fun validMinimalProductWeight() = 0.5
 
     fun countValueForOneGram(priceForKilos: Double, productQuantity: Double): Double {
         return priceForKilos / productQuantity
@@ -82,7 +87,7 @@ abstract class AbstractSheetProcessor {
     fun getCellValue(formulaEvaluator: FormulaEvaluator, cell: Cell): String {
         val value: String
         value = when (cell.cellType) {
-            Cell.CELL_TYPE_NUMERIC -> cell.numericCellValue.toString()
+            Cell.CELL_TYPE_NUMERIC -> BigDecimal(cell.numericCellValue).toPlainString()
                 .replaceFirst("\\.0+$".toRegex(), EMPTY_SPACE)
             Cell.CELL_TYPE_STRING -> cell.stringCellValue
             Cell.CELL_TYPE_BLANK -> EMPTY_SPACE
@@ -93,17 +98,13 @@ abstract class AbstractSheetProcessor {
         return value
     }
 
-    class ExcelFile(var workbook: Workbook, var excelFile: InputStream) {
-        fun setExcelFile(excelFile: FileInputStream) {
-            this.excelFile = excelFile
-        }
-    }
+    class ExcelFile(var workbook: Workbook, var excelFile: InputStream)
 
     companion object {
         const val XLS_EXTENSIONS = ".xls"
         const val DELIMITER = ";"
         const val EMPTY_SPACE = ""
         @JvmStatic
-        public val LOGGER = LoggerFactory.getLogger(AbstractSheetProcessor::class.java)
+        val LOGGER = LoggerFactory.getLogger(AbstractSheetProcessor::class.java)
     }
 }

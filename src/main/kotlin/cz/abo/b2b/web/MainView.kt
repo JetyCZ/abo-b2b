@@ -38,11 +38,12 @@ import cz.abo.b2b.web.state.shoppingcart.ShoppingCart
 import cz.abo.b2b.web.state.shoppingcart.ShoppingCartItem
 import cz.abo.b2b.web.state.shoppingcart.ShoppingCartSupplier
 import cz.abo.b2b.web.view.component.StyledText
+import cz.abo.b2b.web.view.component.ViewUtils.Companion.round
 import org.apache.commons.lang3.StringUtils
+import org.apache.commons.text.StringEscapeUtils
 import org.springframework.security.access.annotation.Secured
 import org.vaadin.klaudeta.PaginatedGrid
 import java.math.BigDecimal
-import java.math.RoundingMode
 import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.annotation.security.PermitAll
@@ -230,15 +231,16 @@ class MainView(val productRepository: ProductRepository,
             val bestBefore = if (product.bestBefore!=null) "\nDatum minimální trvanlivost: "  + MainView.dateFormatter.format(product.bestBefore) else ""
             val rowNum = if (product.rowNum>0) "\nČíslo řádku v ceníku: "  + product.rowNum else ""
             val description = if (!StringUtils.isEmpty(product.description)) "\nPopis: "  + product.description else ""
+            val productNameHtml = StringEscapeUtils.escapeHtml4(product.productName).replace("'", "&#39;")
             val title = """
-Název produktu: ${product.productName}
-Cena za ${product.unit.name.lowercase()} bez DPH: ${product.priceNoVAT.toPlainString()}
+Název produktu: ${productNameHtml}
+Cena za ${product.unit.name.lowercase()} bez DPH: ${round(product.priceVAT())}
 Objednáno ${product.unit.name.lowercase()}: ${item.count}
-Celkem cena bez DPH: ${item.totalPriceNoVAT().toPlainString()}
-Celkem cena s DPH: ${item.totalPriceVAT()}${ean}${supplierCode}${bestBefore}${rowNum}${description}                
+Celkem cena bez DPH: ${round(item.totalPriceNoVAT())}
+Celkem cena s DPH: ${round(item.totalPriceVAT())}${ean}${supplierCode}${bestBefore}${rowNum}${description}                
             """.trimIndent()
 
-            Html("<span title='${title}'>${item.product.productName}</span>")
+            Html("<span title='${title}'>${productNameHtml}</span>")
 
         }
         productColumn.setHeader("V košíku")
@@ -257,25 +259,25 @@ Celkem cena s DPH: ${item.totalPriceVAT()}${ean}${supplierCode}${bestBefore}${ro
         oneSupplierDiv.add(
             Html(
                 "<span>" +
-                        "<b>Bez DPH</b>: " + shoppingCartItem.totalPriceNoVAT() +
-                        "&nbsp;<b>s DPH</b>: " + shoppingCartItem.totalPriceVAT() +
+                        "<b>Bez DPH</b>: " + round(shoppingCartItem.totalPriceNoVAT()) +
+                        "&nbsp;<b>s DPH</b>: " + round(shoppingCartItem.totalPriceVAT()) +
                         "</span>"
             )
         )
         val remainingToFreeTransportNoVAT = shoppingCartItem.remainingToFreeTransportNoVAT()
 
         val transportFreeLabel =
-            StringBuffer("<div>Doprava zdarma (bez DPH):" + shoppingCartItem.supplier.freeTransportFrom + " ")
+            StringBuffer("<div>Doprava zdarma (bez DPH):" + round(shoppingCartItem.supplier.freeTransportFrom) + " ")
         if (remainingToFreeTransportNoVAT.toDouble() > 0) {
             transportFreeLabel.append(
                 "<span style='color:red'>NE</span><br><i>(chybí " +
-                        remainingToFreeTransportNoVAT.setScale(0, RoundingMode.HALF_UP) + " Kč)</i>"
+                        round(remainingToFreeTransportNoVAT) + " Kč)</i>"
             )
         } else {
             transportFreeLabel.append(
                 "<span style='color:green'>ANO</span><br><i>(víc o " +
-                        remainingToFreeTransportNoVAT.multiply(BigDecimal(-1))
-                            .setScale(0, RoundingMode.HALF_UP) + " Kč)</i>"
+                        round(remainingToFreeTransportNoVAT.multiply(BigDecimal(-1)))
+                             + " Kč)</i>"
             )
         }
         transportFreeLabel.append("</div>")

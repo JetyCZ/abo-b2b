@@ -27,20 +27,21 @@ open class SuppliersImport(
         supplierRepository.deleteAll()
         productRepository.deleteAll()
 
-        for (supplier in suppliers.suppliers()) {
+        val suppliersToImport = suppliers.suppliers()
+        for (supplier in suppliersToImport) {
             LOGGER.info("XXX BEFORE: " + supplier.name + "; " + SystemUtils.usedMemory())
-            if (!StringUtils.isEmpty(supplier.importUrl)) {
-                val saved = supplierRepository.save(supplier)
+            val saved = supplierRepository.save(supplier)
 
-                val importerClass = Class.forName(supplier.importerClassName)
-                val importer = applicationContext.getBean(importerClass)
-                val importSource = supplier.importSource()
-                val products = (importer as AbstractSheetProcessor).parseProducts(importSource, saved)
-                productRepository.saveAll(products)
+            val importerClass = Class.forName(supplier.importerClassName)
+            val importer = applicationContext.getBean(importerClass)
+            val importSource = supplier.importSource()
+            val products = (importer as AbstractSheetProcessor).parseProducts(importSource, saved)
+            productRepository.saveAll(products)
 
-            }
             LOGGER.info("XXX AFTER: " + supplier.name + "; " + SystemUtils.usedMemory())
         }
+
+
     }
 
     override fun afterPropertiesSet() {

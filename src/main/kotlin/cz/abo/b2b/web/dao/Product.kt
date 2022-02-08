@@ -1,9 +1,9 @@
 package cz.abo.b2b.web.dao
 
+import cz.abo.b2b.web.view.component.ViewUtils
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.persistence.*
 
@@ -80,9 +80,15 @@ class Product {
     @GeneratedValue
     val id: UUID = UUID.randomUUID()
 
-    fun priceVat(quantity: Int):BigDecimal {
+    fun priceVAT(quantity: Int):BigDecimal {
         return priceVAT().multiply(BigDecimal(quantity))
     }
+    fun priceNoVAT(quantity: Int):BigDecimal {
+        return priceNoVAT.multiply(BigDecimal(quantity))
+    }
 
-    fun priceVAT() = priceNoVAT.multiply(BigDecimal(1 + VAT)).setScale(5).stripTrailingZeros()
+    fun priceVAT() : BigDecimal {
+        return priceNoVAT.multiply(BigDecimal(1 + VAT))
+    }
+
 }

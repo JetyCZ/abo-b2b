@@ -53,7 +53,7 @@ public class KServisSheetProcessor extends AbstractExcelSheetProcessor {
                     double itemPrice = Double.parseDouble(priceStr);
 
                     String description = "<b>Hmotnost balení v kg:</b> " + itemQuantityStr + "<br>";
-                    description = "<b>Bez přid. cukru:</b> " + (("X".equals(values[2]))?"Ano":"Ne") + "<br>";
+                    description += "<b>Bez přid. cukru:</b> " + (("X".equals(values[2]))?"Ano":"Ne") + "<br>";
                     description += "<b>Bez SO2:</b> " + (("X".equals(values[3]))?"Ano":"Ne") + "<br>";
                     Product product = new Product(itemName, new BigDecimal(itemPrice), 0.15, description, new BigDecimal(itemQuantity), UnitEnum.KG, null, supplier);
                     productList.add(product);

@@ -28,7 +28,7 @@ class ShoppingCartSupplier(val supplier: Supplier, freeTransportFrom: BigDecimal
                     .multiply(shoppingCartItem.product.quantity)
             )
         }
-        return result.setScale(2, RoundingMode.HALF_UP)
+        return result
     }
 
     fun totalPriceVAT() : BigDecimal {
@@ -42,11 +42,11 @@ class ShoppingCartSupplier(val supplier: Supplier, freeTransportFrom: BigDecimal
                     .multiply(vatMultiplier)
             )
         }
-        return result.setScale(2, RoundingMode.HALF_UP)
+        return result
     }
 
     fun remainingToFreeTransportNoVAT() : BigDecimal {
-        val remaining = supplier.freeTransportFrom.minus(totalPriceNoVAT())
-        return remaining.setScale(2, RoundingMode.HALF_UP)
+        return supplier.freeTransportFrom.minus(totalPriceNoVAT())
     }
+
 }

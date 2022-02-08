@@ -4,18 +4,22 @@ import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.Supplier
 import cz.abo.b2b.web.importer.dto.ImportSource
 import cz.abo.b2b.web.importer.dto.OrderAttachment
+import cz.abo.b2b.web.importer.impl.HeurekaXMLParser
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.openxml4j.opc.OPCPackage
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
 import java.util.ArrayList
 import java.util.stream.Collectors
 
 abstract class AbstractExcelSheetProcessor : AbstractSheetProcessor() {
-
+    companion object {
+        internal val LOGGER = LoggerFactory.getLogger(AbstractExcelSheetProcessor::class.java)
+    }
     override fun parseProducts(importSource: ImportSource, supplier: Supplier): List<Product> {
 
         val sheet = getProductsSheetFromWorkbook(importSource)
@@ -74,13 +78,20 @@ abstract class AbstractExcelSheetProcessor : AbstractSheetProcessor() {
             val rowData: MutableList<String> = ArrayList()
             parseRow(row, formulaEvaluator, rowData)
             if (!rowData.isEmpty()) {
-                val productList = disintegrateIntoProduct(row.rowNum, rowData, supplier)
-                for (product in productList) {
-                    if (product != null) {
-                        allProducts.add(product)
-                        product.rowNum = row.rowNum
+
+                try {
+                    val productList = disintegrateIntoProduct(row.rowNum, rowData, supplier)
+                    for (product in productList) {
+                        if (product != null) {
+                            allProducts.add(product)
+                            product.rowNum = row.rowNum
+                        }
                     }
+                } catch (e: Exception) {
+                    LOGGER.warn("Product from ${row.rowNum} import failed", e)
                 }
+
+
             }
         }
         return allProducts

@@ -2,6 +2,8 @@ package cz.abo.b2b.web.importer
 
 import cz.abo.b2b.web.dao.Supplier
 import cz.abo.b2b.web.importer.xls.processor.*
+import cz.abo.b2b.web.view.component.MathUtils
+import cz.abo.b2b.web.view.component.MathUtils.Companion.withoutVAT
 import org.springframework.stereotype.Component
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -36,19 +38,36 @@ class Suppliers {
                     WolfberrySheetProcessor::class.qualifiedName!!, "objednavky@wolfberry.cz"),
 
                Supplier("Sičaj",
-                   freeTransportFromVatValue(5000), "",
+                   freeTransportFromVatValue(2000), "",
                    "http://www.sicajbezobalu.cz/google.xml",
                     SicajSheetProcessor::class.qualifiedName!!, "petr.sic@post.cz"),
                 Supplier(
                     "bio nebio",
-                    BigDecimal(0.85 * 3000),
+                    freeTransportFromVatValue(3000),
                     "",
                     "/bionebio/OL_bio_nebio_12_2021.xls",
                     BionebioSheetProcessor::class.qualifiedName!!,
                     "objednavky@bionebio.cz"
                 ),
                 Supplier("K-servis", BigDecimal(5000), "", "/k-servis/cenik_srpen.xlsx", KServisSheetProcessor::class.qualifiedName!!, "k-servis@k-servis.com"),
-                Supplier("Oříšek", BigDecimal(5000), "", "/orisek/orisek_01.10.2021.xls", NutSheetProcessor::class.qualifiedName!!, "orisek@orisek.cz")
+                Supplier("Oříšek", BigDecimal(5000), "", "/orisek/orisek_01.10.2021.xls", NutSheetProcessor::class.qualifiedName!!, "orisek@orisek.cz"),
+                Supplier("BIODVŮR Jaroslav Netík", BigDecimal.ZERO, """
+                    Soukromá farma s celkovou výměrou 42 ha, chov skotu. Pěstování a prodej vyloupané pšenice špaldy, žita a bílé hořčice.
+                    Prodej přímo z farmy, po dohodě v Hradci Králové za cenu z farmy. Dovoz při vytížení kg o 3,-Kč dražší (ceny v závorce).
+                    Pan Netík byl vyhlášen nejlepším ekologickým zemědělcem roku 1995.
+                    Rodina Netíkových si peče doma kváskový chléb.""".trimIndent(),
+                    "",
+                    NetikSheetProcessor::class.qualifiedName!!, "jaroslav.netik@email.cz"
+                ),
+
+                Supplier(
+                    "Caltha",
+                    freeTransportFromVatValue(3000),
+                    "",
+                    "/caltha/2021-10_Objednavkovy_formular_CALTHA.xlsx",
+                    CalthaSheetProcessor::class.qualifiedName!!,
+                    "obchod@caltha.cz"
+                ),
 
          )
 
@@ -57,5 +76,5 @@ class Suppliers {
         return result
     }
 
-    private fun freeTransportFromVatValue(freeTransportIncludingVAT: Int) = BigDecimal(freeTransportIncludingVAT).divide(BigDecimal(1.15), 5, RoundingMode.HALF_UP)
+    fun freeTransportFromVatValue(freeTransportIncludingVAT: Int) = withoutVAT(freeTransportIncludingVAT)
 }

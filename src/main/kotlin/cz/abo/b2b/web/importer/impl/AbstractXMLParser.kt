@@ -33,6 +33,6 @@ abstract class AbstractXMLParser {
     }
 
     protected fun vatToNoVat(priceVAT: BigDecimal?, vat: Double) =
-        priceVAT!!.divide(BigDecimal(1 + vat), 5, RoundingMode.HALF_UP)
+        priceVAT!!.divide(BigDecimal(1 + vat), 5, RoundingMode.HALF_UP).stripTrailingZeros()
 
 }
