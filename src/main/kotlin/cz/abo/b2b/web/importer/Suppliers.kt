@@ -62,7 +62,7 @@ class Suppliers {
 
                 Supplier(
                     "Caltha",
-                    freeTransportFromVatValue(3000),
+                    BigDecimal(4000),
                     "",
                     "/caltha/2021-10_Objednavkovy_formular_CALTHA.xlsx",
                     CalthaSheetProcessor::class.qualifiedName!!,

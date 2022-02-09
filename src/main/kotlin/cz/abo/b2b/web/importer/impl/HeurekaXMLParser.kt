@@ -7,6 +7,7 @@ import cz.abo.b2b.web.importer.dto.ImportSource
 import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
@@ -77,7 +78,10 @@ class HeurekaXMLParser : AbstractXMLParser() {
                 if (unit.equals(UnitEnum.KG) && quantity.compareTo(BigDecimal.ONE)<0) {
                     continue;
                 }
-                val priceNoVAT = vatToNoVat(priceVAT, vat)
+                var priceNoVAT = vatToNoVat(priceVAT, vat)
+                if (unit.equals(UnitEnum.KG) && quantity.compareTo(BigDecimal.ONE)>0) {
+                    priceNoVAT = priceNoVAT.divide(quantity, 5, RoundingMode.HALF_UP).stripTrailingZeros();
+                }
                 val product = Product(productName, priceNoVAT, vat, description, quantity, unit, ean, supplier)
                 product.bestBefore = bestBefore
                 result.add(product)
