@@ -6,6 +6,9 @@ import cz.abo.b2b.web.importer.xls.service.ProcessorService
 import java.util.*
 import kotlin.collections.HashMap
 
+/**
+ * Map, where key is id of supplier and value is ShoppingCartSupplier (items bought for one supplier)
+ */
 open class ShoppingCart : HashMap<Long, ShoppingCartSupplier>() {
     fun add(processorService: ProcessorService, product: Product, count: Long, shop: Shop) {
         val shoppingCartSupplier = shoppingCartSupplier(processorService, product, shop)
@@ -16,6 +19,13 @@ open class ShoppingCart : HashMap<Long, ShoppingCartSupplier>() {
         if (newCount!=null) {
             val shoppingCartSupplier = shoppingCartSupplier(processorService, product, shop)
             shoppingCartSupplier.updateCart(product, newCount)
+            var isEmpty = true;
+            for (item in shoppingCartSupplier.values) {
+                if (item.count>0) isEmpty = false;
+            }
+            if (isEmpty) {
+                remove(shoppingCartSupplier.supplier.id)
+            }
         }
     }
 

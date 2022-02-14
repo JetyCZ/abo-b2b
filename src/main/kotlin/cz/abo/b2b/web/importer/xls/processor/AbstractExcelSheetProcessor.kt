@@ -5,6 +5,7 @@ import cz.abo.b2b.web.dao.Supplier
 import cz.abo.b2b.web.importer.dto.ImportSource
 import cz.abo.b2b.web.importer.dto.OrderAttachment
 import cz.abo.b2b.web.importer.impl.HeurekaXMLParser
+import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.openxml4j.opc.OPCPackage
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException
@@ -45,6 +46,8 @@ abstract class AbstractExcelSheetProcessor : AbstractSheetProcessor() {
         for ((product, orderQuantity) in orderedProducts) {
             setOrderQuantityForProduct(orderSheet, product, orderQuantity)
         }
+        HSSFFormulaEvaluator.evaluateAllFormulaCells(workbook)
+
         try {
             parsedExcel.excelFile.close()
         } catch (e: IOException) {

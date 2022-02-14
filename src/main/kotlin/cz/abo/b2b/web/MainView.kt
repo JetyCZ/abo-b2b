@@ -1,5 +1,6 @@
 package cz.abo.b2b.web
 
+import com.vaadin.componentfactory.MultipleSelect
 import com.vaadin.flow.component.ClickEvent
 import com.vaadin.flow.component.Html
 import com.vaadin.flow.component.button.Button
@@ -84,12 +85,32 @@ class MainView(val productRepository: ProductRepository,
         leftColumn.height = null
         workspace.add(leftColumn)
 
+        val filters = HorizontalLayout()
+
         val filter = TextField()
         filter.placeholder = "Filtrovat podle názvu zboží";
         filter.valueChangeMode = ValueChangeMode.EAGER
         filter.addValueChangeListener { e -> listProducts(e.value) }
-        productsColumn.add(filter)
+        filters.add(filter)
 
+        /**
+        val supplierSelect = MultipleSelect<String>()
+        supplierSelect.emptySelectionCaption = "Vyberte dodavatele"
+        supplierSelect.setItems("Option one", "Option two")
+        supplierSelect.setLabel("Label")
+
+        val placeholderSelect: MultipleSelect<String> = MultipleSelect()
+        placeholderSelect.setItems("Option one", "Option two")
+        placeholderSelect.setPlaceholder("Placeholder")
+
+        val valueSelect: MultipleSelect<String> = MultipleSelect()
+        valueSelect.setItems("Value", "Option one", "Option two")
+        valueSelect.setValue("Value")
+
+        add(supplierSelect, placeholderSelect, valueSelect)
+        */
+
+        productsColumn.add(filters)
         buildProductGrid()
 
 
@@ -226,16 +247,20 @@ class MainView(val productRepository: ProductRepository,
         val productColumn = shoppingCartGrid.addComponentColumn { item ->
 
             val product = item.product
+            val orderedUnits = product.quantity.multiply(BigDecimal(item.count));
             val ean = if (!StringUtils.isEmpty(product.ean)) "\nEAN: "  + product.ean else ""
             val supplierCode = if (!StringUtils.isEmpty(product.supplierCode)) "\nKód dodavatele: "  + product.supplierCode else ""
             val bestBefore = if (product.bestBefore!=null) "\nDatum minimální trvanlivost: "  + MainView.dateFormatter.format(product.bestBefore) else ""
-            val rowNum = if (product.rowNum>0) "\nČíslo řádku v ceníku: "  + product.rowNum else ""
+            val rowNum = if (product.rowNum>0) "\nČíslo řádku v Excel ceníku: "  + (product.rowNum+1) else ""
             val description = if (!StringUtils.isEmpty(product.description)) "\nPopis: "  + product.description else ""
             val productNameHtml = StringEscapeUtils.escapeHtml4(product.productName).replace("'", "&#39;")
             val title = """
 Název produktu: ${productNameHtml}
-Cena za ${product.unit.name.lowercase()} bez DPH: ${round(product.priceVAT())}
-Objednáno ${product.unit.name.lowercase()}: ${item.count}
+Cena za ${product.unit.name.lowercase()} bez DPH: ${round(product.priceNoVAT(1))}
+Cena za ${product.unit.name.lowercase()} s DPH: ${round(product.priceVAT())}
+Objednáno balení: ${item.count}
+Velikost balení: ${product.quantity} ${product.unit.name.lowercase()}
+Celkem objednáno: ${orderedUnits} ${product.unit.name.lowercase()}
 Celkem cena bez DPH: ${round(item.totalPriceNoVAT())}
 Celkem cena s DPH: ${round(item.totalPriceVAT())}${ean}${supplierCode}${bestBefore}${rowNum}${description}                
             """.trimIndent()

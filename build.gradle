@@ -40,6 +40,9 @@ configurations {
 
 dependencies {
     implementation('com.vaadin:vaadin-spring-boot-starter')
+
+    implementation 'com.vaadin.componentfactory:multiple-select:3.0.1'
+
     implementation 'org.vaadin.klaudeta:grid-pagination:2.0.10'
 
     implementation("org.springframework.boot:spring-boot-starter-web")
