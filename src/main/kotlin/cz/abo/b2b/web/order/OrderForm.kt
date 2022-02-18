@@ -55,8 +55,8 @@ class OrderForm(val mainView: MainView, val order: Order, val shoppingCart: Shop
         orderFormData.cc = authenticatedDbUser.email
         val shop = authenticatedDbUser.shop
         orderFormData.subject = "Objednávka - " + shop.name
-        val icoLine = if (StringUtils.isEmpty(shop.ico)) "" else "IČO: ${shop.name}\n"
-        val dicLine = if (StringUtils.isEmpty(shop.dic)) "" else "DIČ: ${shop.name}\n"
+        val icoLine = if (StringUtils.isEmpty(shop.ico)) "" else "IČO: ${shop.ico}\n"
+        val dicLine = if (StringUtils.isEmpty(shop.dic)) "" else "DIČ: ${shop.dic}\n"
         val phoneLine = if (StringUtils.isEmpty(authenticatedDbUser.phone)) "" else "Telefon: ${authenticatedDbUser.phone}\b"
         var orderTable = ""
 

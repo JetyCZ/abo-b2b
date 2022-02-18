@@ -1,8 +1,8 @@
 package cz.abo.b2b.web
 
-import com.vaadin.componentfactory.MultipleSelect
 import com.vaadin.flow.component.ClickEvent
 import com.vaadin.flow.component.Html
+import com.vaadin.flow.component.ItemLabelGenerator
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.GridSortOrder
@@ -29,6 +29,8 @@ import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.ProductRepository
+import cz.abo.b2b.web.dao.Supplier
+import cz.abo.b2b.web.dao.SupplierRepository
 import cz.abo.b2b.web.importer.xls.service.ProcessorService
 import cz.abo.b2b.web.order.EmailService
 import cz.abo.b2b.web.order.OrderForm
@@ -42,11 +44,14 @@ import cz.abo.b2b.web.view.component.StyledText
 import cz.abo.b2b.web.view.component.ViewUtils.Companion.round
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.text.StringEscapeUtils
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.access.annotation.Secured
+import org.vaadin.gatanaso.MultiselectComboBox
 import org.vaadin.klaudeta.PaginatedGrid
 import java.math.BigDecimal
 import java.time.format.DateTimeFormatter
 import java.util.*
+import java.util.stream.Collectors
 import javax.annotation.security.PermitAll
 
 
@@ -55,6 +60,7 @@ import javax.annotation.security.PermitAll
 @PageTitle("Asociace Bezobalu - B2B")
 @Secured("USER")
 class MainView(val productRepository: ProductRepository,
+               val supplierRepository: SupplierRepository,
                val shoppingCart: ShoppingCart,
                val securityService: SecurityService,
                val emailService: EmailService,
@@ -65,12 +71,19 @@ class MainView(val productRepository: ProductRepository,
     companion object {
         public val dateFormatter = DateTimeFormatter.ofPattern("dd.MM. yyyy") // 2024-02-24
     }
+
+    @Value("\${vaadin.servlet.productionMode}")
+    val productionMode: String? = null
+
     private val productGrid: PaginatedGrid<Product> = PaginatedGrid(Product::class.java)
 
     private val leftColumn  = VerticalLayout()
     private val productsColumn = VerticalLayout()
     private val orderColumn = VerticalLayout()
     private val orderForm = OrderForm(this, order, shoppingCart)
+    private val productNameFilter = TextField()
+    private val supplierFilterCombo = MultiselectComboBox<Supplier>()
+
     init {
         height = "100%"
         element.style.set("background-color","#FCFFFC")
@@ -87,33 +100,20 @@ class MainView(val productRepository: ProductRepository,
 
         val filters = HorizontalLayout()
 
-        val filter = TextField()
-        filter.placeholder = "Filtrovat podle názvu zboží";
-        filter.valueChangeMode = ValueChangeMode.EAGER
-        filter.addValueChangeListener { e -> listProducts(e.value) }
-        filters.add(filter)
+        productNameFilter.placeholder = "Filtruj dle názvu";
+        productNameFilter.valueChangeMode = ValueChangeMode.EAGER
+        productNameFilter.addValueChangeListener { e -> listProducts() }
+        filters.add(productNameFilter)
 
-        /**
-        val supplierSelect = MultipleSelect<String>()
-        supplierSelect.emptySelectionCaption = "Vyberte dodavatele"
-        supplierSelect.setItems("Option one", "Option two")
-        supplierSelect.setLabel("Label")
-
-        val placeholderSelect: MultipleSelect<String> = MultipleSelect()
-        placeholderSelect.setItems("Option one", "Option two")
-        placeholderSelect.setPlaceholder("Placeholder")
-
-        val valueSelect: MultipleSelect<String> = MultipleSelect()
-        valueSelect.setItems("Value", "Option one", "Option two")
-        valueSelect.setValue("Value")
-
-        add(supplierSelect, placeholderSelect, valueSelect)
-        */
+        var itemLabelGenerator : ItemLabelGenerator<Supplier> = ItemLabelGenerator { s -> s.name }
+        supplierFilterCombo.placeholder = "Filtruj dle dodavatele"
+        supplierFilterCombo.setItems(supplierRepository.findAll())
+        supplierFilterCombo.setItemLabelGenerator(itemLabelGenerator)
+        supplierFilterCombo.addValueChangeListener { event -> listProducts()}
+        filters.add(supplierFilterCombo)
 
         productsColumn.add(filters)
         buildProductGrid()
-
-
 
         refreshProductGrid()
         productsColumn.add(productGrid)
@@ -127,8 +127,8 @@ class MainView(val productRepository: ProductRepository,
         workspace.element.style.set("background-color","#FFFFA0")
         add(workspace)
 
-
 }
+
 
     private fun buildProductGrid() {
         productGrid.removeAllColumns()
@@ -351,11 +351,20 @@ Celkem cena s DPH: ${round(item.totalPriceVAT())}${ean}${supplierCode}${bestBefo
         add(header)
     }
 
-    private fun listProducts(productName: String?) {
-        if (StringUtils.isEmpty(productName)) {
+    private fun listProducts() {
+        val productName = productNameFilter.value
+        val selectedSuppliers = supplierFilterCombo.selectedItems
+        val supplierIds = selectedSuppliers.stream().map { s -> s.id }.collect(Collectors.toList())
+        if (StringUtils.isEmpty(productName) && supplierIds.isEmpty()) {
             productGrid.setItems(productRepository.findAll())
         } else {
-            productGrid.setItems(productRepository.findByProductNameContainingIgnoreCase(productName))
+            val items: List<Product>
+            if (supplierIds.isEmpty()) {
+                items = productRepository.find(productName)
+            } else {
+                items = productRepository.find(productName, supplierIds)
+            }
+            productGrid.setItems(items)
         }
     }
 

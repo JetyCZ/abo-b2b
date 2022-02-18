@@ -51,14 +51,8 @@ class Suppliers {
                 ),
                 Supplier("K-servis", BigDecimal(5000), "", "/k-servis/cenik_srpen.xlsx", KServisSheetProcessor::class.qualifiedName!!, "k-servis@k-servis.com"),
                 Supplier("Oříšek", BigDecimal(5000), "", "/orisek/orisek_01.10.2021.xls", NutSheetProcessor::class.qualifiedName!!, "orisek@orisek.cz"),
-                Supplier("BIODVŮR Jaroslav Netík", BigDecimal.ZERO, """
-                    Soukromá farma s celkovou výměrou 42 ha, chov skotu. Pěstování a prodej vyloupané pšenice špaldy, žita a bílé hořčice.
-                    Prodej přímo z farmy, po dohodě v Hradci Králové za cenu z farmy. Dovoz při vytížení kg o 3,-Kč dražší (ceny v závorce).
-                    Pan Netík byl vyhlášen nejlepším ekologickým zemědělcem roku 1995.
-                    Rodina Netíkových si peče doma kváskový chléb.""".trimIndent(),
-                    "",
-                    NetikSheetProcessor::class.qualifiedName!!, "jaroslav.netik@email.cz"
-                ),
+
+                // Labeta 1500 bez DPH > doprava zdarma
 
                 Supplier(
                     "Caltha",
@@ -67,6 +61,15 @@ class Suppliers {
                     "/caltha/2021-10_Objednavkovy_formular_CALTHA.xlsx",
                     CalthaSheetProcessor::class.qualifiedName!!,
                     "obchod@caltha.cz"
+                ),
+
+                Supplier("BIODVŮR Jaroslav Netík", BigDecimal.ZERO, """
+                    Soukromá farma s celkovou výměrou 42 ha, chov skotu. Pěstování a prodej vyloupané pšenice špaldy, žita a bílé hořčice.
+                    Prodej přímo z farmy, po dohodě v Hradci Králové za cenu z farmy. Dovoz při vytížení kg o 3,-Kč dražší (ceny v závorce).
+                    Pan Netík byl vyhlášen nejlepším ekologickým zemědělcem roku 1995.
+                    Rodina Netíkových si peče doma kváskový chléb.""".trimIndent(),
+                    "",
+                    NetikSheetProcessor::class.qualifiedName!!, "jaroslav.netik@email.cz"
                 ),
 
          )
