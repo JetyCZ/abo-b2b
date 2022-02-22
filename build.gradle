@@ -61,6 +61,7 @@ dependencies {
 
 
     implementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+    implementation ("org.mariadb.jdbc:mariadb-java-client:2.1.2")
 
     // Security
     implementation "org.springframework.security:spring-security-web"
@@ -95,5 +96,5 @@ test {
 }
 
 vaadin {
-   productionMode = false
+   productionMode = true
 }

@@ -1,49 +1,47 @@
 package cz.abo.b2b.web.security
 
 import com.vaadin.flow.component.UI
-import com.vaadin.flow.server.VaadinService
 import com.vaadin.flow.server.VaadinServletRequest
 import cz.abo.b2b.web.dao.Shop
+import cz.abo.b2b.web.dao.ShopRepository
 import cz.abo.b2b.web.dao.User
 import cz.abo.b2b.web.dao.UserRepository
 import cz.abo.b2b.web.security.users.Tarif
-import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler
 import org.springframework.stereotype.Component
 
 
 @Component
-open class SecurityService(val userRepository: UserRepository, val passwordEncoder: PasswordEncoder) {
+open class SecurityService(val userRepository: UserRepository, val shopRepository: ShopRepository, val passwordEncoder: PasswordEncoder) {
 
     companion object {
         private const val LOGOUT_SUCCESS_URL = "/"
 
         @JvmStatic
-        fun testUser(testEmail: String) =
+        fun testUser(testEmail: String, shop: Shop) =
             User(
-                "Pavel", "Jetenský", testEmail, "777045366", Tarif.PROFITABLE, "", "",
-                Shop(
-                    "Krámek bezobalu v Brozanech u Pardubic",
-                    "Brozany 7",
-                    "53352",
-                    "Staré Hradiště",
-                    "04641515",
-                    null,
-                    "50.0648194N, 15.7965928E"
-                )
+                "Pavel", "Jetenský", testEmail, "777045366", Tarif.PROFITABLE, "", "",shop
             )
+
+        private fun testShop() = Shop(
+            "Krámek bezobalu v Brozanech u Pardubic",
+            "Brozany 7",
+            "53352",
+            "Staré Hradiště",
+            "04641515",
+            null,
+            "50.0648194N, 15.7965928E"
+        )
     }
     init {
         val testEmail = "pavel.jetensky@seznam.cz"
         var testUser = userRepository.findByEmail(testEmail)
         if (testUser==null) {
-            testUser = testUser(testEmail)
+            val testShop = testShop()
+            testUser = testUser(testEmail,testShop)
             testUser.passwordHash = passwordEncoder.encode("test")
             userRepository.save(testUser)
         }

@@ -16,8 +16,8 @@ class Shop(
 ) {
 
     @Id
-    @GeneratedValue
-    val id: UUID = UUID.randomUUID()
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long = 0L
 
 
 }

@@ -72,9 +72,6 @@ class MainView(val productRepository: ProductRepository,
         public val dateFormatter = DateTimeFormatter.ofPattern("dd.MM. yyyy") // 2024-02-24
     }
 
-    @Value("\${vaadin.servlet.productionMode}")
-    val productionMode: String? = null
-
     private val productGrid: PaginatedGrid<Product> = PaginatedGrid(Product::class.java)
 
     private val leftColumn  = VerticalLayout()
