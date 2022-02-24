@@ -24,8 +24,8 @@ open class SuppliersImport(
     }
 
     fun importAll() {
-        supplierRepository.deleteAll()
         productRepository.deleteAll()
+        supplierRepository.deleteAll()
 
         val suppliersToImport = suppliers.suppliers()
         for (supplier in suppliersToImport) {

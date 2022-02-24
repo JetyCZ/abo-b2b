@@ -77,8 +77,8 @@ class Product {
     var parseIdx: Int = 0
 
     @Id
-    @GeneratedValue
-    val id: UUID = UUID.randomUUID()
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long = 0L
 
     fun priceVAT(quantity: Int):BigDecimal {
         return priceVAT().multiply(BigDecimal(quantity))

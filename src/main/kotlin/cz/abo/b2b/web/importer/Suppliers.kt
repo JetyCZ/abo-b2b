@@ -71,6 +71,10 @@ class Suppliers {
                     "",
                     NetikSheetProcessor::class.qualifiedName!!, "jaroslav.netik@email.cz"
                 ),
+                Supplier("Daniel Buršík", BigDecimal.ZERO, """Český pěstitel Quinoy""".trimIndent(),
+                    "",
+                    BursikSheetProcessor::class.qualifiedName!!, "Bursik.D@seznam.cz"
+                ),
 
          )
 

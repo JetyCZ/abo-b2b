@@ -131,7 +131,7 @@ class RegistrationForm(
         binder.forField(email)
             .withValidator(EmailValidator("Prosím zadejte platnou e-mailovou adresu"))
             .bind("email")
-        binder.forField(email)
+        binder.forField(phone)
             .withValidator(StringLengthValidator("Telefon nesmí být prázdný a musí mít alespoň 9 znaků", 9, null))
             .bind("phone")
         binder.forField(tarif).bind("tarif")
