@@ -75,7 +75,7 @@ class OrderForm(val mainView: MainView, val order: Order, val shoppingCart: Shop
                 priceNoVAT.multiply(product.quantity).multiply(shoppingCartItem.count.toBigDecimal()).toPlainString() + "\t"
         }
         orderFormData.message = """
-Dobrý den, do našeho krámku objednáváme zboží (v příloze).
+Dobrý den, do našeho krámku objednávám zboží (v příloze).
 
 Odběratel:
     ${shop.name}
@@ -90,6 +90,10 @@ Adresa dodání:
 Kontaktní osoba:
     ${authenticatedDbUser.firstname} ${authenticatedDbUser.lastname}
     ${phoneLine}Email: ${authenticatedDbUser.email}
+
+Děkuji
+S pozdravem
+${authenticatedDbUser.firstname} ${authenticatedDbUser.lastname}
     """
         downloadAnchor.removeAll()
         downloadAnchor.add(Span(orderAttachmentFileName))
