@@ -8,9 +8,8 @@ class BionebioSheetProcessorTest extends AbstractSheetProcessorTest {
 
     @Override
     protected String getPricelistResourcePath() {
-        return  "/bionebio/OL_bio_nebio_11_2021.xls"
+        return  "/bionebio/OL_bio_nebio_05_2022.xls"
     }
-
     def "IterateSheetValues"() {
         def f = resourceFilePath(getPricelistResourcePath())
 
@@ -24,17 +23,20 @@ class BionebioSheetProcessorTest extends AbstractSheetProcessorTest {
         item1.VAT == 0.15
         item1.unit == UnitEnum.KG
         item1.priceNoVAT == 31.7
+
         def item2 = items["Přírodní třtinový cukr SUROVÝ bio*nebio_4"]
         item2.quantity == 4
         item2.VAT == 0.15
         item2.unit == UnitEnum.KG
-        item2.priceNoVAT == 112/4
+        item2.priceNoVAT == 118/4
 
         def item3 = items["Bio kypřící prášek z vinného kamene bio*nebio_4"]
         item3.quantity == 4
         item3.VAT == 0.15
         item2.unit == UnitEnum.KG
-        item3.priceNoVAT == 545/4
+        item3.priceNoVAT == 856/4
+
+
 
 
     }

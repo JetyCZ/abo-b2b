@@ -33,6 +33,7 @@ open class SupplierJdbcRepositoryTest()  {
     @BeforeEach
     fun before() {
         supplierJdbcRepository = SupplierJdbcRepository(jdbcTemplate)
+        supplierRepository.deleteAll()
     }
 
 

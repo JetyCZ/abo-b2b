@@ -45,7 +45,7 @@ class Suppliers {
                     "bio nebio",
                     freeTransportFromVatValue(3000),
                     "",
-                    "/bionebio/OL_bio_nebio_12_2021.xls",
+                    "/bionebio/OL_bio_nebio_05_2022.xls",
                     BionebioSheetProcessor::class.qualifiedName!!,
                     "objednavky@bionebio.cz"
                 ),

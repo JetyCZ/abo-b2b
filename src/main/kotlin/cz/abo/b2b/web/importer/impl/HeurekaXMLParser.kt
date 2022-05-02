@@ -16,7 +16,7 @@ import java.util.regex.Pattern
 class HeurekaXMLParser : AbstractXMLParser() {
 
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd") // 2024-02-24
-    val productNamePattern = Pattern.compile("^.*(?<quantity>\\d+)\\skg(\\s|$).*")
+    val productNamePattern = Pattern.compile("^.*?(?<quantity>[\\s\\d+\\.\\,]+)\\skg(\\s|$).*")
 
     fun parseStream(importSource: ImportSource, supplier: Supplier): MutableList<Product> {
         val root = parseToXMLDocument(importSource)
@@ -46,7 +46,10 @@ class HeurekaXMLParser : AbstractXMLParser() {
                         try {
                             val matcher = productNamePattern.matcher(productName)
                             if (matcher.matches()) {
-                                quantity = matcher.group("quantity").toBigDecimal()
+                                quantity = matcher.group("quantity")
+                                    .replace(",", ".")
+                                    .replace(" ", "")
+                                    .toBigDecimal()
                                 unit = UnitEnum.KG
                             }
                         } catch (e: Exception) {
