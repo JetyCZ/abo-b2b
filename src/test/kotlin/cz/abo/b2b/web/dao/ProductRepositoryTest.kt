@@ -13,7 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import java.math.BigDecimal
 
 @SpringBootTest(classes = [JdbcDaoSpringConfig::class])
-@AutoConfigureTestDatabase
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @AutoConfigureDataJpa
 open class ProductRepositoryTest()  {
 
@@ -30,11 +30,11 @@ open class ProductRepositoryTest()  {
     fun supplierDetails() {
         val wolfberry = supplierRepository.save(
             Supplier(
-                "Wolfberry", BigDecimal(2000), "", "http://cup.wolfberry.cz/xml-export/bezobalu_cz.xml",
+                "Wolfberry", BigDecimal(2000), ArrayList(), "", "http://cup.wolfberry.cz/xml-export/bezobalu_cz.xml",
                 WolfberrySheetProcessor::class.qualifiedName!!, "objednavky@wolfberry.cz"
             )
         )
-        val netik = Supplier("BIODVŮR Jaroslav Netík", BigDecimal.ZERO, "","",
+        val netik = Supplier("BIODVŮR Jaroslav Netík", BigDecimal.ZERO, ArrayList(),"","",
             NetikSheetProcessor::class.qualifiedName!!, "jaroslav.netik@email.cz"
         )
         supplierRepository.saveAll(

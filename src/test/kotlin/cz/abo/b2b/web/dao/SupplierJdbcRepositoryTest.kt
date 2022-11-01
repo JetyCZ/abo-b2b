@@ -14,7 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import java.math.BigDecimal
 
 @SpringBootTest(classes = [JdbcDaoSpringConfig::class])
-@AutoConfigureTestDatabase
+@AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
 @AutoConfigureDataJpa
 open class SupplierJdbcRepositoryTest()  {
 
@@ -33,17 +33,19 @@ open class SupplierJdbcRepositoryTest()  {
     @BeforeEach
     fun before() {
         supplierJdbcRepository = SupplierJdbcRepository(jdbcTemplate)
+        productRepository.deleteAll()
         supplierRepository.deleteAll()
     }
 
 
     @Test
     fun supplierDetails() {
+        val supplier = Supplier(
+            "Wolfberry", BigDecimal(2000), ArrayList(), "", "http://cup.wolfberry.cz/xml-export/bezobalu_cz.xml",
+            WolfberrySheetProcessor::class.qualifiedName!!, "objednavky@wolfberry.cz"
+        )
         val saved = supplierRepository.save(
-            Supplier(
-                "Wolfberry", BigDecimal(2000), "", "http://cup.wolfberry.cz/xml-export/bezobalu_cz.xml",
-                WolfberrySheetProcessor::class.qualifiedName!!, "objednavky@wolfberry.cz"
-            )
+            supplier
         )
         productRepository.save(
             Product("aaa", BigDecimal(0.15), 0.15, "",BigDecimal(0), UnitEnum.KG, "EAN", saved )

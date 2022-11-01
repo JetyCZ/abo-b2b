@@ -22,7 +22,7 @@ internal class GoogleParserTest {
         val supplier = Supplier(
             "Test",
             BigDecimal(1000),
-            "",
+            ArrayList(),"",
             "https://www.probio.cz/data/product-feed/probio/8re6tf8erd5ordd23c7f59a63.xml",
             "",
             ""

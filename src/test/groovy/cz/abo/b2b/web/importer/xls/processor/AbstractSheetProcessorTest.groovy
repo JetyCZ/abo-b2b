@@ -5,12 +5,13 @@ import cz.abo.b2b.web.dao.Supplier
 import org.apache.commons.io.FileUtils
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
+import org.assertj.core.util.Lists
 import spock.lang.Specification
 
 import static cz.abo.b2b.web.importer.dto.ImportSource.fromFile;
 
 abstract class AbstractSheetProcessorTest extends Specification{
-    def testSupplier = new Supplier("test",BigDecimal.ZERO, "","","","" )
+    def testSupplier = new Supplier("test",BigDecimal.ZERO, Lists.emptyList(), "","","","" )
     protected Sheet fillWriteAndReadSheet(AbstractSheetProcessor processor, Integer additionalParsedIdx = null) {
         def sheetRead
         def filePath = getPricelistResourcePath()

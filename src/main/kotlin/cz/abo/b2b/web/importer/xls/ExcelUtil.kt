@@ -27,8 +27,7 @@ class ExcelUtil {
                     } else if (cellContent is String) {
                         newCell.setCellValue(cellContent)
                     } else {
-                        if (cellContent!=null)
-                            newCell.setCellValue(cellContent.toString())
+                        newCell.setCellValue(cellContent.toString())
                     }
                 }
             }

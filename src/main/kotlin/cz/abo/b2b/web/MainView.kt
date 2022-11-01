@@ -99,14 +99,14 @@ class MainView(val productRepository: ProductRepository,
 
         productNameFilter.placeholder = "Filtruj dle názvu";
         productNameFilter.valueChangeMode = ValueChangeMode.EAGER
-        productNameFilter.addValueChangeListener { e -> listProducts() }
+        productNameFilter.addValueChangeListener { _ -> listProducts() }
         filters.add(productNameFilter)
 
         var itemLabelGenerator : ItemLabelGenerator<Supplier> = ItemLabelGenerator { s -> s.name }
         supplierFilterCombo.placeholder = "Filtruj dle dodavatele"
         supplierFilterCombo.setItems(supplierRepository.findAll())
         supplierFilterCombo.setItemLabelGenerator(itemLabelGenerator)
-        supplierFilterCombo.addValueChangeListener { event -> listProducts()}
+        supplierFilterCombo.addValueChangeListener { _ -> listProducts()}
         filters.add(supplierFilterCombo)
 
         productsColumn.add(filters)
@@ -331,7 +331,7 @@ Celkem cena s DPH: ${round(item.totalPriceVAT())}${ean}${supplierCode}${bestBefo
         if (securityService.authenticatedUser() != null) {
             val logoutButton = Button(
                 "Odhlásit"
-            ) { click: ClickEvent<Button?>? -> securityService.logout() }
+            ) { _: ClickEvent<Button?>? -> securityService.logout() }
             topMenu = HorizontalLayout(tabs, logoutButton)
         } else {
             topMenu = HorizontalLayout(tabs)

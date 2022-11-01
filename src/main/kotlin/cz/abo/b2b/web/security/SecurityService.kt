@@ -31,7 +31,7 @@ open class SecurityService(val userRepository: UserRepository, val shopRepositor
             "Brozany 7",
             "53352",
             "Staré Hradiště",
-            "04641515",
+            "06758622",
             null,
             "50.0648194N, 15.7965928E"
         )

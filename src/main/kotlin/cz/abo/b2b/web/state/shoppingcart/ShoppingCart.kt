@@ -30,12 +30,12 @@ open class ShoppingCart : HashMap<Long, ShoppingCartSupplier>() {
     }
 
     private fun shoppingCartSupplier(processorService: ProcessorService, product: Product, shop: Shop): ShoppingCartSupplier {
-        val shoppingCartSupplier = computeIfAbsent(product.supplier.id) {
-            val supplierProcessor = processorService.selectProcessor(product.supplier)
-            val freeTransportFrom = supplierProcessor.freeTransportFrom(product.supplier, shop)
-            ShoppingCartSupplier(product.supplier, freeTransportFrom)
+        val shoppingCartSupplier = computeIfAbsent(product.supplier!!.id) {
+            val supplierProcessor = processorService.selectProcessor(product.supplier!!)
+            val freeTransportFrom = supplierProcessor.freeTransportFrom(product.supplier!!, shop)
+            ShoppingCartSupplier(product.supplier!!, freeTransportFrom)
         }
-        put(product.supplier.id, shoppingCartSupplier)
+        put(product.supplier!!.id, shoppingCartSupplier)
         return shoppingCartSupplier
     }
 }

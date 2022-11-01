@@ -4,10 +4,7 @@ import cz.abo.b2b.web.importer.dto.ImportSource
 import cz.abo.b2b.web.importer.dto.ImportSourceType
 import java.math.BigDecimal
 import java.util.*
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity
 class Supplier(
@@ -19,6 +16,12 @@ class Supplier(
      */
     var freeTransportFrom: BigDecimal,
 
+    @OneToMany(
+        cascade = [CascadeType.ALL],
+        orphanRemoval = true
+    )
+    var products: MutableList<Product> = ArrayList(),
+
     @Column(columnDefinition = "LONGTEXT")
     var description: String?,
     var importUrl: String,
@@ -28,7 +31,7 @@ class Supplier(
 
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "supplier_seq")
     val id: Long = 0
 
     fun importSource() : ImportSource{
@@ -43,5 +46,15 @@ class Supplier(
                 ImportSourceType.CLASSPATH_RESOURCE
             )
         }
+    }
+
+    fun addProduct(product: Product) {
+        products.add(product)
+        product.supplier = this
+    }
+
+    fun removeProduct(product: Product) {
+        products.remove(product)
+        product.supplier = null
     }
 }

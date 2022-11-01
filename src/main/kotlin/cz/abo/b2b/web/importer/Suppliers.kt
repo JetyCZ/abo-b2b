@@ -1,5 +1,6 @@
 package cz.abo.b2b.web.importer
 
+import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.Supplier
 import cz.abo.b2b.web.importer.xls.processor.*
 import cz.abo.b2b.web.view.component.MathUtils
@@ -19,6 +20,7 @@ class Suppliers {
 
             listOf(
                 Supplier("Diana", freeTransportFromVatValue(6000),
+                    ArrayList(),
                     "Nejširší výběr sušeného a lyofilizovaného ovoce, ořechů," +
                             " super-potravin, semínek, sušeného ovoce a ořechů v polevách, " +
                             "ale i cukrovinek, želé a lékořice doručíme nyní až k Vám domů! " +
@@ -31,39 +33,39 @@ class Suppliers {
                     DianaSheetProcessor::class.qualifiedName!!,
                     "diana.company@diana-company.cz"),
 
-                Supplier("PROBIO", BigDecimal(2500), "", "https://www.probio.cz/data/product-feed/probio/8re6tf8erd5ordd23c7f59a63.xml",
+                Supplier("PROBIO", BigDecimal(2500), ArrayList(),"", "https://www.probio.cz/data/product-feed/probio/8re6tf8erd5ordd23c7f59a63.xml",
                     ProbioSheetProcessor::class.qualifiedName!!, "objednavky@probio.cz"),
 
-                Supplier("Wolfberry", BigDecimal(2000), "", "http://cup.wolfberry.cz/xml-export/bezobalu_cz.xml",
+                Supplier("Wolfberry", BigDecimal(2000), ArrayList(), "", "http://cup.wolfberry.cz/xml-export/bezobalu_cz.xml",
                     WolfberrySheetProcessor::class.qualifiedName!!, "objednavky@wolfberry.cz"),
 
                Supplier("Sičaj",
-                   freeTransportFromVatValue(2000), "",
+                   freeTransportFromVatValue(2000), ArrayList(), "",
                    "http://www.sicajbezobalu.cz/google.xml",
                     SicajSheetProcessor::class.qualifiedName!!, "petr.sic@post.cz"),
                 Supplier(
                     "bio nebio",
                     freeTransportFromVatValue(3000),
-                    "",
+                    ArrayList(),"",
                     "/bionebio/OL_bio_nebio_05_2022.xls",
                     BionebioSheetProcessor::class.qualifiedName!!,
                     "objednavky@bionebio.cz"
                 ),
-                Supplier("K-servis", BigDecimal(5000), "", "/k-servis/cenik_srpen.xlsx", KServisSheetProcessor::class.qualifiedName!!, "k-servis@k-servis.com"),
-                Supplier("Oříšek", BigDecimal(5000), "", "/orisek/orisek_01.10.2021.xls", NutSheetProcessor::class.qualifiedName!!, "orisek@orisek.cz"),
+                Supplier("K-servis", BigDecimal(5000), ArrayList(),"", "/k-servis/cenik_srpen.xlsx", KServisSheetProcessor::class.qualifiedName!!, "k-servis@k-servis.com"),
+                Supplier("Oříšek", BigDecimal(5000),ArrayList(), "", "/orisek/orisek_01.10.2021.xls", NutSheetProcessor::class.qualifiedName!!, "orisek@orisek.cz"),
 
                 // Labeta 1500 bez DPH > doprava zdarma
 
                 Supplier(
                     "Caltha",
                     BigDecimal(4000),
-                    "",
+                    ArrayList(),"",
                     "/caltha/2021-10_Objednavkovy_formular_CALTHA.xlsx",
                     CalthaSheetProcessor::class.qualifiedName!!,
                     "obchod@caltha.cz"
                 ),
 
-                Supplier("BIODVŮR Jaroslav Netík", BigDecimal.ZERO, """
+                Supplier("BIODVŮR Jaroslav Netík", BigDecimal.ZERO, ArrayList(), """
                     Soukromá farma s celkovou výměrou 42 ha, chov skotu. Pěstování a prodej vyloupané pšenice špaldy, žita a bílé hořčice.
                     Prodej přímo z farmy, po dohodě v Hradci Králové za cenu z farmy. Dovoz při vytížení kg o 3,-Kč dražší (ceny v závorce).
                     Pan Netík byl vyhlášen nejlepším ekologickým zemědělcem roku 1995.
@@ -71,7 +73,7 @@ class Suppliers {
                     "",
                     NetikSheetProcessor::class.qualifiedName!!, "jaroslav.netik@email.cz"
                 ),
-                Supplier("Daniel Buršík", BigDecimal.ZERO, """Český pěstitel Quinoy""".trimIndent(),
+                Supplier("Daniel Buršík", BigDecimal.ZERO, ArrayList(), """Český pěstitel Quinoy""".trimIndent(),
                     "",
                     BursikSheetProcessor::class.qualifiedName!!, "Bursik.D@seznam.cz"
                 ),

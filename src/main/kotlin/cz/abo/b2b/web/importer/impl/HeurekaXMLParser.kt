@@ -69,9 +69,7 @@ class HeurekaXMLParser : AbstractXMLParser() {
                         priceVAT = BigDecimal(priceVatStr.toDouble())
                     } else if ("VAT" == nodeName) {
                         var vatStr = shopItemChild.firstChild.nodeValue
-                        if (vat != null) {
-                            vat = vatStr.replace("%", "").toDouble() * 0.01
-                        }
+                        vat = vatStr.replace("%", "").toDouble() * 0.01
                     } else if ("EAN" == nodeName) {
                         if (shopItemChild.firstChild!=null) {
                             ean = shopItemChild.firstChild.nodeValue

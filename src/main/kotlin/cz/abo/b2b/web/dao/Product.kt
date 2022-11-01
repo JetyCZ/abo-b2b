@@ -1,14 +1,14 @@
 package cz.abo.b2b.web.dao
 
-import cz.abo.b2b.web.view.component.ViewUtils
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
-import java.util.*
 import javax.persistence.*
+
 
 @Entity
 class Product {
+
     constructor(
         productName: String,
 
@@ -69,15 +69,18 @@ class Product {
     var unit: UnitEnum
     var ean: String?
 
-    @ManyToOne
-    var supplier: Supplier
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    var supplier: Supplier? = null
 
     var rowNum: Int = 0
     var bestBefore: LocalDate? = null
     var parseIdx: Int = 0
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_seq")
+    @SequenceGenerator(name = "product_seq",
+        initialValue = 1, allocationSize = 50)
     var id: Long = 0L
 
     fun priceVAT(quantity: Int):BigDecimal {
