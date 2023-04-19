@@ -74,7 +74,8 @@ public class ProcessorService {
         ShoppingCartSupplier shoppingCartSupplier = shoppingCart.get(supplierId);
         for (ShoppingCartItem shoppingCartItem : shoppingCartSupplier.values()) {
             Integer count = (int) shoppingCartItem.getCount();
-            orderedProducts.put(shoppingCartItem.getProduct(), count);
+            if (count>0)
+                orderedProducts.put(shoppingCartItem.getProduct(), count);
         }
 
         Workbook workbook = abstractSheetProcessor.fillOrder(new File(outputFilename), orderedProducts).getWorkbook();

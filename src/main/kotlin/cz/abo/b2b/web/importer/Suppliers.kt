@@ -19,6 +19,10 @@ class Suppliers {
         result.addAll(
 
             listOf(
+               // Supplier("Zelenina Rokytno", BigDecimal(500), ArrayList(),"", "1wp91zLLQBmJs_IpNXlVoSK3tAmGlJ7X3tFsA_TJPnj4",
+               //     ProbioSheetProcessor::class.qualifiedName!!, "objednavky@probio.cz"),
+
+
                 Supplier("Diana", freeTransportFromVatValue(6000),
                     ArrayList(),
                     "Nejširší výběr sušeného a lyofilizovaného ovoce, ořechů," +
@@ -33,7 +37,7 @@ class Suppliers {
                     DianaSheetProcessor::class.qualifiedName!!,
                     "diana.company@diana-company.cz"),
 
-                Supplier("PROBIO", BigDecimal(2500), ArrayList(),"", "https://www.probio.cz/data/product-feed/probio/8re6tf8erd5ordd23c7f59a63.xml",
+                Supplier("PROBIO(ONLY THEIR EXCEL)", BigDecimal(2500), ArrayList(),"", "https://www.probio.cz/data/product-feed/probio/8re6tf8erd5ordd23c7f59a63.xml",
                     ProbioSheetProcessor::class.qualifiedName!!, "objednavky@probio.cz"),
 
                 Supplier("Wolfberry", BigDecimal(2000), ArrayList(), "", "http://cup.wolfberry.cz/xml-export/bezobalu_cz.xml",
@@ -45,7 +49,7 @@ class Suppliers {
                     SicajSheetProcessor::class.qualifiedName!!, "petr.sic@post.cz"),
                 Supplier(
                     "bio nebio",
-                    freeTransportFromVatValue(3000),
+                    freeTransportFromVatValue(4025),
                     ArrayList(),"",
                     "/bionebio/OL_bio_nebio_05_2022.xls",
                     BionebioSheetProcessor::class.qualifiedName!!,
