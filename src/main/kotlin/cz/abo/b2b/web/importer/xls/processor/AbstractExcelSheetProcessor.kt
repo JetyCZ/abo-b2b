@@ -149,7 +149,7 @@ abstract class AbstractExcelSheetProcessor : AbstractSheetProcessor() {
         get() = null
 
     open fun sheetIndexIfNameFails(): Int? {
-        return null
+        return 0
     }
 
     fun isRowEmpty(row: Row): Boolean {

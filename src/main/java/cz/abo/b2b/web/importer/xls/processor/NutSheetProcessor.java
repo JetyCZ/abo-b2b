@@ -3,6 +3,7 @@ package cz.abo.b2b.web.importer.xls.processor;
 import cz.abo.b2b.web.dao.Product;
 import cz.abo.b2b.web.dao.Supplier;
 import cz.abo.b2b.web.dao.UnitEnum;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
@@ -41,16 +42,26 @@ public class NutSheetProcessor extends AbstractExcelSheetProcessor {
     }
 
     private void parseOneItem(String[] values, List<Product> productList, Supplier supplier) {
-        String quantityStr = values[2];
+        String quantityStr = values[4].replaceAll(" ","");
         try {
-            double productQuantityKg = Double.parseDouble(quantityStr);
+            quantityStr = values[4].replaceAll(" ","");
+            double productQuantityKg;
+            if (quantityStr.contains("(")) {
+                String productQuantityKgStr = StringUtils.substringBefore(quantityStr, "(");
+                productQuantityKg = Double.parseDouble(productQuantityKgStr);
+            } else {
+                productQuantityKg = Double.parseDouble(quantityStr);
+            }
             String productName = values[1];
-            double productPrice = Double.parseDouble(values[3]);
-            double vat = (Double.parseDouble(values[4]));
+            double productPrice = Double.parseDouble(values[5]);
+            double vat = 0.15;
 
-            Product product = new Product(productName, new BigDecimal(productPrice), vat, "",
+            String description = "Balení: " + quantityStr + "\n"
+                    + "Bez přid. cukru: " + values[2] + "\n"
+                    + "Bez SO2: " + values[3];
+
+            Product product = new Product(productName, new BigDecimal(productPrice), vat, description,
                     new BigDecimal(productQuantityKg), UnitEnum.KG, null, supplier);
-
             productList.add(product);
         } catch (NumberFormatException e) {
             LOGGER.warn("Item was not created, because of non numeric value " + quantityStr +

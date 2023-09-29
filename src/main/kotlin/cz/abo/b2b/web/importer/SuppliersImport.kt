@@ -29,16 +29,19 @@ open class SuppliersImport(
 
         val suppliersToImport = suppliers.suppliers()
         for (supplier in suppliersToImport) {
-            LOGGER.info("XXX BEFORE: " + supplier.name + "; " + SystemUtils.usedMemory())
             val saved = supplierRepository.save(supplier)
 
             val importerClass = Class.forName(supplier.importerClassName)
             val importer = applicationContext.getBean(importerClass)
             val importSource = supplier.importSource()
-            val products = (importer as AbstractSheetProcessor).parseProducts(importSource, saved)
-            productRepository.saveAll(products)
+            try {
+                val products = (importer as AbstractSheetProcessor).parseProducts(importSource, saved)
+                productRepository.saveAll(products)
+                LOGGER.info("XXX Import ok: " + products.size)
 
-            LOGGER.info("XXX AFTER: " + supplier.name + "; " + SystemUtils.usedMemory())
+            } catch (e: Exception) {
+                LOGGER.error("XXX Import failed: " + supplier.name, e)
+            }
         }
 
 

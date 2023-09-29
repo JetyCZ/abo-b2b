@@ -1,0 +1,7 @@
+#Run sudo mysqld --user=root
+CREATE DATABASE b2b;
+CREATE USER 'b2b'@'localhost' IDENTIFIED BY 'bZelvaSamaLeta';
+GRANT ALL PRIVILEGES ON *.* TO 'b2b'@localhost IDENTIFIED BY 'bZelvaSamaLeta'
+
+
+

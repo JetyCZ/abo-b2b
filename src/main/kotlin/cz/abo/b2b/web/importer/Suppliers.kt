@@ -48,15 +48,15 @@ class Suppliers {
                    "http://www.sicajbezobalu.cz/google.xml",
                     SicajSheetProcessor::class.qualifiedName!!, "petr.sic@post.cz"),
                 Supplier(
-                    "bio nebio",
+                    "bio nebio (USE e-shop)",
                     freeTransportFromVatValue(4025),
                     ArrayList(),"",
-                    "/bionebio/OL_bio_nebio_05_2022.xls",
+                    "/bionebio/OL_bio nebio_08_2023.xlsx",
                     BionebioSheetProcessor::class.qualifiedName!!,
                     "objednavky@bionebio.cz"
                 ),
-                Supplier("K-servis", BigDecimal(5000), ArrayList(),"", "/k-servis/cenik_srpen.xlsx", KServisSheetProcessor::class.qualifiedName!!, "k-servis@k-servis.com"),
-                Supplier("Oříšek", BigDecimal(5000),ArrayList(), "", "/orisek/orisek_01.10.2021.xls", NutSheetProcessor::class.qualifiedName!!, "orisek@orisek.cz"),
+                Supplier("K-servis", BigDecimal(5000), ArrayList(),"", "/k-servis/k-servis_cenik_cervenec2023.xlsx", KServisSheetProcessor::class.qualifiedName!!, "k-servis@k-servis.com"),
+                Supplier("Oříšek", BigDecimal(5000),ArrayList(), "", "/orisek/orisek_07.2023.xlsx", NutSheetProcessor::class.qualifiedName!!, "orisek@orisek.cz"),
 
                 // Labeta 1500 bez DPH > doprava zdarma
 
