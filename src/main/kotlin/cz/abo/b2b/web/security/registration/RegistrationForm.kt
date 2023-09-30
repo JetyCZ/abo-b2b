@@ -96,14 +96,14 @@ class RegistrationForm(
                 ResponsiveStep("0", 1, ResponsiveStep.LabelsPosition.TOP),
                 ResponsiveStep("490px", 2, ResponsiveStep.LabelsPosition.TOP)
             )
-        val h2 = H2("Registrace nového uživatele")
-        setColspan(h2, 2)
-        add(h2)
-        addUserInputs()
-        addShopInputs()
-        add(submitButton)
-        setColspan(submitButton, 2)
-        binder.readBean(userDetails)
+            val h2 = H2("Registrace nového uživatele")
+            setColspan(h2, 2)
+            add(h2)
+            addUserInputs()
+            addShopInputs()
+            add(submitButton)
+            setColspan(submitButton, 2)
+            binder.readBean(userDetails)
         }
 
     private fun addUserInputs() {

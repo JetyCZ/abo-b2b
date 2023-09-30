@@ -37,6 +37,7 @@ class OrderForm(val mainView: MainView, val order: Order, val shoppingCart: Shop
             mainView.cancelOrder()
         }
         buttonSend.addClickListener {
+            orderFormBinder.writeBean(orderFormData)
             mainView.sendOrder(orderFormData)
         }
         downloadAnchor.setTarget("_new")
