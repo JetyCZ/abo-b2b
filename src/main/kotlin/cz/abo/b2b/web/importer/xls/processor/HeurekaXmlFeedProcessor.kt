@@ -2,17 +2,11 @@ package cz.abo.b2b.web.importer.xls.processor
 
 import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.Supplier
-import cz.abo.b2b.web.importer.xls.processor.AbstractSheetProcessor
-import java.math.BigDecimal
-import cz.abo.b2b.web.dao.UnitEnum
 import cz.abo.b2b.web.importer.dto.ImportSource
 import cz.abo.b2b.web.importer.dto.OrderAttachment
-import cz.abo.b2b.web.importer.xls.ExcelUtil
 import cz.abo.b2b.web.importer.xls.ExcelUtil.Companion.createHeaderRow
 import cz.abo.b2b.web.importer.xls.ExcelUtil.Companion.createRows
 import cz.abo.b2b.web.view.component.ViewUtils.Companion.round
-import org.apache.commons.lang3.StringUtils
-import org.apache.poi.xssf.usermodel.XSSFFont
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.stereotype.Component
 import java.io.File
@@ -23,7 +17,7 @@ import kotlin.collections.ArrayList
  * @author Tomas Kodym
  */
 @Component
-class ProbioSheetProcessor() : AbstractSheetProcessor() {
+class HeurekaXmlFeedProcessor() : AbstractSheetProcessor() {
 
     override fun parseProducts(importSource: ImportSource, supplier: Supplier): List<Product> {
         return heurekaXMLParser.parseStream(importSource, supplier)

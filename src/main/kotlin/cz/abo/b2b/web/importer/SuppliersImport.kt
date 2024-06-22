@@ -9,7 +9,9 @@ import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.context.ApplicationContext
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 
 @Component
 open class SuppliersImport(
@@ -23,6 +25,7 @@ open class SuppliersImport(
         val LOGGER = LoggerFactory.getLogger(SuppliersImport::class.java)
     }
 
+    @Scheduled(cron = "0 0 4 * * ?")
     fun importAll() {
         productRepository.deleteAll()
         supplierRepository.deleteAll()
@@ -38,7 +41,7 @@ open class SuppliersImport(
                 val products = (importer as AbstractSheetProcessor).parseProducts(importSource, saved)
                 productRepository.saveAll(products)
                 LOGGER.info("XXX Import ok: " + products.size)
-
+                supplier.lastImport = LocalDateTime.now()
             } catch (e: Exception) {
                 LOGGER.error("XXX Import failed: " + supplier.name, e)
             }

@@ -35,7 +35,7 @@ class HeurekaXMLParser : AbstractXMLParser() {
                 var vat = 0.15
                 var ean: String? = null
                 var unit = UnitEnum.KS
-                for (j in 1 until shopItemChildrenCount) {
+                for (j in 0 until shopItemChildrenCount) {
                     val shopItemChild = shopItemChildren.item(j)
                     if (shopItemChild.firstChild==null || StringUtils.isEmpty(shopItemChild.firstChild.nodeValue)) {
                         continue;

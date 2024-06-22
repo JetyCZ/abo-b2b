@@ -1,16 +1,14 @@
 package cz.abo.b2b.web.importer
 
-import cz.abo.b2b.web.dao.Product
 import cz.abo.b2b.web.dao.Supplier
 import cz.abo.b2b.web.importer.xls.processor.*
-import cz.abo.b2b.web.view.component.MathUtils
 import cz.abo.b2b.web.view.component.MathUtils.Companion.withoutVAT
 import org.springframework.stereotype.Component
 import java.math.BigDecimal
-import java.math.RoundingMode
 
 @Component
 class Suppliers {
+
 
     @Throws(Exception::class)
     fun suppliers(): List<Supplier> {
@@ -37,8 +35,15 @@ class Suppliers {
                     DianaSheetProcessor::class.qualifiedName!!,
                     "diana.company@diana-company.cz"),
 
+                Supplier("Svět plodů", freeTransportFromVatValue(9999),
+                    ArrayList(),
+                    "Prémiové ořechy a sušené ovoce bez síření a přidaného cukru. Ochutnejte.",
+                    "https://www.svetplodu.cz/feed/30/dc167ad430082a86a5ab492d25acb1b6b2f05231",
+                    HeurekaXmlFeedProcessor::class.qualifiedName!!,
+                    "VOobjednavka@svetplodu.cz"),
+
                 Supplier("PROBIO(ONLY THEIR EXCEL)", BigDecimal(2500), ArrayList(),"", "https://www.probio.cz/data/product-feed/probio/8re6tf8erd5ordd23c7f59a63.xml",
-                    ProbioSheetProcessor::class.qualifiedName!!, "objednavky@probio.cz"),
+                    HeurekaXmlFeedProcessor::class.qualifiedName!!, "objednavky@probio.cz"),
 
                 Supplier("Wolfberry", BigDecimal(2000), ArrayList(), "", "http://cup.wolfberry.cz/xml-export/bezobalu_cz.xml",
                     WolfberrySheetProcessor::class.qualifiedName!!, "objednavky@wolfberry.cz"),
@@ -51,12 +56,13 @@ class Suppliers {
                     "bio nebio (USE e-shop)",
                     freeTransportFromVatValue(4025),
                     ArrayList(),"",
-                    "/bionebio/OL_bio nebio_08_2023.xlsx",
+                    "/bionebio/OL_bio_nebio_03_2024.xlsx",
                     BionebioSheetProcessor::class.qualifiedName!!,
                     "objednavky@bionebio.cz"
                 ),
-                Supplier("K-servis", BigDecimal(5000), ArrayList(),"", "/k-servis/k-servis_cenik_cervenec2023.xlsx", KServisSheetProcessor::class.qualifiedName!!, "k-servis@k-servis.com"),
-                Supplier("Oříšek", BigDecimal(5000),ArrayList(), "", "/orisek/orisek_07.2023.xlsx", NutSheetProcessor::class.qualifiedName!!, "orisek@orisek.cz"),
+                Supplier("K-servis", BigDecimal(5000), ArrayList(),"", "/k-servis/2024_03_k-servis.xlsx", KServisSheetProcessor::class.qualifiedName!!, "k-servis@k-servis.com"),
+                Supplier("Oříšek", BigDecimal(5000),ArrayList(), "",
+                    "/orisek/orisek_2024_03_1.xls", NutSheetProcessor::class.qualifiedName!!, "orisek@orisek.cz"),
 
                 // Labeta 1500 bez DPH > doprava zdarma
 
@@ -81,6 +87,11 @@ class Suppliers {
                     "",
                     BursikSheetProcessor::class.qualifiedName!!, "Bursik.D@seznam.cz"
                 ),
+                Supplier("Farma Němcova", BigDecimal(2500), ArrayList(),"", "https://www.farmanemcova.cz/exchange/5A68793B-3A12-4704-9313-56B0D45FEC97/xml/feed.xml",
+                    HeurekaXmlFeedProcessor::class.qualifiedName!!, "objednavky@farmanemcova.cz"),
+
+                Supplier("Zelenina Rokytno", BigDecimal(1300), ArrayList(),"", "https://www.farmanemcova.cz/exchange/5A68793B-3A12-4704-9313-56B0D45FEC97/xml/feed.xml",
+                    HeurekaXmlFeedProcessor::class.qualifiedName!!, "objednavky@farmanemcova.cz"),
 
          )
 

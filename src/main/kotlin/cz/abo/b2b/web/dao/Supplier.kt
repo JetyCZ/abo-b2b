@@ -3,6 +3,7 @@ package cz.abo.b2b.web.dao
 import cz.abo.b2b.web.importer.dto.ImportSource
 import cz.abo.b2b.web.importer.dto.ImportSourceType
 import java.math.BigDecimal
+import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
 
@@ -26,8 +27,11 @@ class Supplier(
     var description: String?,
     var importUrl: String,
     var importerClassName: String,
-    var orderEmail: String
+    var orderEmail: String,
+    var lastImport: LocalDateTime? = null
 ) {
+
+
 
 
     @Id

@@ -8,7 +8,7 @@ class KServisSheetProcessorTest extends AbstractSheetProcessorTest {
 
     @Override
     protected String getPricelistResourcePath() {
-        return  "/k-servis/cenik_srpen.xlsx"
+        return  "/k-servis/2023_11_k-servis_ceník_listopad.xlsx"
     }
 
     def "IterateSheetValues"() {

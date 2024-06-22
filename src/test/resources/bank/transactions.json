@@ -1,0 +1,79 @@
+{
+  "lastPage": true,
+  "transactions": [
+    {
+      "entryReference": "6046967543",
+      "amount": {
+        "value": 141.43,
+        "currency": "CZK"
+      },
+      "creditDebitIndication": "CRDT",
+      "bookingDate": "2024-01-10T10:01:01.000+01:00",
+      "valueDate": "2024-01-10T10:01:01.000+01:00",
+      "bankTransactionCode": {
+        "code": "10000107000"
+      },
+      "entryDetails": {
+        "transactionDetails": {
+          "references": {},
+          "relatedParties": {
+            "counterParty": {
+              "name": "EVO Payments Interna",
+              "organisationIdentification": {
+                "bankCode": "5500"
+              },
+              "account": {
+                "accountNumber": "5170011899"
+              }
+            }
+          },
+          "remittanceInformation": {
+            "creditorReferenceInformation": {
+              "variable": "0",
+              "constant": "0",
+              "specific": "0"
+            },
+            "originatorMessage": "SOA/CZ0240000020220/PRZ/AS/ECZ/0039523/01/24 08-01-24 T144,00 -P2,57  Krámek Bezobalu"
+          }
+        }
+      }
+    },
+    {
+      "entryReference": "6043758814",
+      "amount": {
+        "value": 1793.26,
+        "currency": "CZK"
+      },
+      "creditDebitIndication": "CRDT",
+      "bookingDate": "2024-01-09T09:55:27.000+01:00",
+      "valueDate": "2024-01-09T09:55:27.000+01:00",
+      "bankTransactionCode": {
+        "code": "10000107000"
+      },
+      "entryDetails": {
+        "transactionDetails": {
+          "references": {},
+          "relatedParties": {
+            "counterParty": {
+              "name": "EVO Payments Interna",
+              "organisationIdentification": {
+                "bankCode": "5500"
+              },
+              "account": {
+                "accountNumber": "5170011899"
+              }
+            }
+          },
+          "remittanceInformation": {
+            "creditorReferenceInformation": {
+              "variable": "0",
+              "constant": "0",
+              "specific": "0"
+            },
+            "originatorMessage": "SOA/CZ0240000020220/PRZ/AS/ECZ/0036494/01/24 07-01-24 T1817,23 -P23,97  Krámek Bezobalu"
+          }
+        }
+      }
+    }
+    ]
+}

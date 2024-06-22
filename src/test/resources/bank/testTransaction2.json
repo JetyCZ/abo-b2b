@@ -1,0 +1,216 @@
+{
+  "lastPage" : true,
+  "transactions" : [ {
+    "entryReference" : "6202710404",
+    "amount" : {
+      "value" : 1,
+      "currency" : "CZK"
+    },
+    "creditDebitIndication" : "CRDT",
+    "bookingDate" : "2024-03-10T21:04:35.000+01:00",
+    "valueDate" : "2024-03-10T21:04:35.000+01:00",
+    "bankTransactionCode" : {
+      "code" : "10000107000"
+    },
+    "entryDetails" : {
+      "transactionDetails" : {
+        "references" : { },
+        "relatedParties" : {
+          "counterParty" : {
+            "name" : "Pavel Jetenský",
+            "organisationIdentification" : {
+              "bankCode" : "3030"
+            },
+            "account" : {
+              "accountNumber" : "1309028073"
+            }
+          }
+        },
+        "remittanceInformation" : {
+          "creditorReferenceInformation" : {
+            "variable" : "12345",
+            "constant" : "44444",
+            "specific" : "55555"
+          },
+          "originatorMessage" : "Test transakční api zpráva pro příjemce"
+        }
+      }
+    }
+  }, {
+    "entryReference" : "6202708705",
+    "amount" : {
+      "value" : 1,
+      "currency" : "CZK"
+    },
+    "creditDebitIndication" : "CRDT",
+    "bookingDate" : "2024-03-10T21:01:11.000+01:00",
+    "valueDate" : "2024-03-10T21:01:10.000+01:00",
+    "bankTransactionCode" : {
+      "code" : "10000107000"
+    },
+    "entryDetails" : {
+      "transactionDetails" : {
+        "references" : { },
+        "relatedParties" : {
+          "counterParty" : {
+            "name" : "Pavel Jetenský",
+            "organisationIdentification" : {
+              "bankCode" : "3030"
+            },
+            "account" : {
+              "accountNumber" : "1309028073"
+            }
+          }
+        },
+        "remittanceInformation" : {
+          "creditorReferenceInformation" : {
+            "variable" : "12345",
+            "constant" : "44444",
+            "specific" : "55555"
+          },
+          "originatorMessage" : "Test transakční api zpráva pro příjemce"
+        }
+      }
+    }
+  }, {
+    "entryReference" : "6195552600",
+    "amount" : {
+      "value" : 1175.45,
+      "currency" : "CZK"
+    },
+    "creditDebitIndication" : "CRDT",
+    "bookingDate" : "2024-03-07T10:13:47.000+01:00",
+    "valueDate" : "2024-03-07T10:13:47.000+01:00",
+    "bankTransactionCode" : {
+      "code" : "10000107000"
+    },
+    "entryDetails" : {
+      "transactionDetails" : {
+        "references" : { },
+        "relatedParties" : {
+          "counterParty" : {
+            "name" : "EVO Payments Interna",
+            "organisationIdentification" : {
+              "bankCode" : "5500"
+            },
+            "account" : {
+              "accountNumber" : "5170011899"
+            }
+          }
+        },
+        "remittanceInformation" : {
+          "creditorReferenceInformation" : {
+            "variable" : "0",
+            "constant" : "0",
+            "specific" : "0"
+          },
+          "originatorMessage" : "SOA/CZ0240000020220/PRZ/AS/ECZ/0301019/03/24 05-03-24 T1195,00 -P19,55  Krámek Bezobalu"
+        }
+      }
+    }
+  }, {
+    "entryReference" : "6193572571",
+    "amount" : {
+      "value" : -1225,
+      "currency" : "CZK"
+    },
+    "creditDebitIndication" : "DBIT",
+    "bookingDate" : "2024-03-06T17:54:11.000+01:00",
+    "valueDate" : "2024-03-06T17:54:11.000+01:00",
+    "bankTransactionCode" : {
+      "code" : "10000101000"
+    },
+    "entryDetails" : {
+      "transactionDetails" : {
+        "references" : { },
+        "relatedParties" : {
+          "counterParty" : {
+            "organisationIdentification" : {
+              "bankCode" : "0100"
+            },
+            "account" : {
+              "accountNumber" : "2819050267"
+            }
+          }
+        },
+        "remittanceInformation" : {
+          "unstructured" : "MLECNE VYROBKY",
+          "creditorReferenceInformation" : {
+            "variable" : "22460133",
+            "constant" : "0308"
+          }
+        }
+      }
+    }
+  }, {
+    "entryReference" : "6193565563",
+    "amount" : {
+      "value" : -4217,
+      "currency" : "CZK"
+    },
+    "creditDebitIndication" : "DBIT",
+    "bookingDate" : "2024-03-06T17:46:10.000+01:00",
+    "valueDate" : "2024-03-06T17:46:10.000+01:00",
+    "bankTransactionCode" : {
+      "code" : "10000101000"
+    },
+    "entryDetails" : {
+      "transactionDetails" : {
+        "references" : { },
+        "relatedParties" : {
+          "counterParty" : {
+            "organisationIdentification" : {
+              "bankCode" : "0300"
+            },
+            "account" : {
+              "accountNumber" : "194252774"
+            }
+          }
+        },
+        "remittanceInformation" : {
+          "unstructured" : "Bio Nebio",
+          "creditorReferenceInformation" : {
+            "variable" : "2403714"
+          },
+          "originatorMessage" : "Bio Nebio"
+        }
+      }
+    }
+  }, {
+    "entryReference" : "6192963395",
+    "amount" : {
+      "value" : 1484.64,
+      "currency" : "CZK"
+    },
+    "creditDebitIndication" : "CRDT",
+    "bookingDate" : "2024-03-06T11:01:03.000+01:00",
+    "valueDate" : "2024-03-06T11:01:03.000+01:00",
+    "bankTransactionCode" : {
+      "code" : "10000107000"
+    },
+    "entryDetails" : {
+      "transactionDetails" : {
+        "references" : { },
+        "relatedParties" : {
+          "counterParty" : {
+            "name" : "EVO Payments Interna",
+            "organisationIdentification" : {
+              "bankCode" : "5500"
+            },
+            "account" : {
+              "accountNumber" : "5170011899"
+            }
+          }
+        },
+        "remittanceInformation" : {
+          "creditorReferenceInformation" : {
+            "variable" : "0",
+            "constant" : "0",
+            "specific" : "0"
+          },
+          "originatorMessage" : "SOA/CZ0240000020220/PRZ/AS/ECZ/0297409/03/24 04-03-24 T1506,00 -P21,36  Krámek Bezobalu"
+        }
+      }
+    }
+  } ]
+}

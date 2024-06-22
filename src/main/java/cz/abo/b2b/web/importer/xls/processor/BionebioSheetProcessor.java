@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 
 @Component
 public class BionebioSheetProcessor extends AbstractExcelSheetProcessor {
-    public static final Double EUR_TO_CZK = new Double(26);
+    public static final Double EUR_TO_CZK = 26D;
     private static final Logger log = LoggerFactory.getLogger(BionebioSheetProcessor.class);
 
     @Override
@@ -43,7 +43,7 @@ public class BionebioSheetProcessor extends AbstractExcelSheetProcessor {
 
         if (values.length>=4) {
             if (rowNum ==2 && values.length>=4) {
-                parsedEurValue = Double.parseDouble(values[3]);
+                parsedEurValue = Double.parseDouble(values[4]);
             }
             String productName = values[1].trim();
             if (productName.endsWith(" kg")) {
@@ -54,8 +54,8 @@ public class BionebioSheetProcessor extends AbstractExcelSheetProcessor {
                     productQuantityStr = productQuantityStr.replaceFirst("\\,","\\.");
                     double quantityKg = Double.parseDouble(productQuantityStr);
                     Double productPrice = null;
-                    if (values[2].length()>0) {
-                        productPrice = Double.parseDouble(values[2]);
+                    if (values[3].length()>0) {
+                        productPrice = Double.parseDouble(values[3]);
                     } else {
                         String eurColumnValue = values[3];
                         if (!StringUtils.isEmpty(eurColumnValue)) {
@@ -67,10 +67,11 @@ public class BionebioSheetProcessor extends AbstractExcelSheetProcessor {
                         }
                     }
 
-                    String note = values[7];
+                    String note = values[8];
                     String description = "";
                     if (!StringUtils.isEmpty(note)) {
-                        if (note.contains("Cena za celé balení")) {
+                        // Cena za celé balení Ceba za celé balení
+                        if (note.endsWith("za celé balení")) {
                             productPrice = productPrice/quantityKg;
                         } else {
                             description = note;

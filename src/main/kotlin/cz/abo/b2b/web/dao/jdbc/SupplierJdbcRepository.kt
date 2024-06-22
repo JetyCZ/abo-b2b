@@ -12,7 +12,7 @@ open class SupplierJdbcRepository (val jdbcTemplate: JdbcTemplate) {
 
     fun supplierDetails(): List<SupplierDetails> {
         return jdbcTemplate.query(
-            "select supplier_id, name, count(supplier_id) as product_count from supplier s JOIN product p where s.id=p.supplier_id group by s.id",
+            "select supplier_id, name, last_import, count(supplier_id) as product_count from supplier s JOIN product p where s.id=p.supplier_id group by s.id",
             arrayOf()
         ) { rs: ResultSet, rowNum: Int ->
             SupplierDetails(

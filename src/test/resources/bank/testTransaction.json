@@ -1,0 +1,79 @@
+{
+  "lastPage": true,
+  "transactions": [
+    {
+      "entryReference": "6202710404",
+      "amount": {
+        "value": 1,
+        "currency": "CZK"
+      },
+      "creditDebitIndication": "CRDT",
+      "bookingDate": "2024-03-10T21:04:35.000+01:00",
+      "valueDate": "2024-03-10T21:04:35.000+01:00",
+      "bankTransactionCode": {
+        "code": "10000107000"
+      },
+      "entryDetails": {
+        "transactionDetails": {
+          "references": {},
+          "relatedParties": {
+            "counterParty": {
+              "name": "Pavel Jetenský",
+              "organisationIdentification": {
+                "bankCode": "3030"
+              },
+              "account": {
+                "accountNumber": "1309028073"
+              }
+            }
+          },
+          "remittanceInformation": {
+            "creditorReferenceInformation": {
+              "variable": "12345",
+              "constant": "44444",
+              "specific": "55555"
+            },
+            "originatorMessage": "Test transakční api zpráva pro příjemce"
+          }
+        }
+      }
+    },
+    {
+      "entryReference": "6202708705",
+      "amount": {
+        "value": 1,
+        "currency": "CZK"
+      },
+      "creditDebitIndication": "CRDT",
+      "bookingDate": "2024-03-10T21:01:11.000+01:00",
+      "valueDate": "2024-03-10T21:01:10.000+01:00",
+      "bankTransactionCode": {
+        "code": "10000107000"
+      },
+      "entryDetails": {
+        "transactionDetails": {
+          "references": {},
+          "relatedParties": {
+            "counterParty": {
+              "name": "Pavel Jetenský",
+              "organisationIdentification": {
+                "bankCode": "3030"
+              },
+              "account": {
+                "accountNumber": "1309028073"
+              }
+            }
+          },
+          "remittanceInformation": {
+            "creditorReferenceInformation": {
+              "variable": "12345",
+              "constant": "44444",
+              "specific": "55555"
+            },
+            "originatorMessage": "Test transakční api zpráva pro příjemce"
+          }
+        }
+      }
+    }
+  ]
+}
