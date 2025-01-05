@@ -65,7 +65,7 @@ class HeurekaXMLParser : AbstractXMLParser() {
                         }
                     } else if ("PRICE_VAT" == nodeName) {
                         var priceVatStr = shopItemChild.firstChild.nodeValue
-                        priceVatStr = priceVatStr.replace(',', '.')
+                        priceVatStr = priceVatStr.replace("\\s".toRegex(), "").replace(',','.')
                         priceVAT = BigDecimal(priceVatStr.toDouble())
                     } else if ("VAT" == nodeName) {
                         var vatStr = shopItemChild.firstChild.nodeValue

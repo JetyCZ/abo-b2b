@@ -6,7 +6,7 @@ class NutSheetProcessorTest extends AbstractSheetProcessorTest {
 
     @Override
     protected String getPricelistResourcePath() {
-        return  "/orisek/orisek_07.2023.xlsx"
+        return  "/orisek/orisek_1.12.2024.xls"
     }
 
     def "IterateSheetValues"() {

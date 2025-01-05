@@ -32,6 +32,7 @@ open class SuppliersImport(
 
         val suppliersToImport = suppliers.suppliers()
         for (supplier in suppliersToImport) {
+            LOGGER.info("XXX Import started " + supplier.name)
             val saved = supplierRepository.save(supplier)
 
             val importerClass = Class.forName(supplier.importerClassName)
@@ -40,11 +41,12 @@ open class SuppliersImport(
             try {
                 val products = (importer as AbstractSheetProcessor).parseProducts(importSource, saved)
                 productRepository.saveAll(products)
-                LOGGER.info("XXX Import ok: " + products.size)
+                LOGGER.info("XXX Import ok " + supplier.name + ": " + products.size)
                 supplier.lastImport = LocalDateTime.now()
             } catch (e: Exception) {
                 LOGGER.error("XXX Import failed: " + supplier.name, e)
             }
+            LOGGER.info("XXX Import finished " + supplier.name)
         }
 
 

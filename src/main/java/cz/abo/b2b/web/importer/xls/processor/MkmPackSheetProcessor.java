@@ -33,7 +33,7 @@ public class MkmPackSheetProcessor extends AbstractExcelSheetProcessor {
 
         if (values.length>=3) {
             // SUŠENÉ OVOCE BEZ CUKRU A SO2
-            String name = values[1];
+            String name = values[0];
             if (!StringUtils.isEmpty(name) &&
                     StringUtils.isEmpty(values[2])
             ) {
@@ -55,10 +55,13 @@ public class MkmPackSheetProcessor extends AbstractExcelSheetProcessor {
                     // This is OK
                     try {
                         // Packaging per 1kg
-                        productPrice = Double.valueOf(readPrice(values[2]));
+                        productPrice = Double.valueOf(readPrice(values[6]));
                         productQuantity = 1;
                     } catch (NumberFormatException ex) {
-                        // This is OK
+                        if (!StringUtils.isEmpty(productName.trim())) {
+                            String errorMsg = "Price cannot be determined: rowNum: %d; firstCell:%s".formatted(rowNum, values[0]);
+                            getLOGGER().warn(errorMsg);
+                        }
                     }
                 }
                 Product product = new Product(productName, new BigDecimal(productPrice), 0.15, "",

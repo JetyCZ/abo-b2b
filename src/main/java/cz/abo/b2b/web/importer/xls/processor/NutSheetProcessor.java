@@ -42,9 +42,9 @@ public class NutSheetProcessor extends AbstractExcelSheetProcessor {
     }
 
     private void parseOneItem(String[] values, List<Product> productList, Supplier supplier) {
-        String quantityStr = values[4].replaceAll(" ","");
+        String quantityStr = values[2].replaceAll(" ","");
         try {
-            quantityStr = values[4].replaceAll(" ","");
+            quantityStr = values[2].replaceAll(" ","");
             double productQuantityKg;
             if (quantityStr.contains("(")) {
                 String productQuantityKgStr = StringUtils.substringBefore(quantityStr, "(");
@@ -52,13 +52,12 @@ public class NutSheetProcessor extends AbstractExcelSheetProcessor {
             } else {
                 productQuantityKg = Double.parseDouble(quantityStr);
             }
+
             String productName = values[1];
-            double productPrice = Double.parseDouble(values[5]);
+            double productPrice = Double.parseDouble(values[3]);
             double vat = 0.15;
 
-            String description = "Balení: " + quantityStr + "\n"
-                    + "Bez přid. cukru: " + values[2] + "\n"
-                    + "Bez SO2: " + values[3];
+            String description = "Balení: " + quantityStr + "\n";
 
             Product product = new Product(productName, new BigDecimal(productPrice), vat, description,
                     new BigDecimal(productQuantityKg), UnitEnum.KG, null, supplier);
