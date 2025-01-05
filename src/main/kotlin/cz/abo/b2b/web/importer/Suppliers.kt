@@ -56,13 +56,16 @@ class Suppliers {
                     "bio nebio (USE e-shop)",
                     freeTransportFromVatValue(4025),
                     ArrayList(),"",
-                    "/bionebio/OL_bio_nebio_03_2024.xlsx",
+                    "/bionebio/OL_bio_nebio_01_2025.xlsx",
                     BionebioSheetProcessor::class.qualifiedName!!,
                     "objednavky@bionebio.cz"
                 ),
-                Supplier("K-servis", BigDecimal(5000), ArrayList(),"", "/k-servis/2024_03_k-servis.xlsx", KServisSheetProcessor::class.qualifiedName!!, "k-servis@k-servis.com"),
+                Supplier("K-servis", BigDecimal(5000), ArrayList(),"", "/k-servis/2025_01_k-servis.xlsx", KServisSheetProcessor::class.qualifiedName!!, "k-servis@k-servis.com"),
                 Supplier("Oříšek", BigDecimal(5000),ArrayList(), "",
-                    "/orisek/orisek_2024_03_1.xls", NutSheetProcessor::class.qualifiedName!!, "orisek@orisek.cz"),
+                    "/orisek/orisek_1.12.2024.xls", NutSheetProcessor::class.qualifiedName!!, "orisek@orisek.cz"),
+
+                Supplier("iPlody", BigDecimal(5000),ArrayList(), "",
+                    "/mkm/iPlody_2025_01.xlsx", MkmPackSheetProcessor::class.qualifiedName!!, "martin@iplody.cz"),
 
                 // Labeta 1500 bez DPH > doprava zdarma
 
@@ -88,10 +91,8 @@ class Suppliers {
                     BursikSheetProcessor::class.qualifiedName!!, "Bursik.D@seznam.cz"
                 ),
                 Supplier("Farma Němcova", BigDecimal(2500), ArrayList(),"", "https://www.farmanemcova.cz/exchange/5A68793B-3A12-4704-9313-56B0D45FEC97/xml/feed.xml",
-                    HeurekaXmlFeedProcessor::class.qualifiedName!!, "objednavky@farmanemcova.cz"),
+                    HeurekaXmlFeedProcessor::class.qualifiedName!!, "objednavky@farmanemcova.cz")
 
-                Supplier("Zelenina Rokytno", BigDecimal(1300), ArrayList(),"", "https://www.farmanemcova.cz/exchange/5A68793B-3A12-4704-9313-56B0D45FEC97/xml/feed.xml",
-                    HeurekaXmlFeedProcessor::class.qualifiedName!!, "objednavky@farmanemcova.cz"),
 
          )
 

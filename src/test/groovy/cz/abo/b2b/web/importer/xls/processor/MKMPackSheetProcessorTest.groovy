@@ -6,7 +6,7 @@ class MKMPackSheetProcessorTest extends AbstractSheetProcessorTest {
 
     @Override
     protected String getPricelistResourcePath() {
-        return  "/mkm/MKM_pack_B_cenik_SUROVINY_unor_2020.xlsx"
+        return  "/mkm/iPlody_2025_01.xlsx"
     }
 
     def "IterateSheetValues"() {
