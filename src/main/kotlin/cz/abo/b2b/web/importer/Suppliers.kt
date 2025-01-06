@@ -54,7 +54,7 @@ class Suppliers {
                     SicajSheetProcessor::class.qualifiedName!!, "petr.sic@post.cz"),
                 Supplier(
                     "bio nebio (USE e-shop)",
-                    freeTransportFromVatValue(4025),
+                    BigDecimal(3500),
                     ArrayList(),"",
                     "/bionebio/OL_bio_nebio_01_2025.xlsx",
                     BionebioSheetProcessor::class.qualifiedName!!,

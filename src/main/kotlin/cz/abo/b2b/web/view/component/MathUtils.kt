@@ -12,6 +12,6 @@ class MathUtils {
 
         @JvmStatic
         fun withoutVAT(includingVAT: Int) =
-            BigDecimal(includingVAT).divide(BigDecimal(1.15), 5, RoundingMode.HALF_UP)
+            BigDecimal(includingVAT).divide(BigDecimal(1.12), 5, RoundingMode.HALF_UP)
     }
 }

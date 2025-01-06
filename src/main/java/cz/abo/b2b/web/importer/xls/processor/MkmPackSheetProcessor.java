@@ -40,8 +40,10 @@ public class MkmPackSheetProcessor extends AbstractExcelSheetProcessor {
                 category = " (" + name + ")";
             }
         }
+        boolean validPriceFound = false;
+
         if (values.length>6) {
-            String priceStr5kg = readPrice(values[4]);
+            String priceStrPerKg_5kgPackaging = readPrice(values[4]);
 
                 String productName = values[1].trim().replaceFirst("\\s+á?kg","");
                 if (productName.toUpperCase().contains("VYPRODÁNO")) return new ArrayList<>();
@@ -49,25 +51,30 @@ public class MkmPackSheetProcessor extends AbstractExcelSheetProcessor {
                 double productPrice = 0;
                 double productQuantity = 0;
                 try{
-                    productPrice = Double.valueOf(priceStr5kg)/5;
+                    productPrice = Double.valueOf(priceStrPerKg_5kgPackaging);
                     productQuantity = 5;
+                    validPriceFound = true;
                 } catch (NumberFormatException e) {
                     // This is OK
                     try {
                         // Packaging per 1kg
-                        productPrice = Double.valueOf(readPrice(values[6]));
+                        String priceStrPerKg_OriginalPackaging = readPrice(values[6]);
+                        productPrice = Double.valueOf(priceStrPerKg_OriginalPackaging);
                         productQuantity = 1;
+                        validPriceFound = true;
                     } catch (NumberFormatException ex) {
-                        if (!StringUtils.isEmpty(productName.trim())) {
+                        if (!StringUtils.isEmpty(values[0].trim())) {
                             String errorMsg = "Price cannot be determined: rowNum: %d; firstCell:%s".formatted(rowNum, values[0]);
                             getLOGGER().warn(errorMsg);
                         }
                     }
                 }
-                Product product = new Product(productName, new BigDecimal(productPrice), 0.15, "",
-                    new BigDecimal(productQuantity), UnitEnum.KG, null, supplier);
+                if (validPriceFound) {
+                    Product product = new Product(productName, new BigDecimal(productPrice), 0.15, "",
+                            new BigDecimal(productQuantity), UnitEnum.KG, null, supplier);
 
-                productList.add(product);
+                    productList.add(product);
+                }
 
 
         }
